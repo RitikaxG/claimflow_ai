@@ -1,1 +1,2 @@
-console.log("Hello via Bun!");
+export * from "./claim_extraction";
+export * from "./claim_validation";

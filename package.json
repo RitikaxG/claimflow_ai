@@ -1,5 +1,5 @@
 {
-  "name": "with-tailwind",
+  "name": "claimflow-ai",
   "private": true,
   "scripts": {
     "build": "turbo run build",

@@ -66,9 +66,9 @@ export const ClaimExtractionSchema = z.object({
     documentType : ClaimDocumentTypeSchema,
 
     claimNumber : z.string().nullable(),
-    policyNumer : z.string().nullable(),
+    policyNumber : z.string().nullable(),
 
-    insuredName : z.string().nullable,
+    insuredName : z.string().nullable(),
     claimantName : z.string().nullable(),
     contactEmail : z.string().email().nullable(),
     contactPhone : z.string().nullable(),
