@@ -47,6 +47,7 @@ model Document {
   mimeType String
   sizeBytes Int
   storagePath String?
+  sourceUrl String?
   sourceType DocumentSourceType
 
   runs ExtractionRun[]
