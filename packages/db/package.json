@@ -16,5 +16,9 @@
     "@prisma/client": "7",
     "dotenv": "^17.4.2",
     "pg": "^8.20.0"
+  },
+  "scripts": {
+    "db:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma"
   }
 }
