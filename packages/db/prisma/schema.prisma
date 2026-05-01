@@ -33,7 +33,7 @@ enum ExtractionEventType {
   MODEL_RESPONSE_RECEIVED
   EXTRACTION_COMPLETED
   VALIDATION_STARTED
-  VAIDATION_COMPLETED
+  VALIDATION_COMPLETED
   MISSING_FIELDS_DETECTED
   CONFLICTS_DETECTED
   RUN_COMPLETED
@@ -43,10 +43,13 @@ enum ExtractionEventType {
 
 model Document {
   id String @id @default(cuid())
+
   filename String
   mimeType String
   sizeBytes Int
+
   storagePath String?
+  contentText String?
   sourceUrl String?
   sourceType DocumentSourceType
 
@@ -72,7 +75,7 @@ model ExtractionRun {
 
   rawModelOutput Json?
   extractedJson Json?
-  validatedJson Json?
+  validationJson Json?
   missingFieldsJson Json?
   confidenceJson Json?
 
