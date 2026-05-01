@@ -1,58 +1,55 @@
-# Turborepo Tailwind CSS starter
+# ClaimFlow AI
 
-This Turborepo starter is maintained by the Turborepo core team.
+ClaimFlow AI is a production-style AI workflow project for document intake, claim extraction, validation, review, memory, and observability.
 
-## Using this example
+## Week 1: Document Intake Reviewer
 
-Run the following command:
+### Goal
 
-```sh
-npx create-turbo@latest -e with-tailwind
-```
+Build a working document intake screen where a user uploads a claim PDF or pastes email text and receives structured JSON extracted by an AI model.
 
-## What's inside?
+The system validates the extracted fields, detects missing/conflicting information, saves the run in Postgres, and displays a basic workflow timeline.
 
-This Turborepo includes the following packages/apps:
+### Week 1 Scope
 
-### Apps and Packages
+Input:
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- PDF claim document
+- Email text as fallback
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Output:
 
-### Building packages/ui
+- Structured claim JSON
+- Missing fields
+- Conflicting fields
+- Confidence/status
+- Saved extraction run
+- Timeline events
 
-This example is set up to produce compiled styles for `ui` components into the `dist` directory. The component `.tsx` files are consumed by the Next.js apps directly using `transpilePackages` in `next.config.ts`. This was chosen for several reasons:
+### Day 1 Foundation
 
-- Make sharing one `tailwind.config.ts` to apps and packages as easy as possible.
-- Make package compilation simple by only depending on the Next.js Compiler and `tailwindcss`.
-- Ensure Tailwind classes do not overwrite each other. The `ui` package uses a `ui-` prefix for it's classes.
-- Maintain clear package export boundaries.
+Implemented:
 
-Another option is to consume `packages/ui` directly from source without building. If using this option, you will need to update the `tailwind.config.ts` in your apps to be aware of your package locations, so it can find all usages of the `tailwindcss` class names for CSS compilation.
+- Turborepo setup
+- Next.js app
+- Shared Zod schemas
+- Prisma + Postgres setup
+- Core database models:
+  - documents
+  - extraction_runs
+  - extraction_events
 
-For example, in [tailwind.config.ts](packages/tailwind-config/tailwind.config.ts):
+### Not in Day 1 Scope
 
-```js
-  content: [
-    // app content
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    "../../packages/ui/*.{js,ts,jsx,tsx}",
-  ],
-```
+- Gemini extraction call
+- File upload UI
+- Review queue
+- RAG
+- Agents
+- Workers
+- OCR
+- S3 storage
 
-If you choose this strategy, you can remove the `tailwindcss` and `autoprefixer` dependencies from the `ui` package.
+## Week 1 Demo Target
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [Tailwind CSS](https://tailwindcss.com/) for styles
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+I uploaded a claim document. The system extracted structured fields, validated them, showed missing/conflicting fields, and saved a run timeline.

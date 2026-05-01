@@ -1,0 +1,44 @@
+{
+  "documentType": "auto_insurance_claim_form",
+  "claimNumber": "CLM-2026-1001",
+  "policyNumber": "AUTO-2026-8841",
+  "insuredName": "Amit Sharma",
+  "claimantName": "Amit Sharma",
+  "contactEmail": "amit.sharma@example.com",
+  "contactPhone": "+91-9876543210",
+  "vehicle": {
+    "registrationNumber": "DL01AB1234",
+    "make": "Hyundai",
+    "model": "i20",
+    "year": "2021",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-04-18",
+    "incidentTime": "18:30",
+    "incidentLocation": "Delhi Ring Road",
+    "lossType": "own_damage",
+    "description": "The vehicle hit a divider while avoiding a two-wheeler. The front bumper and left headlight were damaged."
+  },
+  "damage": {
+    "damagedParts": ["front bumper", "left headlight"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 42000,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.9
+}
