@@ -11,3 +11,94 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum DocumentSourceType {
+  PDF
+  EMAIL_TEXT
+  IMAGE
+}
+
+enum ExtractionRunStatus {
+  UPLOADED
+  EXTRACTING
+  VALIDATING
+  COMPLETED
+  NEEDS_REVIEW
+  FAILED
+}
+
+enum ExtractionEventType {
+  DOCUMENT_UPLOADED
+  EXTRACTION_STARTED
+  MODEL_RESPONSE_RECEIVED
+  EXTRACTION_COMPLETED
+  VALIDATION_STARTED
+  VAIDATION_COMPLETED
+  MISSING_FIELDS_DETECTED
+  CONFLICTS_DETECTED
+  RUN_COMPLETED
+  RUN_NEEDS_REVIEW
+  RUN_FAILED
+}
+
+model Document {
+  id String @id @default(cuid())
+  filename String
+  mimeType String
+  sizeBytes Int
+  storagePath String?
+  sourceType DocumentSourceType
+
+  runs ExtractionRun[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("documents")
+}
+
+model ExtractionRun {
+  id String @id @default(cuid())
+
+  documentId String
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  status ExtractionRunStatus @default(UPLOADED)
+
+  model String?
+  promptVersion String?
+
+  rawModelOutput Json?
+  extractedJson Json?
+  validatedJson Json?
+  missingFieldsJson Json?
+  confidenceJson Json?
+
+  errorMessage String?
+
+  events ExtractionEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([documentId])
+  @@index([status])
+  @@map("extraction_runs")
+}
+
+model ExtractionEvent {
+  id String @id @default(cuid())
+
+  runId String
+  run ExtractionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  type ExtractionEventType
+  message String
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([runId])
+  @@index([type])
+  @@map("extraction_events")
+}
