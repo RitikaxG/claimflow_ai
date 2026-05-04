@@ -1,0 +1,15 @@
+{
+  "name": "@repo/shared",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./index.ts",
+    "./schemas": "./schemas/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
