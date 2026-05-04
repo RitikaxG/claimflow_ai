@@ -50,6 +50,20 @@ Implemented:
 - OCR
 - S3 storage
 
+## Day 2: Upload + Run Creation
+
+Implemented:
+
+- PDF upload
+- Email text submission
+- Local file storage for PDFs
+- Document row creation
+- ExtractionRun row creation with `UPLOADED`
+- ExtractionEvent row creation with `DOCUMENT_UPLOADED`
+- Recent runs dashboard
+- Run detail page with timeline
+
 ## Week 1 Demo Target
 
 I uploaded a claim document. The system extracted structured fields, validated them, showed missing/conflicting fields, and saved a run timeline.
+

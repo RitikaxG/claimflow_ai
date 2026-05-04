@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(){
     const runs = await prisma.extractionRun.findMany({
         orderBy : {
-            createdAt : "asc",
+            createdAt : "desc",
         },
         take : 20,
         include : {

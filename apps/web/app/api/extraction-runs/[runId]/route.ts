@@ -26,7 +26,7 @@ export async function GET(_request : Request, { params } : Params ) {
     });
 
     if(!run){
-        return NextResponse.json({ error : "Run not found", status : 404 });
+        return NextResponse.json({ error : "Run not found" }, { status : 404 });
     }
 
     return NextResponse.json({ run });

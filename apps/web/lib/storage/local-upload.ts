@@ -12,7 +12,7 @@ const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 export async function saveUploadedFile(file : File){
 
     if(file.type !== "application/pdf"){
-        throw new Error("Only PDF file sare supported currently");
+        throw new Error("Only PDF file are supported currently");
     }
 
     if(file.size > MAX_FILE_SIZE_BYTES){
