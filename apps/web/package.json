@@ -11,12 +11,14 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@repo/db": "workspace:*",
+    "@repo/shared": "workspace:*",
     "@repo/ui": "*",
-    "@repo/db":"workspace:*",
-    "@repo/shared":"workspace:*",
+    "axios": "^1.16.0",
     "next": "16.2.0",
     "react": "^19.2.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^16.2.0",
