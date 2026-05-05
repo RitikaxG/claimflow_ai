@@ -1,5 +1,5 @@
 {
-  "name": "ai",
+  "name": "@repo/ai",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -8,5 +8,8 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@google/genai": "^1.52.0"
   }
 }
