@@ -7,6 +7,7 @@ import { DocumentMetadataCard } from "./document-metadata-card";
 import { RunHeader } from "./run-header";
 import { RunStatusCard } from "./run-status-card";
 import { RunTimeline } from "./run-timeline";
+import { ExtractedJsonCard } from "./extracted-json-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -46,6 +47,8 @@ export function RunDetailScreen() {
         <DocumentMetadataCard document={selectedRun.document} />
         <RunStatusCard run={selectedRun} />
       </div>
+
+      <ExtractedJsonCard extractedJson={selectedRun.extractedJson} />
 
       <RunTimeline events={selectedRun.events} />
     </div>

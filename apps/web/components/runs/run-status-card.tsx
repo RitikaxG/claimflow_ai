@@ -1,4 +1,7 @@
+"use client";
+
 import type { ExtractionRunRecord } from "../../store/use-dashboard-store";
+import { useDashboardStore } from "../../store/use-dashboard-store";
 import { RunStatusBadge } from "../dashboard/run-status-badge";
 
 type RunStatusCardProps = {
@@ -6,6 +9,14 @@ type RunStatusCardProps = {
 };
 
 export function RunStatusCard({ run }: RunStatusCardProps) {
+  const extractRun = useDashboardStore((state) => state.extractRun);
+  const isExtractingRun = useDashboardStore(
+    (state) => state.isExtractingRun,
+  );
+
+  const canRunExtraction =
+    run.status === "UPLOADED" || run.status === "FAILED";
+
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-950">Run status</h2>
@@ -39,6 +50,23 @@ export function RunStatusCard({ run }: RunStatusCardProps) {
           </dd>
         </div>
       </dl>
+
+      {run.errorMessage ? (
+        <div className="mt-5 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700">
+          {run.errorMessage}
+        </div>
+      ) : null}
+
+      {canRunExtraction ? (
+        <button
+          type="button"
+          disabled={isExtractingRun}
+          onClick={() => void extractRun(run.id)}
+          className="mt-5 w-full rounded-lg bg-gray-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-400"
+        >
+          {isExtractingRun ? "Extracting..." : "Run extraction"}
+        </button>
+      ) : null}
     </section>
   );
 }
