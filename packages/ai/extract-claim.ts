@@ -1,11 +1,46 @@
 import { readFile } from "node:fs/promises";
 import { getGeminiClient } from "./gemini-client";
 import { GEMINI_MODEL } from "./gemini-client";
-import { CLAIM_EXTRACTION_SYSTEM_PROMPT } from "./prompt";
+import { CLAIM_EXTRACTION_SYSTEM_PROMPT, CLAIM_EXTRACTION_PROMPT_VERSION } from "./prompt";
+import { ClaimExtractionSchema, type ClaimExtraction } from "@repo/shared/schemas";
+import { CLAIM_EXTRACTION_RESPONSE_SCHEMA } from "./claim-response-schema";
 
-const ai = getGeminiClient();
+export type ClaimExtractionResult = {
+    model : string,
+    promptVersion : string,
+    rawModelOutput : unknown,
+    extractedJson : ClaimExtraction,
+    confidenceJson : {
+        overallConfidence : number,
+    }
+};
 
-export async function extractClaimFromPdf(filePath : string){
+function parseGeminiClaimResponse(responseText : string): ClaimExtraction{
+    const parsed = JSON.parse(responseText);
+    return ClaimExtractionSchema.parse(parsed);
+}
+
+function toClaimExtractionResult(params : {
+    responseText : string,
+    rawModelOutput : unknown,
+}) : ClaimExtractionResult {
+    const extractedJson = parseGeminiClaimResponse(params.responseText);
+
+    return{
+        model : GEMINI_MODEL,
+        promptVersion : CLAIM_EXTRACTION_PROMPT_VERSION,
+        rawModelOutput : params.rawModelOutput,
+        extractedJson,
+        confidenceJson : {
+            overallConfidence : extractedJson.overallConfidence,
+        },
+    };
+}
+
+export async function extractClaimFromPdf(
+    filePath : string
+): Promise<ClaimExtractionResult>{
+    const ai = await getGeminiClient();
     const pdfBuffer = await readFile(filePath);
 
     const contents = [
@@ -18,19 +53,50 @@ export async function extractClaimFromPdf(filePath : string){
         }
     ];
 
-    const response = (await ai).models.generateContent({
+    const response = await ai.models.generateContent({
         model : GEMINI_MODEL,
         contents : contents,
+        config : {
+            responseMimeType : "application/json",
+            responseJsonSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
+        }
     });
 
-    return response;
+    if(!response.text){
+        throw new Error("Gemini returned an empty extraction response");
+    }
+
+    return toClaimExtractionResult({
+        responseText : response.text,
+        rawModelOutput : response,
+    });
 }
 
-export async function extractClaimFromEmailText(contentText : string){
-    const response = (await ai).models.generateContent({
-        model : GEMINI_MODEL,
-        contents : contentText,
-    })
+export async function extractClaimFromEmailText(
+    contentText : string
+): Promise<ClaimExtractionResult>{
+    const ai = getGeminiClient();
 
-    return response;
+    const response = await ai.models.generateContent({
+        model : GEMINI_MODEL,
+        contents : [
+            { text : `${CLAIM_EXTRACTION_SYSTEM_PROMPT}
+            Email Text:
+            ${contentText}
+            `},
+        ],
+        config: {
+            responseMimeType : "application/json",
+            responseJsonSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
+        }
+    });
+
+    if(!response.text){
+        throw new Error()
+    }
+
+    return toClaimExtractionResult({
+        responseText : response.text,
+        rawModelOutput : response,
+    });
 }

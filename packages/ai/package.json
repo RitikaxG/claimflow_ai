@@ -10,6 +10,11 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@google/genai": "^1.52.0"
+    "@repo/shared":"workspace:*",
+    "@google/genai": "^1.52.0",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "exports": {
+    ".": "./index.ts"
   }
 }

@@ -49,7 +49,7 @@ export const DamageDetailsSchema = z.object({
 });
 
 export const PoliceDetailsSchema = z.object({
-    wasReportedToPolice : z.boolean().default(false),
+    wasReportedToPolice : z.boolean().nullable(),
     policeStation : z.string().nullable(),
     firNumber : z.string().nullable(),
     reportDate : z.string().nullable(),
