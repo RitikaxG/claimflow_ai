@@ -1,69 +1,146 @@
 # ClaimFlow AI
 
-ClaimFlow AI is a production-style AI workflow project for document intake, claim extraction, validation, review, memory, and observability.
+ClaimFlow AI is a document-intake workflow for insurance claims.
 
-## Week 1: Document Intake Reviewer
+It lets a user upload a claim PDF or paste claim email text, extracts structured claim JSON using Gemini, saves the run in Postgres, and shows a traceable timeline.
 
-### Goal
+## Current Scope
 
-Build a working document intake screen where a user uploads a claim PDF or pastes email text and receives structured JSON extracted by an AI model.
-
-The system validates the extracted fields, detects missing/conflicting information, saves the run in Postgres, and displays a basic workflow timeline.
-
-### Week 1 Scope
-
-Input:
+Supported inputs:
 
 - PDF claim document
-- Email text as fallback
+- Pasted email text
 
-Output:
+Current output:
 
 - Structured claim JSON
-- Missing fields
-- Conflicting fields
-- Confidence/status
+- Model and prompt version
+- Confidence JSON
 - Saved extraction run
 - Timeline events
 
-### Day 1 Foundation
+## Tech Stack
+
+- Turborepo
+- Next.js
+- TypeScript
+- Prisma
+- Postgres
+- Zod
+- Gemini API
+- Zustand
+
+## Workflow
+
+```txt
+PDF / email text
+→ Document row
+→ ExtractionRun row
+→ DOCUMENT_UPLOADED event
+→ Run extraction
+→ Gemini extraction
+→ Zod-parsed structured JSON
+→ extractedJson saved in Postgres
+→ status moves to VALIDATING
+→ JSON + timeline shown in UI
+```
+
+## Progress
+
+### Day 1: Foundation
 
 Implemented:
 
 - Turborepo setup
 - Next.js app
+- Prisma + Postgres
 - Shared Zod schemas
-- Prisma + Postgres setup
-- Core database models:
-  - documents
-  - extraction_runs
-  - extraction_events
+- DB models:
+  - `documents`
+  - `extraction_runs`
+  - `extraction_events`
 
-### Not in Day 1 Scope
-
-- Gemini extraction call
-- File upload UI
-- Review queue
-- RAG
-- Agents
-- Workers
-- OCR
-- S3 storage
-
-## Day 2: Upload + Run Creation
+### Day 2: Upload + Run Creation
 
 Implemented:
 
 - PDF upload
 - Email text submission
-- Local file storage for PDFs
-- Document row creation
-- ExtractionRun row creation with `UPLOADED`
-- ExtractionEvent row creation with `DOCUMENT_UPLOADED`
-- Recent runs dashboard
-- Run detail page with timeline
+- Local PDF storage
+- `POST /api/documents/upload`
+- Run creation with `UPLOADED` status
+- Dashboard recent runs list
+- Run detail timeline
 
-## Week 1 Demo Target
+### Day 3: Gemini Extraction
 
-I uploaded a claim document. The system extracted structured fields, validated them, showed missing/conflicting fields, and saved a run timeline.
+Implemented:
 
+- `@repo/ai` package
+- Gemini client
+- Prompt versioning
+- PDF extraction
+- Email text extraction
+- `POST /api/extraction-runs/[runId]/extract`
+- Manual **Run extraction** button
+- Extracted JSON panel
+- Timeline events:
+  - `EXTRACTION_STARTED`
+  - `MODEL_RESPONSE_RECEIVED`
+  - `EXTRACTION_COMPLETED`
+  - `RUN_FAILED`
+
+## Current Run Lifecycle
+
+```txt
+UPLOADED
+→ EXTRACTING
+→ VALIDATING
+```
+
+Failure lifecycle:
+
+```txt
+UPLOADED / FAILED
+→ EXTRACTING
+→ FAILED
+```
+
+## Environment Variables
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/claimflow_ai?sslmode=disable
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+For local extraction, keep Gemini variables in:
+
+```txt
+apps/web/.env.local
+```
+
+## Run Locally
+
+```bash
+bun install
+bun run db:migrate
+bun run dev
+```
+
+App runs at:
+
+```txt
+http://localhost:3001
+```
+
+## Next Step
+
+Day 4:
+
+- Validate extracted JSON
+- Detect missing fields
+- Detect conflicting fields
+- Set final status:
+  - `COMPLETED`
+  - `NEEDS_REVIEW`
