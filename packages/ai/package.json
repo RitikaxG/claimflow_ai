@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "@repo/shared":"workspace:*",
-    "@google/genai": "^1.52.0",
-    "zod-to-json-schema": "^3.25.2"
+    "@google/genai": "^1.52.0"
   },
   "exports": {
     ".": "./index.ts"

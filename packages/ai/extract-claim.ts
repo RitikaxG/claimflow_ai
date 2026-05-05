@@ -4,6 +4,7 @@ import { GEMINI_MODEL } from "./gemini-client";
 import { CLAIM_EXTRACTION_SYSTEM_PROMPT, CLAIM_EXTRACTION_PROMPT_VERSION } from "./prompt";
 import { ClaimExtractionSchema, type ClaimExtraction } from "@repo/shared/schemas";
 import { CLAIM_EXTRACTION_RESPONSE_SCHEMA } from "./claim-response-schema";
+import { text } from "node:stream/consumers";
 
 export type ClaimExtractionResult = {
     model : string,
@@ -37,10 +38,22 @@ function toClaimExtractionResult(params : {
     };
 }
 
+function toRawModelOutput(response : {
+    text? : string,
+    candidates? : unknown,
+    usageMetadata? : unknown,
+}){
+    return {
+        text : response.text ?? null,
+        candidates : response.candidates ?? null,
+        usageMetadata : response.usageMetadata ?? null,
+    };
+}
+
 export async function extractClaimFromPdf(
     filePath : string
 ): Promise<ClaimExtractionResult>{
-    const ai = await getGeminiClient();
+    const ai = getGeminiClient();
     const pdfBuffer = await readFile(filePath);
 
     const contents = [
@@ -58,7 +71,7 @@ export async function extractClaimFromPdf(
         contents : contents,
         config : {
             responseMimeType : "application/json",
-            responseJsonSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
+            responseSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
         }
     });
 
@@ -68,7 +81,7 @@ export async function extractClaimFromPdf(
 
     return toClaimExtractionResult({
         responseText : response.text,
-        rawModelOutput : response,
+        rawModelOutput : toRawModelOutput(response),
     });
 }
 
@@ -87,16 +100,16 @@ export async function extractClaimFromEmailText(
         ],
         config: {
             responseMimeType : "application/json",
-            responseJsonSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
+            responseSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
         }
     });
 
     if(!response.text){
-        throw new Error()
+        throw new Error("Gemini returned an empty extraction response");
     }
 
     return toClaimExtractionResult({
         responseText : response.text,
-        rawModelOutput : response,
+        rawModelOutput : toRawModelOutput(response),
     });
 }
