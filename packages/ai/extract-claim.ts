@@ -1,10 +1,8 @@
 import { readFile } from "node:fs/promises";
-import { getGeminiClient } from "./gemini-client";
-import { GEMINI_MODEL } from "./gemini-client";
+import { getGeminiClient, GEMINI_MODEL } from "./gemini-client";
 import { CLAIM_EXTRACTION_SYSTEM_PROMPT, CLAIM_EXTRACTION_PROMPT_VERSION } from "./prompt";
 import { ClaimExtractionSchema, type ClaimExtraction } from "@repo/shared/schemas";
 import { CLAIM_EXTRACTION_RESPONSE_SCHEMA } from "./claim-response-schema";
-import { text } from "node:stream/consumers";
 
 export type ClaimExtractionResult = {
     model : string,
