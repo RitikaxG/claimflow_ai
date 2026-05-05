@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import axios from "axios";
+import { run } from "node:test";
 
 export type RunStatus = 
     | "UPLOADED"
@@ -39,12 +40,21 @@ export type ExtractionRunRecord = {
     id : string,
     documentId : string,
     status : RunStatus,
+
     model : string | null,
     promptVersion : string | null,
     schemaVersion : string,
+
+    rawModelOutput : unknown | null,
+    extractedJson : unknown | null,
+    validationJson : unknown | null,
+    missingFieldsJson : unknown | null,
+    confidenceJson : unknown | null,
+
     errorMessage : string | null,
     createdAt : string,
     updatedAt : string,
+
     document : DocumentRecord,
     events : ExtractionEventRecord[],
 };
@@ -71,6 +81,8 @@ type DashboardStore = {
     isFetchingRun : boolean,
     isUploadingPdf : boolean,
     isSubmittingEmail : boolean,
+    isExtractingRun : boolean,
+
 
     error : string | null,
     successMessage : string | null,
@@ -80,6 +92,8 @@ type DashboardStore = {
     uploadPdf : (file : File) => Promise<void>;
     submitEmailText : (contentText : string) => Promise<void>;
     clearMessages : () => void;
+    
+    extractRun : (runId : string) => Promise<void>;
 };
 
 type ApiErrorResponse = {
@@ -106,6 +120,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     isFetchingRun: false,
     isUploadingPdf: false,
     isSubmittingEmail: false,
+    isExtractingRun : false,
 
     error: null,
     successMessage: null,
@@ -199,4 +214,31 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             });
         }
     },
+
+    extractRun : async(runId : string) => {
+        set({
+            isExtractingRun : true,
+            error : null,
+            successMessage : null,
+        });
+
+        try{
+            await axios.post(`/api/extraction-runs/${runId}/extract`);
+
+            set({
+                isExtractingRun : false,
+                successMessage : "Extraction Completed. Structured JSON saved.",
+            })
+
+            await get().fetchRun(runId);
+            await get().fetchRuns();
+        } catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to run extraction."),
+                isExtractingRun : false,
+            });
+
+            await get().fetchRun(runId);
+        }
+    }
 }));
