@@ -8,6 +8,9 @@ import { RunHeader } from "./run-header";
 import { RunStatusCard } from "./run-status-card";
 import { RunTimeline } from "./run-timeline";
 import { ExtractedJsonCard } from "./extracted-json-card";
+import { ValidationSummaryCard } from "./validation-summary-card";
+import { MissingFieldsCard } from "./missing-fields-card";
+import { ConflictsCard } from "./conflicts-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -49,6 +52,13 @@ export function RunDetailScreen() {
       </div>
 
       <ExtractedJsonCard extractedJson={selectedRun.extractedJson} />
+
+      <ValidationSummaryCard validationJson={selectedRun.validationJson} />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <MissingFieldsCard missingFieldsJson={selectedRun.missingFieldsJson} />
+        <ConflictsCard validationJson={selectedRun.validationJson} />
+      </div>
 
       <RunTimeline events={selectedRun.events} />
     </div>

@@ -16,7 +16,7 @@ export function RunStatusCard({ run }: RunStatusCardProps) {
 
   const validateRun = useDashboardStore((state) => state.validateRun);
   const isValidatingRun = useDashboardStore(
-  (state) => state.isValidatingRun,
+    (state) => state.isValidatingRun,
   );
 
   const canRunExtraction =
