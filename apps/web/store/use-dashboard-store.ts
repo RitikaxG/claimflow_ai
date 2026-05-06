@@ -80,7 +80,9 @@ type DashboardStore = {
     isFetchingRun : boolean,
     isUploadingPdf : boolean,
     isSubmittingEmail : boolean,
+
     isExtractingRun : boolean,
+    isValidatingRun : boolean,
 
 
     error : string | null,
@@ -93,6 +95,7 @@ type DashboardStore = {
     clearMessages : () => void;
     
     extractRun : (runId : string) => Promise<void>;
+    validateRun : (runId : string) => Promise<void>;
 };
 
 type ApiErrorResponse = {
@@ -119,7 +122,9 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     isFetchingRun: false,
     isUploadingPdf: false,
     isSubmittingEmail: false,
+
     isExtractingRun : false,
+    isValidatingRun : false,
 
     error: null,
     successMessage: null,
@@ -236,6 +241,33 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
                 error : getErrorMessage(error, "Failed to run extraction."),
                 isExtractingRun : false,
             });
+
+            await get().fetchRun(runId);
+        }
+    },
+
+    validateRun : async(runId : string) => {
+        set({
+            isValidatingRun : true,
+            error : null,
+            successMessage : null,
+        })
+
+        try{
+            await axios.post(`/api/extraction-runs/${runId}/validate`);
+
+            set({
+                isValidatingRun: false,
+                successMessage : "Validation completed."
+            });
+
+            await get().fetchRun(runId);
+            await get().fetchRuns();
+        } catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to validate run."),
+                isValidatingRun : false,
+            })
 
             await get().fetchRun(runId);
         }
