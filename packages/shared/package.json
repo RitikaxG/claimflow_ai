@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     ".": "./index.ts",
-    "./schemas": "./schemas/index.ts"
+    "./schemas": "./schemas/index.ts",
+    "./validation":"./validation/index.ts"
   },
   "dependencies": {
     "zod": "^4.0.0"

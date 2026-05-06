@@ -1,4 +1,4 @@
-import { ClaimExtractionSchema, ClaimValidationResult, ClaimValidationResultSchema } from "../schemas";
+import { ClaimExtractionSchema, type ClaimValidationResult, ClaimValidationResultSchema } from "../schemas";
 
 type ValidationIssue = ClaimValidationResult["conflicts"][number];
 
