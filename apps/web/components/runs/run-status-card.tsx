@@ -14,8 +14,15 @@ export function RunStatusCard({ run }: RunStatusCardProps) {
     (state) => state.isExtractingRun,
   );
 
+  const validateRun = useDashboardStore((state) => state.validateRun);
+  const isValidatingRun = useDashboardStore(
+  (state) => state.isValidatingRun,
+  );
+
   const canRunExtraction =
     run.status === "UPLOADED" || run.status === "FAILED";
+
+  const canRunValidation = run.status === "VALIDATING";
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -65,6 +72,17 @@ export function RunStatusCard({ run }: RunStatusCardProps) {
           className="mt-5 w-full rounded-lg bg-gray-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-400"
         >
           {isExtractingRun ? "Extracting..." : "Run extraction"}
+        </button>
+      ) : null}
+
+      {canRunValidation ? (
+        <button
+            type="button"
+            disabled={isValidatingRun}
+            onClick={() => void validateRun(run.id)}
+            className="mt-5 w-full rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-400"
+        >
+            {isValidatingRun ? "Validating..." : "Run validation"}
         </button>
       ) : null}
     </section>

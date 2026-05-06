@@ -73,7 +73,7 @@ export function validateClaimExtraction(input : unknown): ClaimValidationResult 
     if(claim.incident.lossType === "unknown"){
         addConflict({
             field : "incident.lossType",
-            message : "Loss type is unknown",
+            message : "Loss type is unknown.",
             severity : "error",
             ruleId : "LOSS_TYPE_UNKNOWN",
         });
