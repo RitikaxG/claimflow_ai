@@ -1,0 +1,46 @@
+{
+  "documentType": "auto_insurance_claim_form",
+  "claimNumber": "CLM-2026-1003",
+  "policyNumber": "AUTO-2026-5512",
+  "insuredName": "Rohan Verma",
+  "claimantName": "Rohan Verma",
+  "contactEmail": "rohan.verma@example.com",
+  "contactPhone": null,
+  "vehicle": {
+    "registrationNumber": "KA05MN7890",
+    "make": "Honda",
+    "model": "City",
+    "year": null,
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-04-21",
+    "incidentTime": "20:45",
+    "incidentLocation": "Bengaluru Outer Ring Road",
+    "lossType": "third_party",
+    "description": "The insured vehicle collided with another vehicle at a traffic signal. The third-party vehicle had visible rear-side damage."
+  },
+  "damage": {
+    "damagedParts": [],
+    "damageSeverity": "unknown",
+    "estimatedRepairCost": 68000,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [
+    "policeReport"
+  ],
+  "overallConfidence": 0.85
+}

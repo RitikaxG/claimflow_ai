@@ -1,0 +1,31 @@
+{
+  "isValid": false,
+  "missingFields": [
+    "policyNumber",
+    "insuredName",
+    "claimantName",
+    "incident.incidentDate",
+    "incident.incidentLocation",
+    "incident.lossType",
+    "incident.description"
+  ],
+  "conflicts": [],
+  "warnings": [
+    {
+      "field": "documentType",
+      "message": "Document is a repair estimate, not a complete auto insurance claim form.",
+      "severity": "warning",
+      "ruleId": "DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY"
+    },
+    {
+      "field": "overallConfidence",
+      "message": "Extraction confidence is below the review threshold.",
+      "severity": "warning",
+      "ruleId": "LOW_CONFIDENCE_REVIEW"
+    }
+  ],
+  "requiredEvidence": [
+    "claimForm"
+  ],
+  "finalStatus": "NEEDS_REVIEW"
+}

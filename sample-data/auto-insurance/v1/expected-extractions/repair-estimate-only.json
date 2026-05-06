@@ -1,0 +1,53 @@
+{
+  "documentType": "repair_estimate",
+  "claimNumber": null,
+  "policyNumber": null,
+  "insuredName": null,
+  "claimantName": null,
+  "contactEmail": null,
+  "contactPhone": null,
+  "vehicle": {
+    "registrationNumber": "DL01AB1234",
+    "make": null,
+    "model": null,
+    "year": null,
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": null,
+    "incidentTime": null,
+    "incidentLocation": null,
+    "lossType": "unknown",
+    "description": null
+  },
+  "damage": {
+    "damagedParts": [
+      "front bumper",
+      "left headlight",
+      "paint and labor"
+    ],
+    "damageSeverity": "unknown",
+    "estimatedRepairCost": 42000,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": null,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": false,
+    "damagePhoto": false,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [
+    "claimForm",
+    "policyNumber",
+    "claimantName",
+    "incidentDetails"
+  ],
+  "overallConfidence": 0.72
+}

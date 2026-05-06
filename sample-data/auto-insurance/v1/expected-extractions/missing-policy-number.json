@@ -1,0 +1,44 @@
+{
+  "documentType": "auto_insurance_claim_form",
+  "claimNumber": "CLM-2026-1002",
+  "policyNumber": null,
+  "insuredName": "Priya Mehta",
+  "claimantName": "Priya Mehta",
+  "contactEmail": "priya.mehta@example.com",
+  "contactPhone": "+91-9988776655",
+  "vehicle": {
+    "registrationNumber": "MH12CD4567",
+    "make": "Maruti Suzuki",
+    "model": "Swift",
+    "year": null,
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-04-20",
+    "incidentTime": "09:15",
+    "incidentLocation": "Pune Highway",
+    "lossType": "own_damage",
+    "description": "The rear bumper was damaged after another car hit the vehicle from behind."
+  },
+  "damage": {
+    "damagedParts": ["rear bumper"],
+    "damageSeverity": "unknown",
+    "estimatedRepairCost": 18500,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": null,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.85
+}

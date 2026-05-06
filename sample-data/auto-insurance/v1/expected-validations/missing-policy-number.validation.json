@@ -1,0 +1,10 @@
+{
+  "isValid": false,
+  "missingFields": [
+    "policyNumber"
+  ],
+  "conflicts": [],
+  "warnings": [],
+  "requiredEvidence": [],
+  "finalStatus": "NEEDS_REVIEW"
+}
