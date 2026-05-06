@@ -7,6 +7,19 @@ type ConflictsCardProps = {
   validationJson: unknown | null;
 };
 
+function toTitleCase(value: string) {
+  return value
+    .replaceAll("_or_", " or ")
+    .replaceAll("_", " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\bfir\b/gi, "FIR")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatFieldPath(field: string) {
+  return field.split(".").map(toTitleCase).join(" → ");
+}
+
 function IssueList({
   title,
   emptyText,
@@ -35,10 +48,18 @@ function IssueList({
                   : "border-yellow-100 bg-yellow-50"
               }`}
             >
-              <div className="font-medium text-gray-950">{issue.field}</div>
+              <div className="font-medium text-gray-950">
+                {formatFieldPath(issue.field)}
+              </div>
+
               <p className="mt-1 text-gray-700">{issue.message}</p>
-              <p className="mt-2  break-words text-xs font-medium text-gray-500">
+
+              <p className="mt-2 break-words text-xs font-medium text-gray-500">
                 {issue.severity.toUpperCase()} · {issue.ruleId}
+              </p>
+
+              <p className="mt-1 break-words text-xs text-gray-400">
+                {issue.field}
               </p>
             </li>
           ))}
@@ -98,9 +119,10 @@ export function ConflictsCard({ validationJson }: ConflictsCardProps) {
                 {validation.requiredEvidence.map((evidence) => (
                   <li
                     key={evidence}
+                    title={evidence}
                     className="rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-800"
                   >
-                    {evidence}
+                    {toTitleCase(evidence)}
                   </li>
                 ))}
               </ul>
