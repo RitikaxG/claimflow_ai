@@ -2,14 +2,19 @@
   "isValid": false,
   "missingFields": [
     "policyNumber",
-    "insuredName",
-    "claimantName",
+    "claimantName_or_insuredName",
     "incident.incidentDate",
     "incident.incidentLocation",
-    "incident.lossType",
     "incident.description"
   ],
-  "conflicts": [],
+  "conflicts": [
+    {
+      "field": "incident.lossType",
+      "message": "Loss type is unknown.",
+      "severity": "error",
+      "ruleId": "LOSS_TYPE_UNKNOWN"
+    }
+  ],
   "warnings": [
     {
       "field": "documentType",
