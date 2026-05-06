@@ -37,7 +37,7 @@ function IssueList({
             >
               <div className="font-medium text-gray-950">{issue.field}</div>
               <p className="mt-1 text-gray-700">{issue.message}</p>
-              <p className="mt-2 text-xs font-medium text-gray-500">
+              <p className="mt-2  break-words text-xs font-medium text-gray-500">
                 {issue.severity.toUpperCase()} · {issue.ruleId}
               </p>
             </li>

@@ -55,10 +55,9 @@ export function RunDetailScreen() {
 
       <ValidationSummaryCard validationJson={selectedRun.validationJson} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <MissingFieldsCard missingFieldsJson={selectedRun.missingFieldsJson} />
-        <ConflictsCard validationJson={selectedRun.validationJson} />
-      </div>
+      <MissingFieldsCard missingFieldsJson={selectedRun.missingFieldsJson} />
+
+      <ConflictsCard validationJson={selectedRun.validationJson} />
 
       <RunTimeline events={selectedRun.events} />
     </div>

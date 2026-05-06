@@ -2,6 +2,24 @@ type MissingFieldsCardProps = {
   missingFieldsJson: unknown | null;
 };
 
+function toTitleCase(value: string) {
+  return value
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatFieldName(field: string) {
+  return field
+    .split(".")
+    .map((part) =>
+      part
+        .split("_or_")
+        .map(toTitleCase)
+        .join(" or "),
+    )
+    .join(" → ");
+}
+
 export function MissingFieldsCard({
   missingFieldsJson,
 }: MissingFieldsCardProps) {
@@ -33,13 +51,18 @@ export function MissingFieldsCard({
           No missing required fields detected.
         </div>
       ) : (
-        <ul className="mt-5 space-y-2">
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2">
           {missingFields.map((field) => (
             <li
               key={field}
-              className="rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm font-medium text-orange-800"
+              className="rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm"
             >
-              {field}
+              <p className="font-semibold text-orange-800">
+                {formatFieldName(field)}
+              </p>
+              <p className="mt-1 break-words text-xs text-orange-700">
+                {field}
+              </p>
             </li>
           ))}
         </ul>
