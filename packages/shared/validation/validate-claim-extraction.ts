@@ -109,7 +109,7 @@ export function validateClaimExtraction(input : unknown): ClaimValidationResult 
     if(claim.documentType === "repair_estimate"){
         addWarning({
             field : "documentType",
-            message : "Document is a repair estimate not a complete auto insurance claim form.",
+            message : "Document is a repair estimate, not a complete auto insurance claim form.",
             severity : "warning",
             ruleId : "DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY",
         });
@@ -120,7 +120,7 @@ export function validateClaimExtraction(input : unknown): ClaimValidationResult 
     if(claim.overallConfidence < REVIEW_CONFIDENCE_THRESHOLD){
         addWarning({
             field : "overallConfidence",
-            message : "Extraction confidence is below review threshold.",
+            message : "Extraction confidence is below the review threshold.",
             severity : "warning",
             ruleId : "LOW_CONFIDENCE_REVIEW",
         });
