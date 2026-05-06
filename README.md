@@ -2,7 +2,7 @@
 
 ClaimFlow AI is a document-intake workflow for insurance claims.
 
-It lets a user upload a claim PDF or paste claim email text, extracts structured claim JSON using Gemini, saves the run in Postgres, and shows a traceable timeline.
+It lets a user upload a claim PDF or paste claim email text, extracts structured claim JSON using Gemini, validates the extracted data with deterministic rules, saves the run in Postgres, and shows a traceable timeline.
 
 ## Current Scope
 
@@ -16,6 +16,10 @@ Current output:
 - Structured claim JSON
 - Model and prompt version
 - Confidence JSON
+- Missing fields
+- Conflicts and warnings
+- Required evidence
+- Final status: `COMPLETED` or `NEEDS_REVIEW`
 - Saved extraction run
 - Timeline events
 
@@ -42,7 +46,11 @@ PDF / email text
 → Zod-parsed structured JSON
 → extractedJson saved in Postgres
 → status moves to VALIDATING
-→ JSON + timeline shown in UI
+→ Run validation
+→ deterministic rules check missing fields, conflicts, warnings, and evidence
+→ validationJson + missingFieldsJson saved in Postgres
+→ status becomes COMPLETED or NEEDS_REVIEW
+→ validation result + timeline shown in UI
 ```
 
 ## Progress
@@ -90,19 +98,82 @@ Implemented:
   - `EXTRACTION_COMPLETED`
   - `RUN_FAILED`
 
+### Day 4: Validation Layer
+
+Implemented:
+
+- Deterministic claim validation after extraction
+- `validateClaimExtraction()` shared validation service
+- `POST /api/extraction-runs/[runId]/validate`
+- Manual **Run validation** button
+- Missing fields detection
+- Conflicts and warnings detection
+- Required evidence detection
+- Final status:
+  - `COMPLETED`
+  - `NEEDS_REVIEW`
+- Saved `validationJson` and `missingFieldsJson`
+- Validation summary UI
+- Missing fields UI
+- Conflicts, warnings, and required evidence UI
+- Timeline events:
+  - `VALIDATION_STARTED`
+  - `VALIDATION_COMPLETED`
+  - `MISSING_FIELDS_DETECTED`
+  - `CONFLICTS_DETECTED`
+  - `RUN_COMPLETED`
+  - `RUN_NEEDS_REVIEW`
+
+Day 4 flow:
+
+```txt
+Upload PDF or paste email text
+→ created run
+→ click Run extraction
+→ Gemini extracts structured claim JSON
+→ app saves extractedJson
+→ status moves to VALIDATING
+→ click Run validation
+→ app checks missing fields, conflicts, warnings, and required evidence
+→ app saves validationJson and missingFieldsJson
+→ status becomes COMPLETED or NEEDS_REVIEW
+→ UI explains the result
+→ timeline proves what happened
+```
+
+Tested with synthetic PDFs:
+
+- valid own-damage claim → `COMPLETED`
+- missing policy number → `NEEDS_REVIEW`
+- repair estimate only → `NEEDS_REVIEW`
+- third-party without police report → `NEEDS_REVIEW`
+- theft claim missing FIR → `NEEDS_REVIEW`
+
 ## Current Run Lifecycle
+
+Completed lifecycle:
 
 ```txt
 UPLOADED
 → EXTRACTING
 → VALIDATING
+→ COMPLETED
+```
+
+Needs-review lifecycle:
+
+```txt
+UPLOADED
+→ EXTRACTING
+→ VALIDATING
+→ NEEDS_REVIEW
 ```
 
 Failure lifecycle:
 
 ```txt
 UPLOADED / FAILED
-→ EXTRACTING
+→ EXTRACTING / VALIDATING
 → FAILED
 ```
 
@@ -136,11 +207,10 @@ http://localhost:3001
 
 ## Next Step
 
-Day 4:
+Week 2:
 
-- Validate extracted JSON
-- Detect missing fields
-- Detect conflicting fields
-- Set final status:
-  - `COMPLETED`
-  - `NEEDS_REVIEW`
+- Add human review queue
+- Show runs that need review
+- Allow reviewer decisions
+- Store reviewer notes and corrections
+- Use reviewer feedback later for memory/rule improvement
