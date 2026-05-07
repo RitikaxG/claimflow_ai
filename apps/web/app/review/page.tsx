@@ -4,7 +4,7 @@ import { ReviewQueueList } from "../../components/review/review-queue-list";
 export default function ReviewQueuePage() {
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-8">
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="mx-auto max-w-7xl space-y-8">
         <header className="space-y-4">
           <div>
             <p className="text-sm font-medium text-gray-500">

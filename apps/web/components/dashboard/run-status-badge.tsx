@@ -16,7 +16,7 @@ type RunStatusBadgeProps = {
 export function RunStatusBadge({ status }: RunStatusBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${statusClassName[status]}`}
+      className={`inline-flex whitespace-nowrap items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${statusClassName[status]}`}
     >
       {status.replace("_", " ")}
     </span>
