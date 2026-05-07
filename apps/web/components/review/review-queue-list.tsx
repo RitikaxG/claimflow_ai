@@ -124,7 +124,7 @@ export function ReviewQueueList() {
                       {formatDate(run.updatedAt)}
                     </td>
 
-                    <td className="px-5 py-4">
+                    <td className="whitespace-nowrap px-5 py-4">
                       <Link
                         href={`/runs/${run.id}`}
                         className="font-medium text-gray-950 underline underline-offset-4"
