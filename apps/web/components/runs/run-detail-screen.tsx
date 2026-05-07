@@ -11,6 +11,7 @@ import { ExtractedJsonCard } from "./extracted-json-card";
 import { ValidationSummaryCard } from "./validation-summary-card";
 import { MissingFieldsCard } from "./missing-fields-card";
 import { ConflictsCard } from "./conflicts-card";
+import { NeedsReviewCallout } from "./needs-review-callout";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -54,6 +55,8 @@ export function RunDetailScreen() {
       <ExtractedJsonCard extractedJson={selectedRun.extractedJson} />
 
       <ValidationSummaryCard validationJson={selectedRun.validationJson} />
+
+      <NeedsReviewCallout validationJson={selectedRun.validationJson} />
 
       <MissingFieldsCard missingFieldsJson={selectedRun.missingFieldsJson} />
 
