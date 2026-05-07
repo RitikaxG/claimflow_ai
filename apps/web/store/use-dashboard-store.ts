@@ -74,9 +74,11 @@ type RunResponse = {
 
 type DashboardStore = {
     runs : ExtractionRunRecord[],
+    reviewRuns : ExtractionRunRecord[],
     selectedRun : ExtractionRunRecord | null,
 
     isFetchingRuns : boolean,
+    isFetchingReviewRuns : boolean,
     isFetchingRun : boolean,
     isUploadingPdf : boolean,
     isSubmittingEmail : boolean,
@@ -89,6 +91,7 @@ type DashboardStore = {
     successMessage : string | null,
 
     fetchRuns : () => Promise<void>;
+    fetchReviewRuns : () => Promise<void>;
     fetchRun : (runId : string) => Promise<void>;
     uploadPdf : (file : File) => Promise<void>;
     submitEmailText : (contentText : string) => Promise<void>;
@@ -116,15 +119,19 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
     runs : [],
+    reviewRuns : [],
     selectedRun : null,
 
     isFetchingRuns: false,
+    isFetchingReviewRuns : false,
     isFetchingRun: false,
     isUploadingPdf: false,
     isSubmittingEmail: false,
 
     isExtractingRun : false,
     isValidatingRun : false,
+
+    
 
     error: null,
     successMessage: null,
@@ -263,6 +270,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             await get().fetchRun(runId);
             await get().fetchRuns();
+            await get().fetchReviewRuns();
         } catch(error){
             set({
                 error : getErrorMessage(error, "Failed to validate run."),
@@ -270,6 +278,26 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             })
 
             await get().fetchRun(runId);
+        }
+    },
+
+    fetchReviewRuns : async () => {
+        set({
+            isFetchingReviewRuns : true,
+            error : null,
+        })
+        try{
+            const res = await axios.get<RunsResponse>("/api/review-queue");
+
+            set({
+                reviewRuns : res.data.runs,
+                isFetchingReviewRuns : false,
+            })
+        }catch(error){
+            set({
+                error : getErrorMessage(error,"Failed to fetch review queue"),
+                isFetchingReviewRuns : false,
+            })
         }
     }
 }));

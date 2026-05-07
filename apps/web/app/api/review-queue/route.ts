@@ -7,7 +7,7 @@ export async function GET(){
             status : "NEEDS_REVIEW"
         },
         orderBy : {
-            createdAt : "desc",
+            updatedAt : "desc",
         },
         include : {
             document : true,
