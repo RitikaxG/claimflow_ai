@@ -34,6 +34,9 @@ export async function restoreSoftDeletedDocument(params : {
             where : {
                 documentId : restoredDocument.id,
             },
+            orderBy : {
+                createdAt : "desc"
+            },
             include : {
                 document : true,
                 events : {
