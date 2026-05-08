@@ -79,7 +79,7 @@ export async function POST(req : Request){
             if(existingDocument && existingDocument.deletedAt){
                 const latestRun = existingDocument.runs[0] ?? null;
 
-                const restoredDocument = await restoreSoftDeletedDocument({
+                const restored = await restoreSoftDeletedDocument({
                     documentId : existingDocument.id,
                     latestRunId : latestRun?.id,
                     filename : existingDocument.filename,
@@ -89,8 +89,8 @@ export async function POST(req : Request){
                     duplicate : true,
                     restored : true,
                     message : "Document restored. Previous extraction and validation results are available.",
-                    document : restoredDocument,
-                    run : latestRun,
+                    document : restored.document,
+                    run : restored.run,
                 },{
                     status : 200
                 });
@@ -194,7 +194,7 @@ export async function POST(req : Request){
         if(existingDocument && existingDocument.deletedAt){
             const latestRun = existingDocument.runs[0] ?? null;
 
-            const restoredDocument = await restoreSoftDeletedDocument({
+            const restored = await restoreSoftDeletedDocument({
                 documentId : existingDocument.id,
                 latestRunId : latestRun?.id,
                 filename : existingDocument.filename,
@@ -204,8 +204,8 @@ export async function POST(req : Request){
                 duplicate : true,
                 restored : true,
                 message : "Email text restored. Previous extraction and validation results are available.",
-                document : restoredDocument,
-                run : latestRun,
+                document : restored.document,
+                run : restored.run,
             },
             { status : 200 });
         }
@@ -246,7 +246,13 @@ export async function POST(req : Request){
             return { document, run, event };
         });
 
-        return NextResponse.json(result, { status : 201 });
+        return NextResponse.json({
+            duplicate : false,
+            restored : false,
+            message : "Email text submitted. Extraction run created",
+            ...result,
+        }, 
+        { status : 201 });
     }catch(error){
         const message = error instanceof Error ? error.message : "Unknown document upload error";
 

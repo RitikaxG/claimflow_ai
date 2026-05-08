@@ -4,29 +4,50 @@ export async function findDocumentByHash(params : {
     sourceType : DocumentSourceType,
     contentHash : string,
 }) {
-    return prisma.document.findFirst({
+    const include = {
+        runs : {
+            orderBy : {
+                createdAt : "desc" as const
+            }
+        },
+        take : 1,
+        include : {
+            document : true,
+            events : {
+                orderBy : {
+                    createdAt : "asc" as const
+                },
+            },
+        },
+    };
+
+    const activeDocument = await prisma.document.findFirst({
         where : {
             sourceType : params.sourceType,
-            contentHash : params.contentHash
+            contentHash : params.contentHash,
+            deletedAt : null,
         },
         orderBy : {
             createdAt : "desc"
         },
-        include : {
-            runs : {
-                orderBy : {
-                    createdAt : "desc",
-                },
-                take : 1,
-                include : {
-                    document : true,
-                    events : {
-                        orderBy : {
-                            createdAt : "asc",
-                        }
-                    }
-                }
+        include,
+    });
+
+    if(activeDocument){
+        return activeDocument;
+    }
+
+    return prisma.document.findFirst({
+        where : {
+            sourceType : params.sourceType,
+            contentHash : params.contentHash,
+            deletedAt : {
+                not : null,
             }
         },
-    })
+        orderBy : {
+            createdAt : "desc",
+        },
+        include,
+    });
 }

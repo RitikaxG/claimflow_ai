@@ -55,7 +55,7 @@ export async function DELETE( req : NextRequest, { params } : Params ){
         }
 
         const result = await prisma.$transaction(async (tx) => {
-            const updatedDocument = await prisma.document.update({
+            const updatedDocument = await tx.document.update({
                 where : { id : documentId },
                 data : {
                     deletedAt : new Date(),
@@ -80,7 +80,7 @@ export async function DELETE( req : NextRequest, { params } : Params ){
 
             return {
                 document : updatedDocument,
-                affectedRun : document.runs.map((run) => run.id),
+                affectedRunIds : document.runs.map((run) => run.id),
             }
         })
 
