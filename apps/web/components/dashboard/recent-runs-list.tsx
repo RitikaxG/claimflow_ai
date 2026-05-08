@@ -18,10 +18,32 @@ export function RecentRunsList() {
   const error = useDashboardStore((state) => state.error);
   const successMessage = useDashboardStore((state) => state.successMessage);
   const fetchRuns = useDashboardStore((state) => state.fetchRuns);
+  const deleteDocument = useDashboardStore((state) => state.deleteDocument);
+  const deletingDocumentId = useDashboardStore(
+    (state) => state.deletingDocumentId,
+  );
 
   useEffect(() => {
     void fetchRuns();
   }, [fetchRuns]);
+
+  const handleDeleteDocument = (params: {
+    documentId: string;
+    filename: string;
+  }) => {
+    const confirmed = window.confirm(
+      `Soft delete "${params.filename}"?\n\nThis will hide it from the dashboard and review queue, but keep the source document, extraction result, validation result, and audit trail for restore later.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    void deleteDocument(
+      params.documentId,
+      "User soft deleted document from dashboard.",
+    );
+  };
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -83,12 +105,30 @@ export function RecentRunsList() {
                     {formatDate(run.createdAt)}
                   </td>
                   <td className="px-5 py-4">
-                    <Link
-                      href={`/runs/${run.id}`}
-                      className="font-medium text-gray-950 underline underline-offset-4"
-                    >
-                      View
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={`/runs/${run.id}`}
+                        className="font-medium text-gray-950 underline underline-offset-4"
+                      >
+                        View
+                      </Link>
+
+                      <button
+                        type="button"
+                        disabled={deletingDocumentId === run.document.id}
+                        onClick={() =>
+                          handleDeleteDocument({
+                            documentId: run.document.id,
+                            filename: run.document.filename,
+                          })
+                        }
+                        className="font-medium text-red-600 underline underline-offset-4 disabled:cursor-not-allowed disabled:text-gray-400"
+                      >
+                        {deletingDocumentId === run.document.id
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

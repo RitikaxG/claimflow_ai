@@ -78,6 +78,13 @@ type RunResponse = {
     run : ExtractionRunRecord,
 };
 
+type DeleteDocumentResponse = {
+    document : DocumentRecord,
+    affectedRunIds : string[],
+    alreadyDeleted? : boolean,
+    message? : string,
+}
+
 type DashboardStore = {
     runs : ExtractionRunRecord[],
     reviewRuns : ExtractionRunRecord[],
@@ -92,6 +99,7 @@ type DashboardStore = {
     isExtractingRun : boolean,
     isValidatingRun : boolean,
 
+    deletingDocumentId : string | null,
 
     error : string | null,
     successMessage : string | null,
@@ -105,6 +113,7 @@ type DashboardStore = {
     
     extractRun : (runId : string) => Promise<void>;
     validateRun : (runId : string) => Promise<void>;
+    deleteDocument : (documentId : string, deletedReason? : string) => Promise<void>;
 };
 
 type ApiErrorResponse = {
@@ -137,7 +146,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     isExtractingRun : false,
     isValidatingRun : false,
 
-    
+    deletingDocumentId : null,
 
     error: null,
     successMessage: null,
@@ -303,6 +312,45 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             set({
                 error : getErrorMessage(error,"Failed to fetch review queue"),
                 isFetchingReviewRuns : false,
+            })
+        }
+    },
+    deleteDocument : async (
+        documentId : string,
+        deletedReason = "Document no longer required.",
+    ) => {
+        set({
+            deletingDocumentId : documentId,
+            error : null,
+            successMessage : null,
+        });
+
+        try{
+            const res = await axios.delete<DeleteDocumentResponse>(
+                `/api/documents/${documentId}`,
+                {
+                    data : {
+                        deletedReason
+                    },
+                },
+            );
+
+            set({
+                deletingDocumentId: null,
+                successMessage : res.data.message ?? "Document soft deleted successfully."
+            });
+
+            await get().fetchRuns();
+            await get().fetchReviewRuns();
+
+            const selectedRun = get().selectedRun;
+            if(selectedRun?.document.id === documentId){
+                await get().fetchRun(selectedRun.id);
+            }
+        }catch(error){
+            set({
+                deletingDocumentId : null,
+                error : getErrorMessage(error,"Failed to delete document."),
             })
         }
     }
