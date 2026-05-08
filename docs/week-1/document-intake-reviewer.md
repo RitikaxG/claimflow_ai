@@ -1,102 +1,62 @@
-# Week 1 — Auto Insurance Document Intake
+# Week 1 — Auto Insurance Document Intake Reviewer
 
-## What was built
+## What is this?
 
 ClaimFlow AI Week 1 built an **Auto Insurance Document Intake Reviewer**.
 
-It accepts:
-
-- PDF claim documents
-- Pasted email text
-
-It then runs:
+It accepts an auto insurance claim **PDF** or pasted **email text**, extracts structured claim JSON using Gemini, validates the extracted data with deterministic rules, and updates the run status to either `COMPLETED` or `NEEDS_REVIEW`.
 
 ```txt
 PDF / Email text
 → Gemini extraction
 → structured claim JSON
 → deterministic validation
-→ final status: COMPLETED or NEEDS_REVIEW
+→ COMPLETED or NEEDS_REVIEW
 → timeline + validation explanation
 ```
 
-The goal was to turn messy insurance claim inputs into structured, reviewable product data.
+The goal was to prove that AI output should not be blindly trusted. It should become product data only after validation, persistence, and traceability.
 
 ---
 
-## Why this matters
+## Demo
 
-Insurance claims often arrive as incomplete PDFs, repair estimates, police reports, or emails.
+Demo video: [Week 1 ClaimFlow AI demo](https://x.com/RitikaxG/status/2052737543192629329?s=20)
 
-The system should not blindly trust AI output. It should:
+### Dashboard
 
-- extract claim data
-- validate required fields
-- detect missing information
-- detect conflicts
-- identify required evidence
-- decide whether the claim can proceed or needs review
+The dashboard supports PDF upload, email text submission, recent runs, and access to the review queue.
 
-`NEEDS_REVIEW` is not a failure. It means the system correctly found that human attention is needed.
+![Dashboard](./images/dashboard.png)
 
----
+### Run detail
 
-## Demo flow
+Each uploaded document creates an extraction run. The run detail page shows document metadata, current status, source document, extracted JSON, validation result, and timeline.
 
-### Complete claim
+![Run detail 1](./images/run-detail-1.png)
 
-```txt
-Upload PDF / email
-→ Run extraction
-→ View extracted JSON
-→ Run validation
-→ Status becomes COMPLETED
-→ Timeline shows upload → extraction → validation → completed
-```
-
-### Incomplete claim
-
-```txt
-Upload incomplete claim
-→ Run extraction
-→ Run validation
-→ Status becomes NEEDS_REVIEW
-→ UI shows missing fields, conflicts, warnings, required evidence
-→ Timeline explains why review is needed
-```
-
-### Soft delete + restore
-
-```txt
-Upload document
-→ Extract and validate
-→ Soft delete document
-→ Document disappears from active dashboard/review queue
-→ Re-upload same document
-→ Existing document is restored
-→ Previous extractedJson and validationJson are reused
-```
+![Run detail 2](./images/run-detail-2.png)
 
 ---
 
-## What was achieved
+## What was built
 
 ### 1. Document intake
 
-Supported source types:
+Supported inputs:
 
 - `PDF`
 - `EMAIL_TEXT`
 
 PDFs are stored locally during development using `Document.storagePath`.
 
-Email text is saved directly in Postgres using `Document.contentText`.
+Email text is stored directly in Postgres using `Document.contentText`, so the original submitted email can be recovered later.
 
 ---
 
-### 2. Structured AI extraction
+### 2. Structured JSON extraction
 
-Gemini extracts auto insurance claim data into structured JSON.
+Gemini extracts auto insurance claim data into a structured schema.
 
 The app stores:
 
@@ -106,11 +66,15 @@ The app stores:
 - `promptVersion`
 - `confidenceJson`
 
+This makes the AI extraction debuggable and traceable.
+
 ---
 
 ### 3. Deterministic validation
 
-The extracted JSON is validated with rules for:
+The extracted JSON is validated using deterministic rules.
+
+Validation checks:
 
 - missing fields
 - conflicts
@@ -118,12 +82,18 @@ The extracted JSON is validated with rules for:
 - required evidence
 - low confidence
 
-Validation produces:
+The final status becomes:
 
 ```txt
 COMPLETED
 NEEDS_REVIEW
 ```
+
+![Validation summary](./images/validation-summary.png)
+
+If the claim needs review, the UI explains why.
+
+![Conflicts and review reasons](./images/conflicts.png)
 
 ---
 
@@ -150,11 +120,37 @@ DOCUMENT_RESTORED
 DUPLICATE_UPLOAD_DETECTED
 ```
 
-This gives the run an audit-style history.
+This gives every run an audit-style history.
+
+![Timeline](./images/timeline.png)
 
 ---
 
-## Week 1 schema design
+### 5. Basic review queue foundation
+
+Week 1 includes a basic review queue that shows runs where:
+
+```txt
+ExtractionRun.status === NEEDS_REVIEW
+```
+
+This is the foundation for Week 2, where `ReviewTask`, `ReviewDecision`, and `ReviewEvent` will be added.
+
+![Review queue](./images/review-queue.png)
+
+---
+
+## Schema design for Week 1
+
+Week 1 uses three core entities:
+
+```txt
+Document
+ExtractionRun
+ExtractionEvent
+```
+
+![Schema design](./images/schema-design.png)
 
 ### Document
 
@@ -217,7 +213,7 @@ FAILED
 
 ### ExtractionEvent
 
-Represents the timeline of what happened during a run.
+Represents the timeline for a run.
 
 It answers:
 
@@ -246,15 +242,15 @@ It continues with:
 JSON → validation → status decision → timeline
 ```
 
-This makes the workflow safer and more product-like.
+This makes the system safer for insurance workflows.
 
 ---
 
-### 2. `NEEDS_REVIEW` is a valid workflow state
+### 2. `NEEDS_REVIEW` is not failure
 
-Incomplete or uncertain claims move to review instead of breaking the app.
+`NEEDS_REVIEW` means the system worked correctly.
 
-This prepares the system for Week 2 human-in-the-loop review.
+It found that the claim needs human attention because something is missing, inconsistent, uncertain, or evidence-dependent.
 
 ---
 
@@ -274,13 +270,17 @@ Hide from active dashboard/review queue
 
 Reason:
 
-Insurance workflows need traceability. Deleted records may still need to be audited or restored.
+Insurance workflows need traceability. A deleted claim document may still need to be audited, restored, or inspected later.
+
+![Soft delete 1](./images/soft-delete-1.png)
+
+![Soft delete 2](./images/soft-delete-2.png)
 
 ---
 
-### 4. Restore avoids extra Gemini calls
+### 4. Restore saves Gemini API calls
 
-If a soft-deleted document is uploaded again:
+If the same soft-deleted document is uploaded again:
 
 ```txt
 same sourceType + same contentHash
@@ -313,9 +313,9 @@ Filenames are unreliable. Content hash identifies the actual document.
 
 ---
 
-## What Week 1 did not build
+## What Week 1 intentionally did not build
 
-Week 1 intentionally did not build:
+Week 1 did not build:
 
 - full human review system
 - corrected JSON editor
@@ -352,7 +352,7 @@ By the end of Week 1, ClaimFlow AI can:
 ```txt
 Upload PDF or email text
 Extract structured auto insurance claim JSON
-Validate the extracted JSON
+Validate extracted JSON
 Mark the run COMPLETED or NEEDS_REVIEW
 Show missing fields, conflicts, warnings, and required evidence
 Store timeline events
