@@ -12,6 +12,7 @@ import { ValidationSummaryCard } from "./validation-summary-card";
 import { MissingFieldsCard } from "./missing-fields-card";
 import { ConflictsCard } from "./conflicts-card";
 import { NeedsReviewCallout } from "./needs-review-callout";
+import { SourceDocumentCard } from "./source-document-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -51,6 +52,8 @@ export function RunDetailScreen() {
         <DocumentMetadataCard document={selectedRun.document} />
         <RunStatusCard run={selectedRun} />
       </div>
+
+      <SourceDocumentCard document={selectedRun.document} />
 
       <ExtractedJsonCard extractedJson={selectedRun.extractedJson} />
 
