@@ -4,6 +4,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(){
     const runs = await prisma.extractionRun.findMany({
+        where : {
+            document : {
+                deletedAt : null
+            }
+        },
         orderBy : {
             createdAt : "desc",
         },

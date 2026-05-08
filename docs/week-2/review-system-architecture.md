@@ -350,6 +350,20 @@ Redis later:
 10. Every action creates ReviewDecision and ReviewEvent records.
 ```
 
+## Future Review System Expansion
+
+Current version:
+- One reviewer manually reviews each ReviewTask
+- ReviewDecision stores the accepted human output
+- ReviewEvent stores audit history
+
+Future version:
+- ReviewTask.assignedTo can assign work to specific reviewers
+- ReviewTask.priority can route urgent claims first
+- Multiple ReviewDecision rows can support multi-reviewer workflows
+- Aggregation logic can compare reviewer outputs and produce finalJson
+- Review workload can be distributed across queues or reviewer groups
+
 ---
 
 ## Final summary

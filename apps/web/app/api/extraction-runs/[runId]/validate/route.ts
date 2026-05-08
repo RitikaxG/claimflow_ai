@@ -38,6 +38,13 @@ export async function POST(_request : Request, { params } : Params ){
             );
         }
 
+        if(run.document.deletedAt){
+            return NextResponse.json(
+                { error : "This document has been deleted and cannot be processed."},
+                { status : 400 },
+            )
+        }
+
         if(run.status !== "VALIDATING"){
             return NextResponse.json(
                 { error : `Validation can only start from VALIDATING status. Current status : ${run.status}`},

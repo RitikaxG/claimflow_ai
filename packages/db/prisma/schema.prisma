@@ -29,6 +29,9 @@ enum ExtractionRunStatus {
 
 enum ExtractionEventType {
   DOCUMENT_UPLOADED
+  DOCUMENT_SOFT_DELETED
+  DOCUMENT_RESTORED
+  DUPLICATE_UPLOAD_DETECTED
   EXTRACTION_STARTED
   MODEL_RESPONSE_RECEIVED
   EXTRACTION_COMPLETED
@@ -53,11 +56,19 @@ model Document {
   sourceUrl String?
   sourceType DocumentSourceType
 
+  contentHash String?
+
   runs ExtractionRun[]
+
+  deletedAt DateTime?
+  deletedReason String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([contentHash])
+  @@index([sourceType, contentHash])
+  @@index([deletedAt])
   @@map("documents")
 }
 

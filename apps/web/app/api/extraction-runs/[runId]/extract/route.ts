@@ -38,6 +38,13 @@ export async function POST(_request : Request, { params } : Params ){
             );
         }
 
+        if(run.document.deletedAt){
+            return NextResponse.json({
+                error : "This document has been deleted and cannot be processed."
+            },
+            { status : 400 },)
+        }
+
         if(run.status !== "UPLOADED" && run.status !== "FAILED"){
             return NextResponse.json(
                 { error : `Extraction can only start from UPLOADED or FAILED status. Current Status : ${run.status}`},

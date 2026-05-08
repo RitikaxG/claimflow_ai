@@ -22,6 +22,9 @@ export type DocumentRecord = {
     contentText : string | null,
     sourceUrl : string | null,
     sourceType : DocumentSourceType,
+    contentHash : string | null,
+    deletedAt : string | null,
+    deletedReason : string | null,
     createdAt : string,
     updatedAt : string,
 };
@@ -59,9 +62,12 @@ export type ExtractionRunRecord = {
 };
 
 type UploadResponse = {
+    duplicate? : boolean,
+    restored? : boolean,
+    message? : string,
     document : DocumentRecord,
-    run : ExtractionRunRecord,
-    event : ExtractionEventRecord,
+    run : ExtractionRunRecord | null,
+    event? : ExtractionEventRecord,
 };
 
 type RunsResponse = {
@@ -186,11 +192,11 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             formData.append("sourceType","PDF");
             formData.append("file",file);
 
-            await axios.post<UploadResponse>("api/documents/upload",formData);
+            const res = await axios.post<UploadResponse>("api/documents/upload",formData);
 
             set({
                 isUploadingPdf : false,
-                successMessage : "PDF uploaded. Extraction run created.",
+                successMessage : res.data.message ?? "PDF uploaded. Extraction run created.",
             });
 
             await get().fetchRuns();
@@ -210,11 +216,11 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             formData.append("sourceType","EMAIL_TEXT");
             formData.append("contentText", contentText);
 
-            await axios.post<UploadResponse>("api/documents/upload",formData);
+            const res = await axios.post<UploadResponse>("api/documents/upload",formData);
 
             set({
                 isSubmittingEmail : false,
-                successMessage : "Email text submitted. Extraction run created."
+                successMessage : res.data.message ?? "Email text submitted. Extraction run created."
             });
 
             await get().fetchRuns();

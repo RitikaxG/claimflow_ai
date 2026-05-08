@@ -7,9 +7,14 @@ Take uploaded File
 → return storagePath
 */
 
+/*
+For duplicate detection, the upload route should read the file once, compute hash,
+then only save if needed.
+*/
+
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
-export async function saveUploadedFile(file : File){
+export async function saveUploadedFile(file : File, buffer : Buffer){
 
     if(file.type !== "application/pdf"){
         throw new Error("Only PDF file are supported currently");
@@ -18,9 +23,6 @@ export async function saveUploadedFile(file : File){
     if(file.size > MAX_FILE_SIZE_BYTES){
         throw new Error("PDF must be smaller than 10 MB");
     }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
 
     const uploadDir = path.join(process.cwd(),"uploads");
     await mkdir(uploadDir, { recursive : true });
