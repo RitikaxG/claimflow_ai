@@ -313,6 +313,27 @@ Filenames are unreliable. Content hash identifies the actual document.
 
 ---
 
+### Week 1 Evaluation Checkpoint
+
+Implemented:
+
+- Exported actual Gemini extraction and validation outputs from Postgres
+- Compared actual outputs against expected outputs for 5 sample PDFs
+- Checked extraction schema validity using `ClaimExtractionSchema`
+- Checked validation schema validity using `ClaimValidationResultSchema`
+- Compared critical extraction fields
+- Compared validation status, missing fields, required evidence, conflict rule IDs, and warning rule IDs
+- Generated eval reports:
+  - `sample-data/auto-insurance/v1/eval-results/week-1-eval.md`
+  - `sample-data/auto-insurance/v1/eval-results/week-1-eval.json`
+
+Result:
+
+- All evaluated samples passed schema checks
+- Validation results matched expected outputs
+- Risky/incomplete claims correctly moved to `NEEDS_REVIEW`
+- Week 1 is ready to support Week 2 human review workflow
+
 ## What Week 1 intentionally did not build
 
 Week 1 did not build:
