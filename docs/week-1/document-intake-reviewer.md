@@ -313,26 +313,33 @@ Filenames are unreliable. Content hash identifies the actual document.
 
 ---
 
-### Week 1 Evaluation Checkpoint
+## Week 1 Evaluation Checkpoint
 
-Implemented:
+Because the Week 1 sample PDFs were clean and controlled, Gemini was able to extract the expected structured JSON for all five test cases.
 
-- Exported actual Gemini extraction and validation outputs from Postgres
-- Compared actual outputs against expected outputs for 5 sample PDFs
-- Checked extraction schema validity using `ClaimExtractionSchema`
-- Checked validation schema validity using `ClaimValidationResultSchema`
-- Compared critical extraction fields
-- Compared validation status, missing fields, required evidence, conflict rule IDs, and warning rule IDs
-- Generated eval reports:
-  - `sample-data/auto-insurance/v1/eval-results/week-1-eval.md`
-  - `sample-data/auto-insurance/v1/eval-results/week-1-eval.json`
+This evaluation was not meant to be a hard benchmark on messy real-world insurance documents. It was a baseline sanity check to verify that:
+
+- Gemini output conforms to the expected `ClaimExtractionSchema`
+- validation output conforms to the expected `ClaimValidationResultSchema`
+- deterministic validation produces the expected `COMPLETED` or `NEEDS_REVIEW` status
+- the project now has a repeatable eval harness for future messy PDFs and regression testing
+
+Evaluated samples:
+
+- valid own-damage claim
+- missing policy number
+- theft claim missing FIR
+- repair estimate only
+- third-party claim without police report
 
 Result:
 
-- All evaluated samples passed schema checks
-- Validation results matched expected outputs
-- Risky/incomplete claims correctly moved to `NEEDS_REVIEW`
-- Week 1 is ready to support Week 2 human review workflow
+- all extracted JSON outputs matched the expected clean-sample outputs
+- all validation outputs matched expected validation results
+- risky/incomplete claims correctly routed to `NEEDS_REVIEW`
+
+The main value of this checkpoint is not that Gemini struggled; it did not on these clean samples. The value is that ClaimFlow now has a reusable evaluation path before adding human review, messy documents, RAG, memory, and orchestration.
+
 
 ## What Week 1 intentionally did not build
 
