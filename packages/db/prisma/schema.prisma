@@ -27,6 +27,37 @@ enum ExtractionRunStatus {
   FAILED
 }
 
+enum ReviewTaskStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  EDITED_AND_APPROVED
+  REJECTED
+  NEEDS_MORE_INFO
+}
+
+enum ReviewPriority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+enum ReviewDecisionType {
+  APPROVE_AS_IS
+  EDIT_AND_APPROVE
+  REJECT
+  REQUEST_MODE_INFO
+}
+
+enum ReviewEventType {
+  REVIEW_TASK_CREATED
+  REVIEW_STARTED
+  REVIEW_APPROVED_AS_IS
+  REVIEW_EDITED_AND_APPROVED
+  REVIEW_REJECTED
+  REVIEW_MORE_INFO_REQUESTED
+}
+
 enum ExtractionEventType {
   DOCUMENT_UPLOADED
   DOCUMENT_SOFT_DELETED
@@ -93,6 +124,7 @@ model ExtractionRun {
   errorMessage String?
 
   events ExtractionEvent[]
+  reviewTask ReviewTask?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,4 +150,67 @@ model ExtractionEvent {
   @@index([runId])
   @@index([type])
   @@map("extraction_events")
+}
+
+model ReviewTask {
+  id String @id @default(cuid())
+
+  runId String @unique
+  run ExtractionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  status ReviewTaskStatus @default(PENDING)
+  priority ReviewPriority @default(NORMAL)
+
+  reasonJson Json
+
+  assignedTo String?
+  startedAt DateTime?
+  completedAt DateTime?
+
+  decisions ReviewDecision[]
+  events ReviewEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+  @@map("review_tasks")
+}
+
+model ReviewDecision {
+  id String @id @default(cuid())
+
+  taskId String
+  task ReviewTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  decision ReviewDecisionType
+
+  correctedJson Json?
+  notes String?
+  reviewerName String?
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([decision])
+  @@map("review_decisions")
+}
+
+model ReviewEvent {
+  id String @id @default(cuid())
+
+  taskId String
+  task ReviewTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  type ReviewEventType
+  message String
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([type])
+  @@map("review_events")
 }
