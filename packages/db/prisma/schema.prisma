@@ -46,7 +46,7 @@ enum ReviewDecisionType {
   APPROVE_AS_IS
   EDIT_AND_APPROVE
   REJECT
-  REQUEST_MODE_INFO
+  REQUEST_MORE_INFO
 }
 
 enum ReviewEventType {
