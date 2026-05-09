@@ -1,0 +1,22 @@
+[
+  {
+    "sampleName": "valid-own-damage",
+    "documentFilename": "valid-own-damage.pdf"
+  },
+  {
+    "sampleName": "missing-policy-number",
+    "documentFilename": "missing-policy-number.pdf"
+  },
+  {
+    "sampleName": "theft-missing-fir",
+    "documentFilename": "theft-missing-fir.pdf"
+  },
+  {
+    "sampleName": "repair-estimate-only",
+    "documentFilename": "repair-estimate-only.pdf"
+  },
+  {
+    "sampleName": "third-party-no-police",
+    "documentFilename": "third-party-no-police.pdf"
+  }
+]

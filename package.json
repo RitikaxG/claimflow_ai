@@ -9,7 +9,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:generate": "bun --filter @repo/db db:generate",
     "db:migrate": "bun --filter @repo/db db:migrate",
-    "db:studio": "bun --filter @repo/db db:studio"
+    "db:studio": "bun --filter @repo/db db:studio",
+    "eval:week1:export": "bun --filter @repo/evals export:week1",
+    "eval:week1": "bun --filter @repo/evals eval:week1"
   },
   "devDependencies": {
     "prettier": "^3.6.0",
