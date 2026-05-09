@@ -1,19 +1,19 @@
 {
-  "name": "evals",
-  "module": "index.ts",
+  "name": "@repo/evals",
   "type": "module",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@repo/db":"workspace:*",
-    "@repo/shared":"workspace:*"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
   "scripts": {
     "export:week1": "bun --env-file ../db/.env export-week1-actuals.ts",
     "eval:week1": "bun evaluate-week1.ts",
     "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@repo/db": "workspace:*",
+    "@repo/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22.0.0",
+    "typescript": "^5"
   }
 }

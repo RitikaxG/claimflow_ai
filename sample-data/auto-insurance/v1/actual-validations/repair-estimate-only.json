@@ -1,0 +1,30 @@
+{
+  "isValid": false,
+  "warnings": [
+    {
+      "field": "documentType",
+      "ruleId": "DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY",
+      "message": "Document is a repair estimate, not a complete auto insurance claim form.",
+      "severity": "warning"
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "incident.lossType",
+      "ruleId": "LOSS_TYPE_UNKNOWN",
+      "message": "Loss type is unknown.",
+      "severity": "error"
+    }
+  ],
+  "finalStatus": "NEEDS_REVIEW",
+  "missingFields": [
+    "policyNumber",
+    "claimantName_or_insuredName",
+    "incident.incidentDate",
+    "incident.incidentLocation",
+    "incident.description"
+  ],
+  "requiredEvidence": [
+    "claimForm"
+  ]
+}

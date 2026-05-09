@@ -1,0 +1,54 @@
+{
+  "damage": {
+    "currency": "INR",
+    "damagedParts": [
+      "rear-side"
+    ],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 68000
+  },
+  "police": {
+    "firNumber": null,
+    "reportDate": null,
+    "policeStation": null,
+    "wasReportedToPolice": false
+  },
+  "vehicle": {
+    "make": "Honda",
+    "year": null,
+    "model": "City",
+    "engineNumber": null,
+    "chassisNumber": null,
+    "registrationNumber": "KA05MN7890"
+  },
+  "incident": {
+    "lossType": "third_party",
+    "description": "The insured vehicle collided with another vehicle at a traffic signal. The third-party vehicle had visible rear-side damage.",
+    "incidentDate": "2026-04-21",
+    "incidentTime": "20:45",
+    "incidentLocation": "Bengaluru Outer Ring Road"
+  },
+  "claimNumber": "CLM-2026-1003",
+  "insuredName": "Rohan Verma",
+  "claimantName": "Rohan Verma",
+  "contactEmail": "rohan.verma@example.com",
+  "contactPhone": null,
+  "documentType": "auto_insurance_claim_form",
+  "policyNumber": "AUTO-2026-5512",
+  "missingEvidence": [
+    "contactPhone",
+    "vehicle.year",
+    "vehicle.engineNumber",
+    "vehicle.chassisNumber",
+    "police.policeStation",
+    "police.firNumber",
+    "police.reportDate"
+  ],
+  "overallConfidence": 0.95,
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "policeReport": false,
+    "repairEstimate": true
+  }
+}

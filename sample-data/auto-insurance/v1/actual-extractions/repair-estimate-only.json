@@ -1,0 +1,48 @@
+{
+  "damage": {
+    "currency": "INR",
+    "damagedParts": [
+      "Front bumper",
+      "Left headlight",
+      "Paint and labor"
+    ],
+    "damageSeverity": "unknown",
+    "estimatedRepairCost": 42000
+  },
+  "police": {
+    "firNumber": null,
+    "reportDate": null,
+    "policeStation": null,
+    "wasReportedToPolice": false
+  },
+  "vehicle": {
+    "make": null,
+    "year": null,
+    "model": null,
+    "engineNumber": null,
+    "chassisNumber": null,
+    "registrationNumber": "DL01AB1234"
+  },
+  "incident": {
+    "lossType": "unknown",
+    "description": null,
+    "incidentDate": null,
+    "incidentTime": null,
+    "incidentLocation": null
+  },
+  "claimNumber": null,
+  "insuredName": null,
+  "claimantName": null,
+  "contactEmail": null,
+  "contactPhone": null,
+  "documentType": "repair_estimate",
+  "policyNumber": null,
+  "missingEvidence": [],
+  "overallConfidence": 0.9,
+  "supportingDocuments": {
+    "claimForm": false,
+    "damagePhoto": false,
+    "policeReport": false,
+    "repairEstimate": true
+  }
+}

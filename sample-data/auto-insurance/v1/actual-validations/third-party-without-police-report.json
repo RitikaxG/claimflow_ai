@@ -1,0 +1,17 @@
+{
+  "isValid": false,
+  "warnings": [
+    {
+      "field": "supportingDocuments.policeReport",
+      "ruleId": "THIRD_PARTY_POLICE_REPORT_RECOMMENDED",
+      "message": "Police report is recommended for third-party claims.",
+      "severity": "warning"
+    }
+  ],
+  "conflicts": [],
+  "finalStatus": "NEEDS_REVIEW",
+  "missingFields": [],
+  "requiredEvidence": [
+    "policeReport"
+  ]
+}

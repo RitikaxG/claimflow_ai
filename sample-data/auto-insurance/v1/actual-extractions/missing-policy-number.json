@@ -1,0 +1,46 @@
+{
+  "damage": {
+    "currency": "INR",
+    "damagedParts": [
+      "rear bumper"
+    ],
+    "damageSeverity": "unknown",
+    "estimatedRepairCost": 18500
+  },
+  "police": {
+    "firNumber": null,
+    "reportDate": null,
+    "policeStation": null,
+    "wasReportedToPolice": false
+  },
+  "vehicle": {
+    "make": "Maruti Suzuki",
+    "year": null,
+    "model": "Swift",
+    "engineNumber": null,
+    "chassisNumber": null,
+    "registrationNumber": "MH12CD4567"
+  },
+  "incident": {
+    "lossType": "own_damage",
+    "description": "The rear bumper was damaged after another car hit the vehicle from behind.",
+    "incidentDate": "2026-04-20",
+    "incidentTime": "09:15",
+    "incidentLocation": "Pune Highway"
+  },
+  "claimNumber": "CLM-2026-1002",
+  "insuredName": "Priya Mehta",
+  "claimantName": "Priya Mehta",
+  "contactEmail": "priya.mehta@example.com",
+  "contactPhone": "+91-9988776655",
+  "documentType": "auto_insurance_claim_form",
+  "policyNumber": null,
+  "missingEvidence": [],
+  "overallConfidence": 0.95,
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "policeReport": false,
+    "repairEstimate": true
+  }
+}

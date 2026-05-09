@@ -1,0 +1,56 @@
+{
+  "damage": {
+    "currency": null,
+    "damagedParts": [],
+    "damageSeverity": "unknown",
+    "estimatedRepairCost": null
+  },
+  "police": {
+    "firNumber": null,
+    "reportDate": null,
+    "policeStation": "Chennai Central Police Station",
+    "wasReportedToPolice": true
+  },
+  "vehicle": {
+    "make": "Toyota",
+    "year": null,
+    "model": "Innova",
+    "engineNumber": null,
+    "chassisNumber": null,
+    "registrationNumber": "TN09XY2222"
+  },
+  "incident": {
+    "lossType": "theft",
+    "description": "The vehicle was parked at Chennai Central Parking Area and was missing when the claimant returned.",
+    "incidentDate": "2026-04-10",
+    "incidentTime": "22:00",
+    "incidentLocation": "Chennai Central Parking Area"
+  },
+  "claimNumber": "CLM-2026-1004",
+  "insuredName": "Neha Iyer",
+  "claimantName": "Neha Iyer",
+  "contactEmail": null,
+  "contactPhone": "+91-9123456780",
+  "documentType": "auto_insurance_claim_form",
+  "policyNumber": "AUTO-2026-7710",
+  "missingEvidence": [
+    "Vehicle engine number",
+    "Vehicle chassis number",
+    "Vehicle year",
+    "Contact email",
+    "Damage details",
+    "Estimated repair cost",
+    "Currency",
+    "FIR number",
+    "Police report date",
+    "Damage photos",
+    "Repair estimate"
+  ],
+  "overallConfidence": 0.95,
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": false,
+    "policeReport": false,
+    "repairEstimate": false
+  }
+}

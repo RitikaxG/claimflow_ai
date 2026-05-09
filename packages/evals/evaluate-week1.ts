@@ -38,7 +38,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const BASE_DIR = process.env.EVAL_BASE_DIR
   ? path.resolve(process.env.EVAL_BASE_DIR)
-  : path.resolve(__dirname, "../../../sample-data/auto-insurance/v1");
+  : path.resolve(__dirname, "../../sample-data/auto-insurance/v1");
 
 const EXPECTED_EXTRACTIONS_DIR = path.join(BASE_DIR, "expected-extractions");
 const ACTUAL_EXTRACTIONS_DIR = path.join(BASE_DIR, "actual-extractions");

@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const BASE_DIR = process.env.EVAL_BASE_DIR
   ? path.resolve(process.env.EVAL_BASE_DIR)
-  : path.resolve(__dirname, "../../../sample-data/auto-insurance/v1");
+  : path.resolve(__dirname, "../../sample-data/auto-insurance/v1");
 
 const MANIFEST_PATH = path.join(BASE_DIR, "eval-manifest.json");
 const ACTUAL_EXTRACTIONS_DIR = path.join(BASE_DIR, "actual-extractions");
@@ -83,7 +83,7 @@ async function findRun(item: EvalManifestItem) {
     throw new Error(`${item.sampleName} is missing documentFilename.`);
   }
 
-  return prisma.extractionRun.findFirst({
+  const candidateRuns = await prisma.extractionRun.findMany({
     where: {
       document: {
         filename: item.documentFilename,
@@ -97,12 +97,18 @@ async function findRun(item: EvalManifestItem) {
       document: true,
     },
   });
+
+  return (
+    candidateRuns.find(
+      (run) => run.extractedJson !== null && run.validationJson !== null,
+    ) ?? null
+  );
 }
 
 async function main() {
   if (!process.env.DATABASE_URL) {
     throw new Error(
-      "DATABASE_URL is missing. Expected it in packages/.env via --env-file ../.env.",
+      "DATABASE_URL is missing. Expected it in packages/db/.env via --env-file ../db/.env.",
     );
   }
 
@@ -115,9 +121,11 @@ async function main() {
     const run = await findRun(item);
 
     if (!run) {
-      throw new Error(
-        `No run found for ${item.sampleName}. Check eval-manifest.json.`,
-      );
+        throw new Error(
+            `No completed validated run found for ${item.sampleName}. ` +
+            `Checked documentFilename="${item.documentFilename}". ` +
+            `Make sure this document has been extracted and validated.`,
+        );
     }
 
     if (!run.extractedJson) {

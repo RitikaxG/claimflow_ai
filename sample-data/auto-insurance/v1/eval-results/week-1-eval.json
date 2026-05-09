@@ -1,0 +1,728 @@
+[
+  {
+    "sampleName": "missing-policy-number",
+    "extractionSchemaValid": true,
+    "validationSchemaValid": true,
+    "extractionScore": 15,
+    "extractionTotal": 15,
+    "validationPassed": true,
+    "expectedFinalStatus": "NEEDS_REVIEW",
+    "actualFinalStatus": "NEEDS_REVIEW",
+    "fieldChecks": [
+      {
+        "field": "documentType",
+        "expected": "auto_insurance_claim_form",
+        "actual": "auto_insurance_claim_form",
+        "passed": true
+      },
+      {
+        "field": "policyNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "claimNumber",
+        "expected": "CLM-2026-1002",
+        "actual": "CLM-2026-1002",
+        "passed": true
+      },
+      {
+        "field": "insuredName",
+        "expected": "Priya Mehta",
+        "actual": "Priya Mehta",
+        "passed": true
+      },
+      {
+        "field": "claimantName",
+        "expected": "Priya Mehta",
+        "actual": "Priya Mehta",
+        "passed": true
+      },
+      {
+        "field": "vehicle.registrationNumber",
+        "expected": "MH12CD4567",
+        "actual": "MH12CD4567",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentDate",
+        "expected": "2026-04-20",
+        "actual": "2026-04-20",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentLocation",
+        "expected": "Pune Highway",
+        "actual": "Pune Highway",
+        "passed": true
+      },
+      {
+        "field": "incident.lossType",
+        "expected": "own_damage",
+        "actual": "own_damage",
+        "passed": true
+      },
+      {
+        "field": "damage.estimatedRepairCost",
+        "expected": 18500,
+        "actual": 18500,
+        "passed": true
+      },
+      {
+        "field": "damage.currency",
+        "expected": "INR",
+        "actual": "INR",
+        "passed": true
+      },
+      {
+        "field": "police.firNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.claimForm",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.repairEstimate",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.policeReport",
+        "expected": false,
+        "actual": false,
+        "passed": true
+      }
+    ],
+    "validationChecks": [
+      {
+        "name": "finalStatus",
+        "expected": "NEEDS_REVIEW",
+        "actual": "NEEDS_REVIEW",
+        "passed": true
+      },
+      {
+        "name": "missingFields",
+        "expected": [
+          "policyNumber"
+        ],
+        "actual": [
+          "policyNumber"
+        ],
+        "passed": true
+      },
+      {
+        "name": "requiredEvidence",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "conflicts.ruleId",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "warnings.ruleId",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      }
+    ],
+    "blockers": []
+  },
+  {
+    "sampleName": "repair-estimate-only",
+    "extractionSchemaValid": true,
+    "validationSchemaValid": true,
+    "extractionScore": 15,
+    "extractionTotal": 15,
+    "validationPassed": false,
+    "expectedFinalStatus": "NEEDS_REVIEW",
+    "actualFinalStatus": "NEEDS_REVIEW",
+    "fieldChecks": [
+      {
+        "field": "documentType",
+        "expected": "repair_estimate",
+        "actual": "repair_estimate",
+        "passed": true
+      },
+      {
+        "field": "policyNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "claimNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "insuredName",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "claimantName",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "vehicle.registrationNumber",
+        "expected": "DL01AB1234",
+        "actual": "DL01AB1234",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentDate",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "incident.incidentLocation",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "incident.lossType",
+        "expected": "unknown",
+        "actual": "unknown",
+        "passed": true
+      },
+      {
+        "field": "damage.estimatedRepairCost",
+        "expected": 42000,
+        "actual": 42000,
+        "passed": true
+      },
+      {
+        "field": "damage.currency",
+        "expected": "INR",
+        "actual": "INR",
+        "passed": true
+      },
+      {
+        "field": "police.firNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.claimForm",
+        "expected": false,
+        "actual": false,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.repairEstimate",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.policeReport",
+        "expected": false,
+        "actual": false,
+        "passed": true
+      }
+    ],
+    "validationChecks": [
+      {
+        "name": "finalStatus",
+        "expected": "NEEDS_REVIEW",
+        "actual": "NEEDS_REVIEW",
+        "passed": true
+      },
+      {
+        "name": "missingFields",
+        "expected": [
+          "claimantName_or_insuredName",
+          "incident.description",
+          "incident.incidentDate",
+          "incident.incidentLocation",
+          "policyNumber"
+        ],
+        "actual": [
+          "claimantName_or_insuredName",
+          "incident.description",
+          "incident.incidentDate",
+          "incident.incidentLocation",
+          "policyNumber"
+        ],
+        "passed": true
+      },
+      {
+        "name": "requiredEvidence",
+        "expected": [
+          "claimForm"
+        ],
+        "actual": [
+          "claimForm"
+        ],
+        "passed": true
+      },
+      {
+        "name": "conflicts.ruleId",
+        "expected": [
+          "LOSS_TYPE_UNKNOWN"
+        ],
+        "actual": [
+          "LOSS_TYPE_UNKNOWN"
+        ],
+        "passed": true
+      },
+      {
+        "name": "warnings.ruleId",
+        "expected": [
+          "DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY",
+          "LOW_CONFIDENCE_REVIEW"
+        ],
+        "actual": [
+          "DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY"
+        ],
+        "passed": false
+      }
+    ],
+    "blockers": []
+  },
+  {
+    "sampleName": "theft-claim-missing-fir",
+    "extractionSchemaValid": true,
+    "validationSchemaValid": true,
+    "extractionScore": 15,
+    "extractionTotal": 15,
+    "validationPassed": true,
+    "expectedFinalStatus": "NEEDS_REVIEW",
+    "actualFinalStatus": "NEEDS_REVIEW",
+    "fieldChecks": [
+      {
+        "field": "documentType",
+        "expected": "auto_insurance_claim_form",
+        "actual": "auto_insurance_claim_form",
+        "passed": true
+      },
+      {
+        "field": "policyNumber",
+        "expected": "AUTO-2026-7710",
+        "actual": "AUTO-2026-7710",
+        "passed": true
+      },
+      {
+        "field": "claimNumber",
+        "expected": "CLM-2026-1004",
+        "actual": "CLM-2026-1004",
+        "passed": true
+      },
+      {
+        "field": "insuredName",
+        "expected": "Neha Iyer",
+        "actual": "Neha Iyer",
+        "passed": true
+      },
+      {
+        "field": "claimantName",
+        "expected": "Neha Iyer",
+        "actual": "Neha Iyer",
+        "passed": true
+      },
+      {
+        "field": "vehicle.registrationNumber",
+        "expected": "TN09XY2222",
+        "actual": "TN09XY2222",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentDate",
+        "expected": "2026-04-10",
+        "actual": "2026-04-10",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentLocation",
+        "expected": "Chennai Central Parking Area",
+        "actual": "Chennai Central Parking Area",
+        "passed": true
+      },
+      {
+        "field": "incident.lossType",
+        "expected": "theft",
+        "actual": "theft",
+        "passed": true
+      },
+      {
+        "field": "damage.estimatedRepairCost",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "damage.currency",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "police.firNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.claimForm",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.repairEstimate",
+        "expected": false,
+        "actual": false,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.policeReport",
+        "expected": false,
+        "actual": false,
+        "passed": true
+      }
+    ],
+    "validationChecks": [
+      {
+        "name": "finalStatus",
+        "expected": "NEEDS_REVIEW",
+        "actual": "NEEDS_REVIEW",
+        "passed": true
+      },
+      {
+        "name": "missingFields",
+        "expected": [
+          "police.firNumber"
+        ],
+        "actual": [
+          "police.firNumber"
+        ],
+        "passed": true
+      },
+      {
+        "name": "requiredEvidence",
+        "expected": [
+          "firNumber",
+          "policeReport"
+        ],
+        "actual": [
+          "firNumber",
+          "policeReport"
+        ],
+        "passed": true
+      },
+      {
+        "name": "conflicts.ruleId",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "warnings.ruleId",
+        "expected": [
+          "THEFT_POLICE_REPORT_REQUIRED"
+        ],
+        "actual": [
+          "THEFT_POLICE_REPORT_REQUIRED"
+        ],
+        "passed": true
+      }
+    ],
+    "blockers": []
+  },
+  {
+    "sampleName": "third-party-without-police-report",
+    "extractionSchemaValid": true,
+    "validationSchemaValid": true,
+    "extractionScore": 15,
+    "extractionTotal": 15,
+    "validationPassed": true,
+    "expectedFinalStatus": "NEEDS_REVIEW",
+    "actualFinalStatus": "NEEDS_REVIEW",
+    "fieldChecks": [
+      {
+        "field": "documentType",
+        "expected": "auto_insurance_claim_form",
+        "actual": "auto_insurance_claim_form",
+        "passed": true
+      },
+      {
+        "field": "policyNumber",
+        "expected": "AUTO-2026-5512",
+        "actual": "AUTO-2026-5512",
+        "passed": true
+      },
+      {
+        "field": "claimNumber",
+        "expected": "CLM-2026-1003",
+        "actual": "CLM-2026-1003",
+        "passed": true
+      },
+      {
+        "field": "insuredName",
+        "expected": "Rohan Verma",
+        "actual": "Rohan Verma",
+        "passed": true
+      },
+      {
+        "field": "claimantName",
+        "expected": "Rohan Verma",
+        "actual": "Rohan Verma",
+        "passed": true
+      },
+      {
+        "field": "vehicle.registrationNumber",
+        "expected": "KA05MN7890",
+        "actual": "KA05MN7890",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentDate",
+        "expected": "2026-04-21",
+        "actual": "2026-04-21",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentLocation",
+        "expected": "Bengaluru Outer Ring Road",
+        "actual": "Bengaluru Outer Ring Road",
+        "passed": true
+      },
+      {
+        "field": "incident.lossType",
+        "expected": "third_party",
+        "actual": "third_party",
+        "passed": true
+      },
+      {
+        "field": "damage.estimatedRepairCost",
+        "expected": 68000,
+        "actual": 68000,
+        "passed": true
+      },
+      {
+        "field": "damage.currency",
+        "expected": "INR",
+        "actual": "INR",
+        "passed": true
+      },
+      {
+        "field": "police.firNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.claimForm",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.repairEstimate",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.policeReport",
+        "expected": false,
+        "actual": false,
+        "passed": true
+      }
+    ],
+    "validationChecks": [
+      {
+        "name": "finalStatus",
+        "expected": "NEEDS_REVIEW",
+        "actual": "NEEDS_REVIEW",
+        "passed": true
+      },
+      {
+        "name": "missingFields",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "requiredEvidence",
+        "expected": [
+          "policeReport"
+        ],
+        "actual": [
+          "policeReport"
+        ],
+        "passed": true
+      },
+      {
+        "name": "conflicts.ruleId",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "warnings.ruleId",
+        "expected": [
+          "THIRD_PARTY_POLICE_REPORT_RECOMMENDED"
+        ],
+        "actual": [
+          "THIRD_PARTY_POLICE_REPORT_RECOMMENDED"
+        ],
+        "passed": true
+      }
+    ],
+    "blockers": []
+  },
+  {
+    "sampleName": "valid-own-damage-claim",
+    "extractionSchemaValid": true,
+    "validationSchemaValid": true,
+    "extractionScore": 15,
+    "extractionTotal": 15,
+    "validationPassed": true,
+    "expectedFinalStatus": "COMPLETED",
+    "actualFinalStatus": "COMPLETED",
+    "fieldChecks": [
+      {
+        "field": "documentType",
+        "expected": "auto_insurance_claim_form",
+        "actual": "auto_insurance_claim_form",
+        "passed": true
+      },
+      {
+        "field": "policyNumber",
+        "expected": "AUTO-2026-8841",
+        "actual": "AUTO-2026-8841",
+        "passed": true
+      },
+      {
+        "field": "claimNumber",
+        "expected": "CLM-2026-1001",
+        "actual": "CLM-2026-1001",
+        "passed": true
+      },
+      {
+        "field": "insuredName",
+        "expected": "Amit Sharma",
+        "actual": "Amit Sharma",
+        "passed": true
+      },
+      {
+        "field": "claimantName",
+        "expected": "Amit Sharma",
+        "actual": "Amit Sharma",
+        "passed": true
+      },
+      {
+        "field": "vehicle.registrationNumber",
+        "expected": "DL01AB1234",
+        "actual": "DL01AB1234",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentDate",
+        "expected": "2026-04-18",
+        "actual": "2026-04-18",
+        "passed": true
+      },
+      {
+        "field": "incident.incidentLocation",
+        "expected": "Delhi Ring Road",
+        "actual": "Delhi Ring Road",
+        "passed": true
+      },
+      {
+        "field": "incident.lossType",
+        "expected": "own_damage",
+        "actual": "own_damage",
+        "passed": true
+      },
+      {
+        "field": "damage.estimatedRepairCost",
+        "expected": 42000,
+        "actual": 42000,
+        "passed": true
+      },
+      {
+        "field": "damage.currency",
+        "expected": "INR",
+        "actual": "INR",
+        "passed": true
+      },
+      {
+        "field": "police.firNumber",
+        "expected": null,
+        "actual": null,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.claimForm",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.repairEstimate",
+        "expected": true,
+        "actual": true,
+        "passed": true
+      },
+      {
+        "field": "supportingDocuments.policeReport",
+        "expected": false,
+        "actual": false,
+        "passed": true
+      }
+    ],
+    "validationChecks": [
+      {
+        "name": "finalStatus",
+        "expected": "COMPLETED",
+        "actual": "COMPLETED",
+        "passed": true
+      },
+      {
+        "name": "missingFields",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "requiredEvidence",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "conflicts.ruleId",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      },
+      {
+        "name": "warnings.ruleId",
+        "expected": [],
+        "actual": [],
+        "passed": true
+      }
+    ],
+    "blockers": []
+  }
+]
