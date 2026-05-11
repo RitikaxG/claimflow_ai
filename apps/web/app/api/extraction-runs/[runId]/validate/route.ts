@@ -1,6 +1,7 @@
 import { ExtractionEventType, prisma, Prisma } from "@repo/db";
 import { NextResponse } from "next/server";
 import { validateClaimExtraction } from "@repo/shared/validation";
+import { createReviewTaskFromValidation } from "../../../../../lib/review/create-review-task-from-validation";
 
 type Params = {
     params : Promise<{ 
@@ -134,6 +135,14 @@ export async function POST(_request : Request, { params } : Params ){
                 },
             });
 
+            if(validationResult.finalStatus === "NEEDS_REVIEW"){
+                await createReviewTaskFromValidation({
+                    run,
+                    validationResult,
+                    tx,
+                })
+            }
+
             return tx.extractionRun.update({
                 where : { id : run.id },
                 data : {
@@ -148,6 +157,15 @@ export async function POST(_request : Request, { params } : Params ){
                             createdAt : "asc",
                         },
                     },
+                    reviewTask : {
+                        include : {
+                            events : {
+                                orderBy : {
+                                    createdAt : "asc",
+                                }
+                            }
+                        }
+                    }
                 },
             });
         });
