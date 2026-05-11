@@ -59,7 +59,7 @@ export async function POST(request : Request, { params } : Params){
 
     if(task.status !== "IN_REVIEW"){
         return NextResponse.json(
-            { error : `More info can be requested when status is IN_REVIEW. Current status : ${task.status}`},
+            { error : `More info can only be requested when status is IN_REVIEW. Current status : ${task.status}`},
             { status : 409 },
         )
     }
@@ -101,6 +101,7 @@ export async function POST(request : Request, { params } : Params){
             },
             include : {
                 run : {
+                    document : true,
                     include : {
                         events : {
                             orderBy : {
