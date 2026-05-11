@@ -39,7 +39,7 @@ export async function POST(_request : Request, { params } : Params){
             }
         });
 
-        await tx.reviewTask.update({
+        return tx.reviewTask.update({
             where : {
                 id : taskId,
             },

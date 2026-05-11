@@ -117,7 +117,7 @@ export async function POST(request : Request, { params } : Params) {
                     decision : ReviewDecisionType.APPROVE_AS_IS,
                     decisionId : decision.id,
                     approvedJsonSource : "extractionRun.extractedJson",
-                    hasCoorectedJson : true,
+                    hasCorrectedJson : true,
                     reviewerName : reviewerName ?? null,
                 }),
             }
@@ -133,7 +133,6 @@ export async function POST(request : Request, { params } : Params) {
             },
             include : {
                 run : {
-                    document : true,
                     include : {
                         document : true,
                         events : {

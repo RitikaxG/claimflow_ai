@@ -101,8 +101,8 @@ export async function POST(request : Request, { params } : Params){
             },
             include : {
                 run : {
-                    document : true,
                     include : {
+                        document : true,
                         events : {
                             orderBy : {
                                 createdAt : "asc",
