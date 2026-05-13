@@ -300,7 +300,7 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
               value={reviewerName}
               onChange={(event) => setReviewerName(event.target.value)}
               placeholder="Ritika"
-              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-gray-400"
             />
           </label>
 
@@ -316,7 +316,7 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
               value={approveNotes}
               onChange={(event) => setApproveNotes(event.target.value)}
               placeholder="Optional approval notes..."
-              className="mt-3 min-h-20 w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm outline-none focus:border-green-400"
+              className="mt-3 min-h-20 w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-green-400"
             />
 
             <button
@@ -343,7 +343,7 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
               value={rejectNotes}
               onChange={(event) => setRejectNotes(event.target.value)}
               placeholder="Explain why this extraction is rejected..."
-              className="mt-3 min-h-24 w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-sm outline-none focus:border-red-400"
+              className="mt-3 min-h-24 w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-red-400"
             />
 
             <button
@@ -372,7 +372,7 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
               value={moreInfoNotes}
               onChange={(event) => setMoreInfoNotes(event.target.value)}
               placeholder="Example: Please provide FIR number and police report."
-              className="mt-3 min-h-24 w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm outline-none focus:border-orange-400"
+              className="mt-3 min-h-24 w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-orange-400"
             />
 
             <button
