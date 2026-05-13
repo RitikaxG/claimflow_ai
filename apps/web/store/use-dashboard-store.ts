@@ -26,7 +26,7 @@ export type ExtractionEventRecord = {
     runId : string,
     type : string,
     message : string,
-    metadata : unknown,
+    metadata : unknown | null,
     createdAt : string,
 };
 

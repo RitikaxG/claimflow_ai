@@ -8,7 +8,7 @@ export default function ReviewQueuePage() {
         <header className="space-y-4">
           <div>
             <p className="text-sm font-medium text-gray-500">
-              Week 2 Foundation · Human Review Queue
+              Week 2 · Human Review Queue
             </p>
 
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950">
@@ -16,8 +16,7 @@ export default function ReviewQueuePage() {
             </h1>
 
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Runs with missing fields, conflicts, low confidence, or required
-              evidence appear here for human review.
+              Review tasks created from AI validation failures appear here for human review.
             </p>
           </div>
 

@@ -5,6 +5,13 @@ import { NextResponse } from "next/server";
 
 export async function GET(){
     const reviewTasks = await prisma.reviewTask.findMany({
+        where : {
+            run : {
+                document : {
+                    deletedAt : null,
+                }
+            }
+        },
         orderBy : {
             createdAt : "desc",
         },

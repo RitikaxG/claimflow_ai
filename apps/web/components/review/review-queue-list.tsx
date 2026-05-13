@@ -79,8 +79,7 @@ export function ReviewQueueList() {
 
       {!isFetchingReviewTasks && reviewTasks.length === 0 ? (
         <div className="p-5 text-sm text-gray-500">
-          No runs need review right now. Validate an incomplete claim to see it
-          appear here.
+          No review tasks right now. Validate an incomplete claim to create one.
         </div>
       ) : null}
 
@@ -90,67 +89,71 @@ export function ReviewQueueList() {
             <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
               <tr>
                 <th className="px-5 py-3">Document</th>
-                <th className="px-5 py-3">Type</th>
-                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3">Source type</th>
+                <th className="px-5 py-3">Task status</th>
+                <th className="px-5 py-3">Priority</th>
                 <th className="px-5 py-3">Missing</th>
                 <th className="px-5 py-3">Conflicts</th>
                 <th className="px-5 py-3">Warnings</th>
                 <th className="px-5 py-3">Evidence</th>
-                <th className="px-5 py-3">Updated</th>
+                <th className="px-5 py-3">Created</th>
                 <th className="px-5 py-3">Action</th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {reviewTasks.map((task) => {
-                const counts = getReviewReasonCounts(task.reasonJson);
-                const run = task.run;
+            {reviewTasks.map((task) => {
+              const counts = getReviewReasonCounts(task.reasonJson);
 
-                return (
-                  <tr key={task.id} className="hover:bg-gray-50">
-                    <td className="px-5 py-4 font-medium text-gray-950">
-                      {task.run.document.filename}
-                    </td>
+              return (
+                <tr key={task.id} className="hover:bg-gray-50">
+                  <td className="px-5 py-4 font-medium text-gray-950">
+                    {task.run.document.filename}
+                  </td>
 
-                    <td className="px-5 py-4 text-gray-600">
-                      {task.run.document.sourceType}
-                    </td>
+                  <td className="px-5 py-4 text-gray-600">
+                    {task.run.document.sourceType}
+                  </td>
 
-                    <td className="px-5 py-4">
-                      <ReviewTaskStatusBadge status={task.status} />
-                    </td>
+                  <td className="px-5 py-4">
+                    <ReviewTaskStatusBadge status={task.status} />
+                  </td>
 
-                    <td className="px-5 py-4 font-medium text-orange-700">
-                      {counts.missingFieldsCount}
-                    </td>
+                  <td className="px-5 py-4 text-gray-700">
+                    {task.priority}
+                  </td>
 
-                    <td className="px-5 py-4 font-medium text-red-700">
-                      {counts.conflictsCount}
-                    </td>
+                  <td className="px-5 py-4 font-medium text-orange-700">
+                    {counts.missingFieldsCount}
+                  </td>
 
-                    <td className="px-5 py-4 font-medium text-yellow-700">
-                      {counts.warningsCount}
-                    </td>
+                  <td className="px-5 py-4 font-medium text-red-700">
+                    {counts.conflictsCount}
+                  </td>
 
-                    <td className="px-5 py-4 font-medium text-gray-700">
-                      {counts.requiredEvidenceCount}
-                    </td>
+                  <td className="px-5 py-4 font-medium text-yellow-700">
+                    {counts.warningsCount}
+                  </td>
 
-                    <td className="px-5 py-4 text-gray-600">
-                      {formatDate(task.updatedAt)}
-                    </td>
+                  <td className="px-5 py-4 font-medium text-gray-700">
+                    {counts.requiredEvidenceCount}
+                  </td>
 
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <Link
-                        href={`/runs/${run.id}`}
-                        className="font-medium text-gray-950 underline underline-offset-4"
-                      >
-                        Review
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
+                  <td className="px-5 py-4 text-gray-600">
+                    {formatDate(task.createdAt)}
+                  </td>
+
+                  <td className="whitespace-nowrap px-5 py-4">
+                    <Link
+                      href={`/review/${task.id}`}
+                      className="font-medium text-gray-950 underline underline-offset-4"
+                    >
+                      Review
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
             </tbody>
           </table>
         </div>
