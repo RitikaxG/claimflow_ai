@@ -3,68 +3,6 @@
 import { create } from "zustand";
 import axios from "axios";
 
-export type RunStatus = 
-    | "UPLOADED"
-    | "EXTRACTING"
-    | "VALIDATING"
-    | "COMPLETED"
-    | "NEEDS_REVIEW"
-    | "FAILED";
-
-export type ReviewTaskStatus = 
-    | "PENDING"
-    | "IN_REVIEW"
-    | "APPROVED"
-    | "EDITED_AND_APPROVED"
-    | "REJECTED"
-    | "NEEDS_MORE_INFO";
-
-export type ReviewPriority = "LOW" | "NORMAL" | "HIGH";
-
-export type ReviewDecisionRecord = {
-    id : string,
-    taskId : string,
-    decision : string,
-    coorectedJson : unknown | null,
-    notes : string | null,
-    reviewerName : string | null,
-    createdAt : string,
-};
-
-export type ReviewEventRecord = {
-    id : string,
-    taskId : string,
-    type : string,
-    message : string,
-    metadata : unknown | null,
-    createdAt : string,
-};
-
-export type ReviewTaskRecord = {
-    id : string,
-    runId : string,
-    status : ReviewTaskStatus,
-    priority : ReviewPriority,
-    reasonJson : unknown,
-    assignedTo : string | null,
-    startedAt : string | null,
-    completedAt : string | null,
-    createdAt : string,
-    updatedAt : string,
-
-    run : ExtractionEventRecord,
-    decisions : ReviewDecisionRecord[],
-    events : ReviewEventRecord[],
-};
-
-type ReviewTasksResponse = {
-    reviewTasks : ReviewTaskRecord[],
-}
-
-type ReviewTaskResponse = {
-    reviewTask : ReviewTaskRecord,
-}
-
 export type DocumentSourceType = "PDF" | "EMAIL_TEXT" | "IMAGE";
 
 export type DocumentRecord = {
@@ -85,7 +23,6 @@ export type DocumentRecord = {
 
 export type ExtractionEventRecord = {
     id : string,
-    document : DocumentRecord,
     runId : string,
     type : string,
     message : string,
@@ -139,6 +76,69 @@ type DeleteDocumentResponse = {
     alreadyDeleted? : boolean,
     message? : string,
 }
+
+export type RunStatus = 
+    | "UPLOADED"
+    | "EXTRACTING"
+    | "VALIDATING"
+    | "COMPLETED"
+    | "NEEDS_REVIEW"
+    | "FAILED";
+
+export type ReviewTaskStatus = 
+    | "PENDING"
+    | "IN_REVIEW"
+    | "APPROVED"
+    | "EDITED_AND_APPROVED"
+    | "REJECTED"
+    | "NEEDS_MORE_INFO";
+
+export type ReviewPriority = "LOW" | "NORMAL" | "HIGH";
+
+export type ReviewDecisionRecord = {
+    id : string,
+    taskId : string,
+    decision : string,
+    correctedJson : unknown | null,
+    notes : string | null,
+    reviewerName : string | null,
+    createdAt : string,
+};
+
+export type ReviewEventRecord = {
+    id : string,
+    taskId : string,
+    type : string,
+    message : string,
+    metadata : unknown | null,
+    createdAt : string,
+};
+
+export type ReviewTaskRecord = {
+    id : string,
+    runId : string,
+    status : ReviewTaskStatus,
+    priority : ReviewPriority,
+    reasonJson : unknown,
+    assignedTo : string | null,
+    startedAt : string | null,
+    completedAt : string | null,
+    createdAt : string,
+    updatedAt : string,
+
+    run : ExtractionRunRecord,
+    decisions : ReviewDecisionRecord[],
+    events : ReviewEventRecord[],
+};
+
+type ReviewTasksResponse = {
+    reviewTasks : ReviewTaskRecord[],
+}
+
+type ReviewTaskResponse = {
+    reviewTask : ReviewTaskRecord,
+}
+
 
 type DashboardStore = {
     runs : ExtractionRunRecord[],
@@ -388,7 +388,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
     fetchReviewTask : async ( taskId : string ) => {
         set({
-            isFetchingReviewTask : false,
+            isFetchingReviewTask : true,
             error : null,
         })
 

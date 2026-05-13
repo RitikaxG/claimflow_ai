@@ -3,27 +3,13 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useDashboardStore } from "../../store/use-dashboard-store";
-import { RunStatusBadge } from "../dashboard/run-status-badge";
-import { isValidationResultView } from "../../types/validation";
+import { ReviewTaskStatusBadge } from "./review-task-status-badge";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-IN", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
-}
-
-function getValidationCounts(validationJson: unknown | null) {
-  const validation = isValidationResultView(validationJson)
-    ? validationJson
-    : null;
-
-  return {
-    missingFieldsCount: validation?.missingFields.length ?? 0,
-    conflictsCount: validation?.conflicts.length ?? 0,
-    warningsCount: validation?.warnings.length ?? 0,
-    requiredEvidenceCount: validation?.requiredEvidence.length ?? 0,
-  };
 }
 
 type ReviewReasonView = {
@@ -71,11 +57,11 @@ export function ReviewQueueList() {
     <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="border-b border-gray-200 p-5">
         <h2 className="text-lg font-semibold text-gray-950">
-          Runs needing review
+          Review tasks
         </h2>
         <p className="mt-1 text-sm text-gray-600">
-          These extraction runs failed deterministic validation and need human
-          review before they can be considered complete.
+          These tasks were created when validation found missing fields, conflicts,
+          low confidence, or required evidence.
         </p>
       </div>
 
@@ -131,7 +117,7 @@ export function ReviewQueueList() {
                     </td>
 
                     <td className="px-5 py-4">
-                      <RunStatusBadge status={task.status} />
+                      <ReviewTaskStatusBadge status={task.status} />
                     </td>
 
                     <td className="px-5 py-4 font-medium text-orange-700">
