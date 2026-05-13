@@ -11,6 +11,60 @@ export type RunStatus =
     | "NEEDS_REVIEW"
     | "FAILED";
 
+export type ReviewTaskStatus = 
+    | "PENDING"
+    | "IN_REVIEW"
+    | "APPROVED"
+    | "EDITED_AND_APPROVED"
+    | "REJECTED"
+    | "NEEDS_MORE_INFO";
+
+export type ReviewPriority = "LOW" | "NORMAL" | "HIGH";
+
+export type ReviewDecisionRecord = {
+    id : string,
+    taskId : string,
+    decision : string,
+    coorectedJson : unknown | null,
+    notes : string | null,
+    reviewerName : string | null,
+    createdAt : string,
+};
+
+export type ReviewEventRecord = {
+    id : string,
+    taskId : string,
+    type : string,
+    message : string,
+    metadata : unknown | null,
+    createdAt : string,
+};
+
+export type ReviewTaskRecord = {
+    id : string,
+    runId : string,
+    status : ReviewTaskStatus,
+    priority : ReviewPriority,
+    reasonJson : unknown,
+    assignedTo : string | null,
+    startedAt : string | null,
+    completedAt : string | null,
+    createdAt : string,
+    updatedAt : string,
+
+    run : ExtractionEventRecord,
+    decisions : ReviewDecisionRecord[],
+    events : ReviewEventRecord[],
+};
+
+type ReviewTasksResponse = {
+    reviewTasks : ReviewTaskRecord[],
+}
+
+type ReviewTaskResponse = {
+    reviewTask : ReviewTaskRecord,
+}
+
 export type DocumentSourceType = "PDF" | "EMAIL_TEXT" | "IMAGE";
 
 export type DocumentRecord = {
@@ -31,6 +85,7 @@ export type DocumentRecord = {
 
 export type ExtractionEventRecord = {
     id : string,
+    document : DocumentRecord,
     runId : string,
     type : string,
     message : string,
@@ -87,12 +142,18 @@ type DeleteDocumentResponse = {
 
 type DashboardStore = {
     runs : ExtractionRunRecord[],
-    reviewRuns : ExtractionRunRecord[],
+
+    reviewTasks : ReviewTaskRecord[],
+    selectedReviewTask : ReviewTaskRecord | null,
+
     selectedRun : ExtractionRunRecord | null,
 
     isFetchingRuns : boolean,
-    isFetchingReviewRuns : boolean,
     isFetchingRun : boolean,
+
+    isFetchingReviewTasks : boolean,
+    isFetchingReviewTask : boolean,
+    
     isUploadingPdf : boolean,
     isSubmittingEmail : boolean,
 
@@ -105,8 +166,11 @@ type DashboardStore = {
     successMessage : string | null,
 
     fetchRuns : () => Promise<void>;
-    fetchReviewRuns : () => Promise<void>;
     fetchRun : (runId : string) => Promise<void>;
+
+    fetchReviewTasks : () => Promise<void>;
+    fetchReviewTask : (taskId : string) => Promise<void>;
+    
     uploadPdf : (file : File) => Promise<void>;
     submitEmailText : (contentText : string) => Promise<void>;
     clearMessages : () => void;
@@ -134,12 +198,18 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
     runs : [],
-    reviewRuns : [],
     selectedRun : null,
 
+    reviewTasks : [],
+    selectedReviewTask : null,
+    
+
     isFetchingRuns: false,
-    isFetchingReviewRuns : false,
     isFetchingRun: false,
+
+    isFetchingReviewTasks : false,
+    isFetchingReviewTask : false,
+
     isUploadingPdf: false,
     isSubmittingEmail: false,
 
@@ -285,7 +355,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             await get().fetchRun(runId);
             await get().fetchRuns();
-            await get().fetchReviewRuns();
+            await get().fetchReviewTasks();
         } catch(error){
             set({
                 error : getErrorMessage(error, "Failed to validate run."),
@@ -296,25 +366,49 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         }
     },
 
-    fetchReviewRuns : async () => {
+    fetchReviewTasks : async () => {
         set({
-            isFetchingReviewRuns : true,
+            isFetchingReviewTasks : true,
             error : null,
         })
         try{
-            const res = await axios.get<RunsResponse>("/api/review-queue");
+            const res = await axios.get<ReviewTasksResponse>("/api/review-tasks");
 
             set({
-                reviewRuns : res.data.runs,
-                isFetchingReviewRuns : false,
+                reviewTasks : res.data.reviewTasks,
+                isFetchingReviewTasks : false,
             })
         }catch(error){
             set({
-                error : getErrorMessage(error,"Failed to fetch review queue"),
-                isFetchingReviewRuns : false,
+                error : getErrorMessage(error,"Failed to fetch review tasks"),
+                isFetchingReviewTasks : false,
             })
         }
     },
+
+    fetchReviewTask : async ( taskId : string ) => {
+        set({
+            isFetchingReviewTask : false,
+            error : null,
+        })
+
+        try{
+            const res = await axios.get<ReviewTaskResponse>(
+                `/api/review-tasks/${taskId}`
+            );
+
+            set({
+                selectedReviewTask : res.data.reviewTask,
+                isFetchingReviewTask : false
+            })
+        }catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to fetch review task."),
+                isFetchingReviewTask : false
+            })
+        }
+    },
+
     deleteDocument : async (
         documentId : string,
         deletedReason = "Document no longer required.",
@@ -341,7 +435,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             });
 
             await get().fetchRuns();
-            await get().fetchReviewRuns();
+            await get().fetchReviewTasks();
 
             const selectedRun = get().selectedRun;
             if(selectedRun?.document.id === documentId){

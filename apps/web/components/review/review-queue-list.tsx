@@ -26,17 +26,46 @@ function getValidationCounts(validationJson: unknown | null) {
   };
 }
 
+type ReviewReasonView = {
+  missingFields?: unknown[];
+  conflicts?: unknown[];
+  warnings?: unknown[];
+  requiredEvidence?: unknown[];
+  sourceFinalStatus?: string;
+};
+
+function getReviewReasonCounts(reasonJson: unknown) {
+  const reason =
+    typeof reasonJson === "object" && reasonJson !== null
+      ? (reasonJson as ReviewReasonView)
+      : null;
+
+  return {
+    missingFieldsCount: Array.isArray(reason?.missingFields)
+      ? reason.missingFields.length
+      : 0,
+    conflictsCount: Array.isArray(reason?.conflicts)
+      ? reason.conflicts.length
+      : 0,
+    warningsCount: Array.isArray(reason?.warnings) ? reason.warnings.length : 0,
+    requiredEvidenceCount: Array.isArray(reason?.requiredEvidence)
+      ? reason.requiredEvidence.length
+      : 0,
+  };
+}
+
 export function ReviewQueueList() {
-  const reviewRuns = useDashboardStore((state) => state.reviewRuns);
-  const isFetchingReviewRuns = useDashboardStore(
-    (state) => state.isFetchingReviewRuns,
+  const reviewTasks = useDashboardStore((state) => state.reviewTasks);
+  const isFetchingReviewTasks = useDashboardStore(
+    (state) => state.isFetchingReviewTasks,
   );
+  const fetchReviewTasks = useDashboardStore((state) => state.fetchReviewTasks);
   const error = useDashboardStore((state) => state.error);
-  const fetchReviewRuns = useDashboardStore((state) => state.fetchReviewRuns);
+  
 
   useEffect(() => {
-    void fetchReviewRuns();
-  }, [fetchReviewRuns]);
+    void fetchReviewTasks();
+  }, [fetchReviewTasks]);
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -56,20 +85,20 @@ export function ReviewQueueList() {
         </div>
       ) : null}
 
-      {isFetchingReviewRuns ? (
+      {isFetchingReviewTasks ? (
         <div className="p-5 text-sm text-gray-500">
           Loading review queue...
         </div>
       ) : null}
 
-      {!isFetchingReviewRuns && reviewRuns.length === 0 ? (
+      {!isFetchingReviewTasks && reviewTasks.length === 0 ? (
         <div className="p-5 text-sm text-gray-500">
           No runs need review right now. Validate an incomplete claim to see it
           appear here.
         </div>
       ) : null}
 
-      {reviewRuns.length > 0 ? (
+      {reviewTasks.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
@@ -87,21 +116,22 @@ export function ReviewQueueList() {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {reviewRuns.map((run) => {
-                const counts = getValidationCounts(run.validationJson);
+              {reviewTasks.map((task) => {
+                const counts = getReviewReasonCounts(task.reasonJson);
+                const run = task.run;
 
                 return (
-                  <tr key={run.id} className="hover:bg-gray-50">
+                  <tr key={task.id} className="hover:bg-gray-50">
                     <td className="px-5 py-4 font-medium text-gray-950">
-                      {run.document.filename}
+                      {task.run.document.filename}
                     </td>
 
                     <td className="px-5 py-4 text-gray-600">
-                      {run.document.sourceType}
+                      {task.run.document.sourceType}
                     </td>
 
                     <td className="px-5 py-4">
-                      <RunStatusBadge status={run.status} />
+                      <RunStatusBadge status={task.status} />
                     </td>
 
                     <td className="px-5 py-4 font-medium text-orange-700">
@@ -121,7 +151,7 @@ export function ReviewQueueList() {
                     </td>
 
                     <td className="px-5 py-4 text-gray-600">
-                      {formatDate(run.updatedAt)}
+                      {formatDate(task.updatedAt)}
                     </td>
 
                     <td className="whitespace-nowrap px-5 py-4">
