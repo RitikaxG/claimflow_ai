@@ -545,12 +545,12 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
                 <DecisionPanel task={task} />
 
                 <TimelineCard
-                  title="Review events"
+                  title="Review timeline"
                   items={task.events}
                 />
 
                 <TimelineCard
-                  title="Extraction timeline"
+                  title="AI Extraction timeline"
                   items={task.run.events}
                 />
               </div>
