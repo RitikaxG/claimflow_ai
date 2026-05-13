@@ -139,6 +139,16 @@ type ReviewTaskResponse = {
     reviewTask : ReviewTaskRecord,
 }
 
+type ReviewTaskAction = 
+    | "start"
+    | "approve"
+    | "reject"
+    | "request_more_info";
+
+type ReviewActionInput = {
+    reviewerName? : string,
+    notes? : string,
+}
 
 type DashboardStore = {
     runs : ExtractionRunRecord[],
@@ -165,11 +175,18 @@ type DashboardStore = {
     error : string | null,
     successMessage : string | null,
 
+    reviewTaskActionInFlight : ReviewTaskAction | null,
+
     fetchRuns : () => Promise<void>;
     fetchRun : (runId : string) => Promise<void>;
 
     fetchReviewTasks : () => Promise<void>;
     fetchReviewTask : (taskId : string) => Promise<void>;
+
+    startReviewTask : (taskId : string) => Promise<void>;
+    approveReviewTask : (taskId : string, input? : ReviewActionInput) => Promise<void>;
+    rejectReviewTask : (taskId : string, input : ReviewActionInput) => Promise<void>;
+    requestMoreInfoReviewTask : (taskId : string, input : ReviewActionInput) => Promise<void>;
     
     uploadPdf : (file : File) => Promise<void>;
     submitEmailText : (contentText : string) => Promise<void>;
@@ -202,10 +219,10 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
     reviewTasks : [],
     selectedReviewTask : null,
-    
 
     isFetchingRuns: false,
     isFetchingRun: false,
+    reviewTaskActionInFlight : null,
 
     isFetchingReviewTasks : false,
     isFetchingReviewTask : false,
@@ -446,6 +463,125 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
                 deletingDocumentId : null,
                 error : getErrorMessage(error,"Failed to delete document."),
             })
+        }
+    },
+    startReviewTask : async (taskId : string) => {
+        set({
+            reviewTaskActionInFlight : "start",
+            error : null,
+            successMessage : null,
+        })
+
+        try{
+            const res = await axios.post<ReviewTaskResponse>(
+                `/api/review-tasks/${taskId}/start`
+            );
+
+            set({
+                selectedReviewTask : res.data.reviewTask,
+                reviewTaskActionInFlight : null,
+                successMessage : "Review task started.",
+            })
+
+            await get().fetchReviewTasks();
+        }catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to start review task."),
+                reviewTaskActionInFlight: null,
+            })
+        }
+    },
+
+    approveReviewTask : async (
+        taskId : string, 
+        input : ReviewActionInput = {}
+    ) => {
+        set({
+            reviewTaskActionInFlight : "approve",
+            error : null,
+            successMessage : null,
+        })
+
+        try{
+            const res = await axios.post<ReviewTaskResponse>(
+                `/api/review-tasks/${taskId}/approve`,
+                input,
+            );
+
+            set({
+                selectedReviewTask : res.data.reviewTask,
+                reviewTaskActionInFlight : null,
+                successMessage : "Review task approved.",
+            })
+
+            await get().fetchReviewTasks();
+        } catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to approve review task."),
+                reviewTaskActionInFlight: null,
+            })
+        }
+    },
+
+    rejectReviewTask: async(
+        taskId : string, 
+        input : ReviewActionInput
+    ) => {
+        set({
+            reviewTaskActionInFlight : "reject",
+            error : null,
+            successMessage : null,
+        })
+
+        try{
+            const res = await axios.post<ReviewTaskResponse>(
+                `/api/review-tasks/${taskId}/reject`,
+                input,
+            )
+
+            set({
+                selectedReviewTask : res.data.reviewTask,
+                reviewTaskActionInFlight : null,
+                successMessage : "Review task rejected.",
+            })
+
+            await get().fetchReviewTasks();
+        } catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to reject review task."),
+                reviewTaskActionInFlight: null,
+            });
+        }
+    },
+
+    requestMoreInfoReviewTask : async (
+        taskId : string,
+        input : ReviewActionInput,
+    ) => {
+        set({
+            reviewTaskActionInFlight : "request_more_info",
+            error : null,
+            successMessage : null,
+        });
+
+        try{
+            const res = await axios.post<ReviewTaskResponse>(
+                `/api/review-tasks/${taskId}/request-more-info`,
+                input,
+            );
+
+            set({
+                selectedReviewTask : res.data.reviewTask,
+                reviewTaskActionInFlight : null,
+                successMessage : "Requested more information for review task.",
+            })
+
+            await get().fetchReviewTasks();
+        }catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to request more information for review task."),
+                reviewTaskActionInFlight: null,
+            });
         }
     }
 }));
