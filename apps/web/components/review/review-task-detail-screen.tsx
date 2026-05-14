@@ -8,6 +8,7 @@ import {
 } from "../../store/use-dashboard-store";
 import { ReviewTaskStatusBadge } from "./review-task-status-badge";
 import { RunStatusBadge } from "../dashboard/run-status-badge";
+import { HumanCorrectionForm } from "./human-correction-form";
 
 type ReviewTaskDetailScreenProps = {
   taskId: string;
@@ -90,7 +91,15 @@ function ReviewReasonCard({ task }: { task: ReviewTaskRecord }) {
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-950">Review reasons</h2>
+      <div>
+        <h2 className="text-lg font-semibold text-gray-950">
+          Original review reasons
+        </h2>
+        <p className="mt-1 text-sm text-gray-600">
+          These explain why the AI output entered human review. After approval, the
+          corrected validation result is shown separately below.
+        </p>
+      </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
@@ -233,12 +242,6 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
   const [rejectNotes, setRejectNotes] = useState("");
   const [moreInfoNotes, setMoreInfoNotes] = useState("");
 
-  const [editApproveNotes, setEditApproveNotes] = useState("");
-  const [correctedJsonText, setCorrectedJsonText] = useState("");
-  const [correctedJsonError, setCorrectedJsonError] = useState<string | null>(
-    null,
-  );
-
   const actionInFlight = useDashboardStore(
     (state) => state.reviewTaskActionInFlight,
   );
@@ -257,15 +260,6 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
 
   const isBusy = actionInFlight !== null;
 
-  useEffect(() => {
-    if (task.status !== "IN_REVIEW") {
-      return;
-    }
-
-    setCorrectedJsonText(JSON.stringify(task.run.extractedJson ?? {}, null, 2));
-    setCorrectedJsonError(null);
-  }, [task.id, task.status, task.run.extractedJson]);
-
   const handleStart = () => {
     void startReviewTask(task.id);
   };
@@ -277,24 +271,12 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
     });
   };
 
-  const handleEditAndApprove = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    try {
-      const correctedJson = JSON.parse(correctedJsonText);
-
-      setCorrectedJsonError(null);
-
-      void editAndApproveReviewTask(task.id, {
-        correctedJson,
-        reviewerName,
-        notes: editApproveNotes,
-      });
-    } catch {
-      setCorrectedJsonError(
-        "Corrected JSON is not valid JSON. Fix the syntax and try again.",
-      );
-    }
+  const handleEditAndApprove = (correctedJson: unknown, notes: string) => {
+    void editAndApproveReviewTask(task.id, {
+      correctedJson,
+      reviewerName,
+      notes,
+    });
   };
 
   const handleReject = (event: FormEvent<HTMLFormElement>) => {
@@ -320,8 +302,8 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
       <h2 className="text-lg font-semibold text-gray-950">Decision panel</h2>
 
       <p className="mt-1 text-sm text-gray-600">
-        Start review first, then approve, edit and approve, reject, or request
-        more information.
+        Start review first, then fix the blocking issues, approve, reject, or
+        request more information.
       </p>
 
       {task.status === "PENDING" ? (
@@ -341,6 +323,7 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
             <span className="text-sm font-medium text-gray-700">
               Reviewer name
             </span>
+
             <input
               value={reviewerName}
               onChange={(event) => setReviewerName(event.target.value)}
@@ -349,13 +332,21 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
             />
           </label>
 
+          <HumanCorrectionForm
+            task={task}
+            isBusy={isBusy}
+            actionInFlight={actionInFlight}
+            onSubmit={handleEditAndApprove}
+          />
+
           <div className="rounded-xl border border-green-100 bg-green-50 p-4">
             <h3 className="text-sm font-semibold text-green-800">
               Approve as-is
             </h3>
 
             <p className="mt-1 text-sm text-green-700">
-              Use this when the extracted JSON is acceptable without edits.
+              Use only when the extracted JSON already passes review validation.
+              For missing fields, use “Save corrections & approve” above.
             </p>
 
             <textarea
@@ -374,53 +365,6 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
               {actionInFlight === "approve" ? "Approving..." : "Approve as-is"}
             </button>
           </div>
-
-          <form
-            onSubmit={handleEditAndApprove}
-            className="rounded-xl border border-blue-100 bg-blue-50 p-4"
-          >
-            <h3 className="text-sm font-semibold text-blue-800">
-              Edit and approve
-            </h3>
-
-            <p className="mt-1 text-sm text-blue-700">
-              Edit the extracted JSON below. The original AI output stays
-              unchanged; your correction is stored as a review decision.
-            </p>
-
-            <textarea
-              value={correctedJsonText}
-              onChange={(event) => {
-                setCorrectedJsonText(event.target.value);
-                setCorrectedJsonError(null);
-              }}
-              spellCheck={false}
-              className="mt-3 min-h-[420px] w-full rounded-lg border border-blue-200 bg-white px-3 py-2 font-mono text-xs text-gray-950 placeholder:text-gray-400 outline-none focus:border-blue-400"
-            />
-
-            {correctedJsonError ? (
-              <div className="mt-3 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
-                {correctedJsonError}
-              </div>
-            ) : null}
-
-            <textarea
-              value={editApproveNotes}
-              onChange={(event) => setEditApproveNotes(event.target.value)}
-              placeholder="Optional correction notes..."
-              className="mt-3 min-h-20 w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-blue-400"
-            />
-
-            <button
-              type="submit"
-              disabled={isBusy}
-              className="mt-3 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-            >
-              {actionInFlight === "edit_and_approve"
-                ? "Saving correction..."
-                : "Edit & approve"}
-            </button>
-          </form>
 
           <form
             onSubmit={handleReject}
