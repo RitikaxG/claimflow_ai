@@ -10,19 +10,18 @@ type RunStatusCardProps = {
 
 export function RunStatusCard({ run }: RunStatusCardProps) {
   const extractRun = useDashboardStore((state) => state.extractRun);
-  const isExtractingRun = useDashboardStore(
-    (state) => state.isExtractingRun,
-  );
+  const isExtractingRun = useDashboardStore((state) => state.isExtractingRun);
 
   const validateRun = useDashboardStore((state) => state.validateRun);
-  const isValidatingRun = useDashboardStore(
-    (state) => state.isValidatingRun,
-  );
+  const isValidatingRun = useDashboardStore((state) => state.isValidatingRun);
 
   const canRunExtraction =
     run.status === "UPLOADED" || run.status === "FAILED";
 
   const canRunValidation = run.status === "VALIDATING";
+
+  const extractionButtonLabel =
+    run.status === "FAILED" ? "Retry extraction" : "Run extraction";
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -64,6 +63,13 @@ export function RunStatusCard({ run }: RunStatusCardProps) {
         </div>
       ) : null}
 
+      {run.status === "FAILED" ? (
+        <div className="mt-5 rounded-xl border border-amber-100 bg-amber-50 p-3 text-sm text-amber-800">
+          This run failed. You can retry extraction after fixing the input or
+          after a transient model/API issue.
+        </div>
+      ) : null}
+
       {canRunExtraction ? (
         <button
           type="button"
@@ -71,18 +77,18 @@ export function RunStatusCard({ run }: RunStatusCardProps) {
           onClick={() => void extractRun(run.id)}
           className="mt-5 w-full rounded-lg bg-gray-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-400"
         >
-          {isExtractingRun ? "Extracting..." : "Run extraction"}
+          {isExtractingRun ? "Extracting..." : extractionButtonLabel}
         </button>
       ) : null}
 
       {canRunValidation ? (
         <button
-            type="button"
-            disabled={isValidatingRun}
-            onClick={() => void validateRun(run.id)}
-            className="mt-5 w-full rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-400"
+          type="button"
+          disabled={isValidatingRun}
+          onClick={() => void validateRun(run.id)}
+          className="mt-5 w-full rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-400"
         >
-            {isValidatingRun ? "Validating..." : "Run validation"}
+          {isValidatingRun ? "Validating..." : "Run validation"}
         </button>
       ) : null}
     </section>

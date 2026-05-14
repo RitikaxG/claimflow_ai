@@ -27,6 +27,30 @@ function getOptionalString(value : unknown) : string | undefined {
     return trimmed.length > 0 ? trimmed : undefined;
 }
 
+const reviewTaskInclude = {
+  run: {
+    include: {
+      document: true,
+      events: {
+        orderBy: {
+          createdAt: "asc" as const,
+        },
+      },
+    },
+  },
+  decisions: {
+    orderBy: {
+      createdAt: "desc" as const,
+    },
+  },
+  events: {
+    orderBy: {
+      createdAt: "asc" as const,
+    },
+  },
+};
+
+
 /*
 
 who approved
@@ -54,7 +78,14 @@ export async function POST(request : Request, { params } : Params) {
     const task = await prisma.reviewTask.findUnique({
         where : {
             id : taskId,
-        }
+        },
+        include : {
+            run : {
+                include : {
+                    document : true,
+                },
+            },
+        },
     });
 
     if(!task){
@@ -71,30 +102,14 @@ export async function POST(request : Request, { params } : Params) {
         )
     }
 
-    const run = await prisma.extractionRun.findUnique({
-        where : {
-            id : task.runId,
-        },
-        include : {
-            document : true,
-        }
-    });
-
-    if(!run){
+    if (task.run.extractedJson === null) {
         return NextResponse.json(
-            { error : "Review task has no extraction run."},
-            { status : 404 },
-        )
-    }
-
-    if(run.extractedJson === null){
-        return NextResponse.json(
-            { error : "Extraction run has no extractedJson to approve."},
-            { status : 400 },
+            { error: "Extraction run has no extractedJson to approve." },
+            { status: 400 },
         );
     }
 
-    const parsedExtractedJson = ClaimExtractionSchema.safeParse(run.extractedJson);
+    const parsedExtractedJson = ClaimExtractionSchema.safeParse(task.run.extractedJson);
     if(!parsedExtractedJson.success){
         return NextResponse.json(
             { 
@@ -123,6 +138,20 @@ export async function POST(request : Request, { params } : Params) {
     }
 
     const updatedTask = await prisma.$transaction(async (tx) => {
+        const claimed = await tx.reviewTask.updateMany({
+            where: {
+                id: taskId,
+                status: ReviewTaskStatus.IN_REVIEW,
+            },
+            data: {
+                status: ReviewTaskStatus.APPROVED,
+                completedAt: new Date(),
+            },
+        });
+
+        if (claimed.count !== 1) {
+            return null;
+        }
         
         const decision = await tx.reviewDecision.create({
             data : {
@@ -141,8 +170,8 @@ export async function POST(request : Request, { params } : Params) {
                 type : ReviewEventType.REVIEW_APPROVED_AS_IS,
                 message : "Review task approved without changes.",
                 metadata : toPrismaJson({
-                    runId : run.id,
-                    documentId : run.document.id,
+                    runId : task.run.id,
+                    documentId : task.run.document.id,
                     previousStatus : task.status,
                     newStatus : ReviewTaskStatus.APPROVED,
                     decision : ReviewDecisionType.APPROVE_AS_IS,
@@ -156,40 +185,21 @@ export async function POST(request : Request, { params } : Params) {
             }
         });
 
-        return tx.reviewTask.update({
+        return tx.reviewTask.findUniqueOrThrow({
             where : {
                 id : taskId,
             },
-            data : {
-                status : ReviewTaskStatus.APPROVED,
-                completedAt : new Date(),
-            },
-            include : {
-                run : {
-                    include : {
-                        document : true,
-                        events : {
-                            orderBy : {
-                                createdAt : "asc",
-                            }
-                        },
-                    }
-                },
-                decisions : {
-                    orderBy : {
-                        createdAt : "desc",
-                    }
-                },
-                events : {
-                    orderBy : {
-                        createdAt : "asc",
-                    }
-                }
-            }
+            include : reviewTaskInclude,
         });
-
         
     });
+
+    if(!updatedTask){
+        return NextResponse.json(
+            { error : "Review task was already completed by another action."},
+            { status : 409 },
+        )
+    }
 
     return NextResponse.json({ reviewTask : updatedTask });
 

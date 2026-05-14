@@ -28,6 +28,30 @@ function getOptionalString(value : unknown) : string | undefined {
     return trimmed.length > 0 ? trimmed : undefined;
 }
 
+const reviewTaskInclude = {
+  run: {
+    include: {
+      document: true,
+      events: {
+        orderBy: {
+          createdAt: "asc" as const,
+        },
+      },
+    },
+  },
+  decisions: {
+    orderBy: {
+      createdAt: "desc" as const,
+    },
+  },
+  events: {
+    orderBy: {
+      createdAt: "asc" as const,
+    },
+  },
+};
+
+
 export async function POST(request : Request, { params } : Params ){
     const { taskId } = await params;
     let body : EditAndApproveRequestBody = {};
@@ -92,6 +116,21 @@ export async function POST(request : Request, { params } : Params ){
     }
 
     const updatedTask = await prisma.$transaction(async (tx) => {
+        const claimed = await tx.reviewTask.updateMany({
+            where : {
+                id : taskId,
+                status: ReviewTaskStatus.IN_REVIEW,
+            },
+            data : {
+                status : ReviewTaskStatus.EDITED_AND_APPROVED,
+                completedAt : new Date(),
+            }
+        });
+
+        if(claimed.count !== 1){
+            return null;
+        }
+
         const decision = await tx.reviewDecision.create({
             data : {
                 taskId,
@@ -121,37 +160,19 @@ export async function POST(request : Request, { params } : Params ){
             }
         })
 
-        return tx.reviewTask.update({
+        return tx.reviewTask.findUniqueOrThrow({
             where : {
                 id : taskId,
             },
-            data : {
-                status : ReviewTaskStatus.EDITED_AND_APPROVED,
-                completedAt : new Date(),
-            },
-            include : {
-                run : {
-                    include : {
-                        document : true,
-                        events : {
-                            orderBy : {
-                                createdAt : "asc",
-                            }
-                        }
-                    }
-                },
-                decisions : {
-                    orderBy : {
-                        createdAt : "desc",
-                    }
-                },
-                events : {
-                    orderBy : {
-                        createdAt : "asc"
-                    }
-                }
-            }
+            include : reviewTaskInclude,
         });
     });
+
+    if(!updatedTask){
+        return NextResponse.json(
+            { error : "Review task was already completed by another action." },
+            { status : 409 },
+        )
+    }
     return NextResponse.json({ reviewTask : updatedTask });
 }

@@ -52,12 +52,20 @@ export async function POST(_request : Request, { params } : Params ){
             )
         }
 
+        const isRetry = run.status === "FAILED";
+        const previousStatus = run.status;
+        const previousError = run.errorMessage;
+
         await prisma.$transaction(async (tx) => {
             await tx.extractionRun.update({
                 where : { id : run.id },
                 data : {
                     status : "EXTRACTING",
                     errorMessage : null,
+
+                    // Clear stale validation state before retrying extraction.
+                    validationJson : Prisma.JsonNull,
+                    missingFieldsJson : Prisma.JsonNull,
                 }
             });
 
@@ -65,12 +73,15 @@ export async function POST(_request : Request, { params } : Params ){
                 data : {
                     runId : run.id,
                     type : ExtractionEventType.EXTRACTION_STARTED,
-                    message : "AI extraction started.",
-                    metadata : {
+                    message : isRetry ? "AI extraction retry started." : "AI extraction started.",
+                    metadata : toPrismaJson({
                         documentId : run.document.id,
                         sourceType : run.document.sourceType,
                         filename : run.document.filename,
-                    },
+                        isRetry,
+                        previousStatus,
+                        previousError,
+                    }),
                 },
             });
         });
@@ -101,11 +112,12 @@ export async function POST(_request : Request, { params } : Params ){
                     runId : run.id,
                     type : ExtractionEventType.MODEL_RESPONSE_RECEIVED,
                     message : "Gemini returned a structured extraction response.",
-                    metadata : {
+                    metadata : toPrismaJson({
                         model : extractedResult.model,
                         promptVersion : extractedResult.promptVersion,
                         overallConfidence : extractedResult.confidenceJson.overallConfidence,
-                    }
+                        isRetry,
+                    }),
                 }
             });
 
@@ -113,10 +125,13 @@ export async function POST(_request : Request, { params } : Params ){
                 data : {
                     runId : run.id,
                     type : ExtractionEventType.EXTRACTION_COMPLETED,
-                    message : "AI extraction completed. Run is ready for validation.",
-                    metadata : {
+                    message : isRetry
+                    ? "AI extraction retry completed. Run is ready for validation."
+                    : "AI extraction completed. Run is ready for validation.",
+                    metadata : toPrismaJson({
                         nextStatus : "VALIDATING",
-                    }
+                        isRetry,
+                    })
                 }
             });
 
@@ -129,6 +144,7 @@ export async function POST(_request : Request, { params } : Params ){
                     rawModelOutput : toPrismaJson(extractedResult.rawModelOutput),
                     extractedJson : toPrismaJson(extractedResult.extractedJson),
                     confidenceJson : toPrismaJson(extractedResult.confidenceJson),
+                    errorMessage : null,
                 },
                 include : {
                     document : true,
