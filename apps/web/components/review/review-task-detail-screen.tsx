@@ -68,7 +68,7 @@ function JsonPanel({
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-950">{title}</h2>
 
-      <pre className="mt-4 max-h-[520px] overflow-auto rounded-xl bg-gray-950 p-4 text-xs text-gray-100">
+      <pre className="mt-4 max-h-[420px] overflow-auto rounded-xl bg-gray-950 p-4 text-xs text-gray-100">
         {prettyJson(value)}
       </pre>
     </section>
@@ -95,9 +95,10 @@ function ReviewReasonCard({ task }: { task: ReviewTaskRecord }) {
         <h2 className="text-lg font-semibold text-gray-950">
           Original review reasons
         </h2>
+
         <p className="mt-1 text-sm text-gray-600">
-          These explain why the AI output entered human review. After approval, the
-          corrected validation result is shown separately below.
+          These explain why the AI output entered human review. After approval,
+          the corrected validation result is shown separately.
         </p>
       </div>
 
@@ -147,9 +148,11 @@ function ReviewReasonCard({ task }: { task: ReviewTaskRecord }) {
                   <p className="text-sm font-medium text-red-700">
                     {conflict.field ?? "Unknown field"}
                   </p>
+
                   <p className="mt-1 text-sm text-gray-700">
                     {conflict.message ?? "No message provided."}
                   </p>
+
                   {conflict.ruleId ? (
                     <p className="mt-1 text-xs text-gray-500">
                       Rule: {conflict.ruleId}
@@ -176,9 +179,11 @@ function ReviewReasonCard({ task }: { task: ReviewTaskRecord }) {
                   <p className="text-sm font-medium text-yellow-700">
                     {warning.field ?? "Unknown field"}
                   </p>
+
                   <p className="mt-1 text-sm text-gray-700">
                     {warning.message ?? "No message provided."}
                   </p>
+
                   {warning.ruleId ? (
                     <p className="mt-1 text-xs text-gray-500">
                       Rule: {warning.ruleId}
@@ -212,7 +217,7 @@ function TimelineCard({
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-950">{title}</h2>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 max-h-[560px] space-y-3 overflow-auto pr-1">
         {items.length === 0 ? (
           <p className="text-sm text-gray-500">No events yet.</p>
         ) : (
@@ -224,7 +229,9 @@ function TimelineCard({
               <p className="text-sm font-medium text-gray-950">
                 {event.type.replaceAll("_", " ")}
               </p>
+
               <p className="mt-1 text-sm text-gray-600">{event.message}</p>
+
               <p className="mt-1 text-xs text-gray-500">
                 {formatDate(event.createdAt)}
               </p>
@@ -236,11 +243,300 @@ function TimelineCard({
   );
 }
 
-function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
-  const [reviewerName, setReviewerName] = useState("");
+function ReviewDecisionSummary({ task }: { task: ReviewTaskRecord }) {
+  const latestDecision = task.decisions[0] ?? null;
+
+  if (!isTerminalReviewStatus(task.status)) {
+    return null;
+  }
+
+  return (
+    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-950">
+        Human review decision
+      </h2>
+
+      <p className="mt-1 text-sm text-gray-600">
+        This is the final human workflow state for this review task.
+      </p>
+
+      <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
+        <p>
+          Status:{" "}
+          <span className="font-semibold text-gray-950">
+            {task.status.replaceAll("_", " ")}
+          </span>
+        </p>
+
+        {latestDecision ? (
+          <>
+            <p className="mt-2">
+              Decision:{" "}
+              <span className="font-semibold text-gray-950">
+                {latestDecision.decision.replaceAll("_", " ")}
+              </span>
+            </p>
+
+            {latestDecision.reviewerName ? (
+              <p className="mt-2">Reviewer: {latestDecision.reviewerName}</p>
+            ) : null}
+
+            {latestDecision.notes ? (
+              <p className="mt-2">Notes: {latestDecision.notes}</p>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function AuditJsonPanels({
+  task,
+  latestDecision,
+}: {
+  task: ReviewTaskRecord;
+  latestDecision: ReviewTaskRecord["decisions"][number] | null;
+}) {
+  return (
+    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-950">Audit evidence</h2>
+
+      <p className="mt-1 text-sm text-gray-600">
+        Original AI output stays immutable. Human-corrected output is stored
+        separately after approval.
+      </p>
+
+      <div className="mt-4 space-y-3">
+        {latestDecision?.correctedJson ? (
+          <details open className="rounded-xl border border-gray-200 bg-white">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-950">
+              Final human-corrected JSON
+            </summary>
+
+            <pre className="max-h-[420px] overflow-auto rounded-b-xl bg-gray-950 p-4 text-xs text-gray-100">
+              {prettyJson(latestDecision.correctedJson)}
+            </pre>
+          </details>
+        ) : null}
+
+        {latestDecision?.correctedValidationJson ? (
+          <details open className="rounded-xl border border-gray-200 bg-white">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-950">
+              Corrected validation JSON
+            </summary>
+
+            <pre className="max-h-[420px] overflow-auto rounded-b-xl bg-gray-950 p-4 text-xs text-gray-100">
+              {prettyJson(latestDecision.correctedValidationJson)}
+            </pre>
+          </details>
+        ) : null}
+
+        <details className="rounded-xl border border-gray-200 bg-white">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-950">
+            Original AI extracted JSON
+          </summary>
+
+          <pre className="max-h-[420px] overflow-auto rounded-b-xl bg-gray-950 p-4 text-xs text-gray-100">
+            {prettyJson(task.run.extractedJson)}
+          </pre>
+        </details>
+
+        <details className="rounded-xl border border-gray-200 bg-white">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-950">
+            Original AI validation JSON
+          </summary>
+
+          <pre className="max-h-[420px] overflow-auto rounded-b-xl bg-gray-950 p-4 text-xs text-gray-100">
+            {prettyJson(task.run.validationJson)}
+          </pre>
+        </details>
+      </div>
+    </section>
+  );
+}
+
+function DecisionActionsPanel({
+  task,
+  reviewerName,
+  setReviewerName,
+  actionInFlight,
+  isBusy,
+  onStart,
+  onApprove,
+  onReject,
+  onRequestMoreInfo,
+}: {
+  task: ReviewTaskRecord;
+  reviewerName: string;
+  setReviewerName: (value: string) => void;
+  actionInFlight: string | null;
+  isBusy: boolean;
+  onStart: () => void;
+  onApprove: (notes: string) => void;
+  onReject: (notes: string) => void;
+  onRequestMoreInfo: (notes: string) => void;
+}) {
   const [approveNotes, setApproveNotes] = useState("");
   const [rejectNotes, setRejectNotes] = useState("");
   const [moreInfoNotes, setMoreInfoNotes] = useState("");
+
+  const handleReject = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onReject(rejectNotes);
+  };
+
+  const handleRequestMoreInfo = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onRequestMoreInfo(moreInfoNotes);
+  };
+
+  return (
+    <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
+      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-950">
+          Review actions
+        </h2>
+
+        <p className="mt-1 text-sm text-gray-600">
+          Keep the decision actions separate from the correction workspace.
+        </p>
+
+        {task.status === "PENDING" ? (
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={onStart}
+            className="mt-4 w-full rounded-lg bg-gray-950 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
+          >
+            {actionInFlight === "start" ? "Starting..." : "Start review"}
+          </button>
+        ) : null}
+
+        {task.status === "IN_REVIEW" ? (
+          <div className="mt-4 space-y-4">
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">
+                Reviewer name
+              </span>
+
+              <input
+                value={reviewerName}
+                onChange={(event) => setReviewerName(event.target.value)}
+                placeholder="Ritika"
+                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-gray-400"
+              />
+            </label>
+
+            <div className="rounded-xl border border-green-100 bg-green-50 p-4">
+              <h3 className="text-sm font-semibold text-green-800">
+                Approve as-is
+              </h3>
+
+              <p className="mt-1 text-sm text-green-700">
+                Use only when the extracted JSON already passes review
+                validation. For missing fields, use the correction form.
+              </p>
+
+              <textarea
+                value={approveNotes}
+                onChange={(event) => setApproveNotes(event.target.value)}
+                placeholder="Optional approval notes..."
+                className="mt-3 min-h-20 w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-green-400"
+              />
+
+              <button
+                type="button"
+                disabled={isBusy}
+                onClick={() => onApprove(approveNotes)}
+                className="mt-3 rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
+              >
+                {actionInFlight === "approve"
+                  ? "Approving..."
+                  : "Approve as-is"}
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleReject}
+              className="rounded-xl border border-red-100 bg-red-50 p-4"
+            >
+              <h3 className="text-sm font-semibold text-red-800">Reject</h3>
+
+              <p className="mt-1 text-sm text-red-700">
+                Reject when the extraction cannot be accepted. Notes are
+                required.
+              </p>
+
+              <textarea
+                required
+                value={rejectNotes}
+                onChange={(event) => setRejectNotes(event.target.value)}
+                placeholder="Explain why this extraction is rejected..."
+                className="mt-3 min-h-24 w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-red-400"
+              />
+
+              <button
+                type="submit"
+                disabled={isBusy}
+                className="mt-3 rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
+              >
+                {actionInFlight === "reject" ? "Rejecting..." : "Reject"}
+              </button>
+            </form>
+
+            <form
+              onSubmit={handleRequestMoreInfo}
+              className="rounded-xl border border-orange-100 bg-orange-50 p-4"
+            >
+              <h3 className="text-sm font-semibold text-orange-800">
+                Request more info
+              </h3>
+
+              <p className="mt-1 text-sm text-orange-700">
+                Use this when the claim needs missing evidence or clarification.
+                Notes are required.
+              </p>
+
+              <textarea
+                required
+                value={moreInfoNotes}
+                onChange={(event) => setMoreInfoNotes(event.target.value)}
+                placeholder="Example: Please provide FIR number and police report."
+                className="mt-3 min-h-24 w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-orange-400"
+              />
+
+              <button
+                type="submit"
+                disabled={isBusy}
+                className="mt-3 rounded-lg bg-orange-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
+              >
+                {actionInFlight === "request_more_info"
+                  ? "Requesting..."
+                  : "Request more info"}
+              </button>
+            </form>
+          </div>
+        ) : null}
+
+        {isTerminalReviewStatus(task.status) ? (
+          <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <p className="text-sm font-medium text-gray-950">
+              This task is completed.
+            </p>
+
+            <p className="mt-1 text-sm text-gray-600">
+              Status: {task.status.replaceAll("_", " ")}
+            </p>
+          </div>
+        ) : null}
+      </section>
+    </aside>
+  );
+}
+
+function ReviewWorkspace({ task }: { task: ReviewTaskRecord }) {
+  const [reviewerName, setReviewerName] = useState("");
 
   const actionInFlight = useDashboardStore(
     (state) => state.reviewTaskActionInFlight,
@@ -259,15 +555,16 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
   );
 
   const isBusy = actionInFlight !== null;
+  const latestDecision = task.decisions[0] ?? null;
 
   const handleStart = () => {
     void startReviewTask(task.id);
   };
 
-  const handleApprove = () => {
+  const handleApprove = (notes: string) => {
     void approveReviewTask(task.id, {
       reviewerName,
-      notes: approveNotes,
+      notes,
     });
   };
 
@@ -279,183 +576,62 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
     });
   };
 
-  const handleReject = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleReject = (notes: string) => {
     void rejectReviewTask(task.id, {
       reviewerName,
-      notes: rejectNotes,
+      notes,
     });
   };
 
-  const handleRequestMoreInfo = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleRequestMoreInfo = (notes: string) => {
     void requestMoreInfoReviewTask(task.id, {
       reviewerName,
-      notes: moreInfoNotes,
+      notes,
     });
   };
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-950">Decision panel</h2>
-
-      <p className="mt-1 text-sm text-gray-600">
-        Start review first, then fix the blocking issues, approve, reject, or
-        request more information.
-      </p>
-
-      {task.status === "PENDING" ? (
-        <button
-          type="button"
-          disabled={isBusy}
-          onClick={handleStart}
-          className="mt-4 rounded-lg bg-gray-950 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-        >
-          {actionInFlight === "start" ? "Starting..." : "Start review"}
-        </button>
-      ) : null}
-
-      {task.status === "IN_REVIEW" ? (
-        <div className="mt-4 space-y-5">
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">
-              Reviewer name
-            </span>
-
-            <input
-              value={reviewerName}
-              onChange={(event) => setReviewerName(event.target.value)}
-              placeholder="Ritika"
-              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-gray-400"
+    <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="space-y-6">
+          {task.status === "IN_REVIEW" ? (
+            <HumanCorrectionForm
+              task={task}
+              isBusy={isBusy}
+              actionInFlight={actionInFlight}
+              onSubmit={handleEditAndApprove}
             />
-          </label>
-
-          <HumanCorrectionForm
-            task={task}
-            isBusy={isBusy}
-            actionInFlight={actionInFlight}
-            onSubmit={handleEditAndApprove}
-          />
-
-          <div className="rounded-xl border border-green-100 bg-green-50 p-4">
-            <h3 className="text-sm font-semibold text-green-800">
-              Approve as-is
-            </h3>
-
-            <p className="mt-1 text-sm text-green-700">
-              Use only when the extracted JSON already passes review validation.
-              For missing fields, use “Save corrections & approve” above.
-            </p>
-
-            <textarea
-              value={approveNotes}
-              onChange={(event) => setApproveNotes(event.target.value)}
-              placeholder="Optional approval notes..."
-              className="mt-3 min-h-20 w-full rounded-lg border border-green-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-green-400"
-            />
-
-            <button
-              type="button"
-              disabled={isBusy}
-              onClick={handleApprove}
-              className="mt-3 rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-            >
-              {actionInFlight === "approve" ? "Approving..." : "Approve as-is"}
-            </button>
-          </div>
-
-          <form
-            onSubmit={handleReject}
-            className="rounded-xl border border-red-100 bg-red-50 p-4"
-          >
-            <h3 className="text-sm font-semibold text-red-800">Reject</h3>
-
-            <p className="mt-1 text-sm text-red-700">
-              Reject when the extraction cannot be accepted. Notes are required.
-            </p>
-
-            <textarea
-              required
-              value={rejectNotes}
-              onChange={(event) => setRejectNotes(event.target.value)}
-              placeholder="Explain why this extraction is rejected..."
-              className="mt-3 min-h-24 w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-red-400"
-            />
-
-            <button
-              type="submit"
-              disabled={isBusy}
-              className="mt-3 rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-            >
-              {actionInFlight === "reject" ? "Rejecting..." : "Reject"}
-            </button>
-          </form>
-
-          <form
-            onSubmit={handleRequestMoreInfo}
-            className="rounded-xl border border-orange-100 bg-orange-50 p-4"
-          >
-            <h3 className="text-sm font-semibold text-orange-800">
-              Request more info
-            </h3>
-
-            <p className="mt-1 text-sm text-orange-700">
-              Use this when the claim needs missing evidence or clarification.
-              Notes are required.
-            </p>
-
-            <textarea
-              required
-              value={moreInfoNotes}
-              onChange={(event) => setMoreInfoNotes(event.target.value)}
-              placeholder="Example: Please provide FIR number and police report."
-              className="mt-3 min-h-24 w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-orange-400"
-            />
-
-            <button
-              type="submit"
-              disabled={isBusy}
-              className="mt-3 rounded-lg bg-orange-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-            >
-              {actionInFlight === "request_more_info"
-                ? "Requesting..."
-                : "Request more info"}
-            </button>
-          </form>
-        </div>
-      ) : null}
-
-      {isTerminalReviewStatus(task.status) ? (
-        <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
-          <p className="text-sm font-medium text-gray-950">
-            This review task is completed.
-          </p>
-
-          {task.decisions[0] ? (
-            <div className="mt-3 text-sm text-gray-700">
-              <p>
-                Latest decision:{" "}
-                <span className="font-semibold">
-                  {task.decisions[0].decision.replaceAll("_", " ")}
-                </span>
-              </p>
-
-              {task.decisions[0].reviewerName ? (
-                <p className="mt-1">
-                  Reviewer: {task.decisions[0].reviewerName}
-                </p>
-              ) : null}
-
-              {task.decisions[0].notes ? (
-                <p className="mt-1">Notes: {task.decisions[0].notes}</p>
-              ) : null}
-            </div>
           ) : null}
+
+          <ReviewDecisionSummary task={task} />
+
+          <ReviewReasonCard task={task} />
+
+          <AuditJsonPanels task={task} latestDecision={latestDecision} />
         </div>
-      ) : null}
-    </section>
+
+        <DecisionActionsPanel
+          task={task}
+          reviewerName={reviewerName}
+          setReviewerName={setReviewerName}
+          actionInFlight={actionInFlight}
+          isBusy={isBusy}
+          onStart={handleStart}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onRequestMoreInfo={handleRequestMoreInfo}
+        />
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <TimelineCard title="Review timeline" items={task.events} />
+
+        <TimelineCard
+          title="AI extraction timeline"
+          items={task.run.events}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -481,8 +657,6 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
       ? selectedReviewTask
       : null;
 
-  const latestDecision = task?.decisions[0] ?? null;
-
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-8">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -497,8 +671,8 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
             </h1>
 
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Open a validation failure, inspect the AI output, correct the JSON,
-              and store a human-reviewed decision.
+              Open a validation failure, inspect the AI output, correct the
+              claim fields, and store a human-reviewed decision.
             </p>
           </div>
 
@@ -577,46 +751,7 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
               </div>
             </section>
 
-            <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
-              <div className="space-y-6">
-                <ReviewReasonCard task={task} />
-
-                <JsonPanel
-                  title="Original AI extracted JSON"
-                  value={task.run.extractedJson}
-                />
-
-                {latestDecision?.correctedJson ? (
-                  <JsonPanel
-                    title="Final human-corrected JSON"
-                    value={latestDecision.correctedJson}
-                  />
-                ) : null}
-
-                <JsonPanel
-                  title="Original AI validation JSON"
-                  value={task.run.validationJson}
-                />
-
-                {latestDecision?.correctedValidationJson ? (
-                  <JsonPanel
-                    title="Corrected validation JSON"
-                    value={latestDecision.correctedValidationJson}
-                  />
-                ) : null}
-              </div>
-
-              <div className="space-y-6">
-                <DecisionPanel task={task} />
-
-                <TimelineCard title="Review timeline" items={task.events} />
-
-                <TimelineCard
-                  title="AI Extraction timeline"
-                  items={task.run.events}
-                />
-              </div>
-            </div>
+            <ReviewWorkspace task={task} />
           </>
         ) : null}
       </div>
