@@ -143,9 +143,16 @@ type ReviewTaskAction =
     | "start"
     | "approve"
     | "reject"
-    | "request_more_info";
+    | "request_more_info"
+    | "edit_and_approve";
 
 type ReviewActionInput = {
+    reviewerName? : string,
+    notes? : string,
+}
+
+type EditAndApproveInput = {
+    correctedJson : unknown;
     reviewerName? : string,
     notes? : string,
 }
@@ -187,6 +194,7 @@ type DashboardStore = {
     approveReviewTask : (taskId : string, input? : ReviewActionInput) => Promise<void>;
     rejectReviewTask : (taskId : string, input : ReviewActionInput) => Promise<void>;
     requestMoreInfoReviewTask : (taskId : string, input : ReviewActionInput) => Promise<void>;
+    editAndApproveReviewTask : (taskId : string, input : EditAndApproveInput) => Promise<void>;
     
     uploadPdf : (file : File) => Promise<void>;
     submitEmailText : (contentText : string) => Promise<void>;
@@ -582,6 +590,36 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
                 error : getErrorMessage(error, "Failed to request more information for review task."),
                 reviewTaskActionInFlight: null,
             });
+        }
+    },
+    editAndApproveReviewTask : async(
+        taskId : string,
+        input : EditAndApproveInput,
+    ) => {
+        set({
+            reviewTaskActionInFlight : "edit_and_approve",
+            error : null,
+            successMessage : null,
+        });
+
+        try{
+            const res = await axios.post<ReviewTaskResponse>(
+                `/api/review-tasks/${taskId}/edit-and-approve`,
+                input,
+            )
+
+            set({
+                selectedReviewTask : res.data.reviewTask,
+                reviewTaskActionInFlight : null,
+                successMessage : "Corrected JSON approved.",
+            });
+
+            await get().fetchReviewTasks();
+        }catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to edit and approve review task."),
+                reviewTaskActionInFlight : null,
+            })
         }
     }
 }));
