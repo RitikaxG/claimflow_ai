@@ -188,6 +188,7 @@ model ReviewDecision {
   decision ReviewDecisionType
 
   correctedJson Json?
+  correctedValidationJson Json?
   notes String?
   reviewerName String?
 

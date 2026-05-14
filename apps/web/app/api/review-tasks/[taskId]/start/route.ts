@@ -1,4 +1,4 @@
-import { prisma, ReviewEventType } from "@repo/db";
+import { prisma, ReviewEventType, ReviewTaskStatus } from "@repo/db";
 import { NextResponse } from "next/server";
 
 type Params = {
@@ -23,7 +23,7 @@ export async function POST(_request : Request, { params } : Params){
         )
     }
 
-    if(task.status !== "PENDING"){
+    if(task.status !== ReviewTaskStatus.PENDING){
         return NextResponse.json(
             { error : `Review can only start from PENDING status. Current status : ${task.status}`},
             { status : 409 },
@@ -36,6 +36,11 @@ export async function POST(_request : Request, { params } : Params){
                 taskId,
                 type : ReviewEventType.REVIEW_STARTED,
                 message : "Human review started.",
+                metadata : {
+                    runId : task.runId,
+                    previousStatus : task.status,
+                    newStatus : ReviewTaskStatus.IN_REVIEW,
+                }
             }
         });
 

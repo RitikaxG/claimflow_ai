@@ -57,7 +57,7 @@ export async function POST(request : Request, { params } : Params){
         )
     }
 
-    if(task.status !== "IN_REVIEW"){
+    if(task.status !== ReviewTaskStatus.IN_REVIEW){
         return NextResponse.json(
             { error : `More info can only be requested when status is IN_REVIEW. Current status : ${task.status}`},
             { status : 409 },

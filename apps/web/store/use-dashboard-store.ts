@@ -100,6 +100,7 @@ export type ReviewDecisionRecord = {
     taskId : string,
     decision : string,
     correctedJson : unknown | null,
+    correctedValidationJson: unknown | null;
     notes : string | null,
     reviewerName : string | null,
     createdAt : string,

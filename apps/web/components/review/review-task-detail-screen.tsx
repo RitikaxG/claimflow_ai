@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useDashboardStore, type ReviewTaskRecord } from "../../store/use-dashboard-store";
+import {
+  useDashboardStore,
+  type ReviewTaskRecord,
+} from "../../store/use-dashboard-store";
 import { ReviewTaskStatusBadge } from "./review-task-status-badge";
 import { RunStatusBadge } from "../dashboard/run-status-badge";
 
@@ -33,7 +36,7 @@ function formatDate(value: string) {
 }
 
 function prettyJson(value: unknown) {
-  return JSON.stringify(value, null, 2);
+  return JSON.stringify(value ?? null, null, 2);
 }
 
 function getReason(reasonJson: unknown): ReviewReasonView {
@@ -516,9 +519,11 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
   const selectedReviewTask = useDashboardStore(
     (state) => state.selectedReviewTask,
   );
+
   const isFetchingReviewTask = useDashboardStore(
     (state) => state.isFetchingReviewTask,
   );
+
   const error = useDashboardStore((state) => state.error);
   const successMessage = useDashboardStore((state) => state.successMessage);
   const fetchReviewTask = useDashboardStore((state) => state.fetchReviewTask);
@@ -532,13 +537,15 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
       ? selectedReviewTask
       : null;
 
+  const latestDecision = task?.decisions[0] ?? null;
+
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <header className="space-y-4">
           <div>
             <p className="text-sm font-medium text-gray-500">
-              Edit and Approve
+              Week 2 Day 6 · Edit and Approve
             </p>
 
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950">
@@ -608,6 +615,14 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
                     <p>Priority: {task.priority}</p>
                     <p>Task created: {formatDate(task.createdAt)}</p>
                     <p>Run status: {task.run.status.replaceAll("_", " ")}</p>
+
+                    {task.startedAt ? (
+                      <p>Started: {formatDate(task.startedAt)}</p>
+                    ) : null}
+
+                    {task.completedAt ? (
+                      <p>Completed: {formatDate(task.completedAt)}</p>
+                    ) : null}
                   </div>
                 </div>
 
@@ -623,30 +638,34 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
                 <ReviewReasonCard task={task} />
 
                 <JsonPanel
-                  title="Original extracted JSON"
+                  title="Original AI extracted JSON"
                   value={task.run.extractedJson}
                 />
 
-                {task.decisions[0]?.correctedJson ? (
+                {latestDecision?.correctedJson ? (
                   <JsonPanel
-                    title="Latest human-corrected JSON"
-                    value={task.decisions[0].correctedJson}
+                    title="Final human-corrected JSON"
+                    value={latestDecision.correctedJson}
                   />
                 ) : null}
 
                 <JsonPanel
-                  title="Validation JSON"
+                  title="Original AI validation JSON"
                   value={task.run.validationJson}
                 />
+
+                {latestDecision?.correctedValidationJson ? (
+                  <JsonPanel
+                    title="Corrected validation JSON"
+                    value={latestDecision.correctedValidationJson}
+                  />
+                ) : null}
               </div>
 
               <div className="space-y-6">
                 <DecisionPanel task={task} />
 
-                <TimelineCard
-                  title="Review timeline"
-                  items={task.events}
-                />
+                <TimelineCard title="Review timeline" items={task.events} />
 
                 <TimelineCard
                   title="AI Extraction timeline"

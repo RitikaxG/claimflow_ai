@@ -1,5 +1,7 @@
 import { prisma, ReviewDecisionType, ReviewEventType, ReviewTaskStatus, Prisma } from "@repo/db";
 import { NextResponse } from "next/server";
+import { ClaimExtractionSchema } from "@repo/shared/schemas";
+import { buildHumanReviewedClaim } from "../../../../../lib/review/build-human-reviewed-claim";
 
 type Params = {
     params : Promise<{
@@ -62,7 +64,7 @@ export async function POST(request : Request, { params } : Params) {
         )
     }
 
-    if(task.status != "IN_REVIEW"){
+    if(task.status != ReviewTaskStatus.IN_REVIEW){
         return NextResponse.json(
             { error : `Approval can only be done when status is IN_REVIEW. Current status : ${task.status}`},
             { status : 409 },
@@ -92,13 +94,42 @@ export async function POST(request : Request, { params } : Params) {
         );
     }
 
+    const parsedExtractedJson = ClaimExtractionSchema.safeParse(run.extractedJson);
+    if(!parsedExtractedJson.success){
+        return NextResponse.json(
+            { 
+                error : "Existing extraction JSON does not match ClaimExtractionSchema",
+                issues : parsedExtractedJson.error.issues,
+            },
+            { status : 400 },
+        )
+    }
+
+    const {
+        normalizedClaim,
+        correctedValidationForReview,
+        hasBlockingIssues,
+        } = buildHumanReviewedClaim(parsedExtractedJson.data);
+
+        if (hasBlockingIssues) {
+        return NextResponse.json(
+            {
+            error:
+                "This task still has blocking validation issues. Use Edit & approve after correcting the JSON, or Request more info.",
+                validationResult: correctedValidationForReview,
+            },
+            { status: 400 },
+        );
+    }
+
     const updatedTask = await prisma.$transaction(async (tx) => {
         
         const decision = await tx.reviewDecision.create({
             data : {
                 taskId,
                 decision : ReviewDecisionType.APPROVE_AS_IS,
-                correctedJson : toPrismaJson(run.extractedJson),
+                correctedJson : toPrismaJson(normalizedClaim),
+                correctedValidationJson: toPrismaJson(correctedValidationForReview),
                 reviewerName,
                 notes,
             }
@@ -119,6 +150,8 @@ export async function POST(request : Request, { params } : Params) {
                     approvedJsonSource : "extractionRun.extractedJson",
                     hasCorrectedJson : true,
                     reviewerName : reviewerName ?? null,
+                    correctedValidation: correctedValidationForReview,
+                    humanReviewValidated: true,
                 }),
             }
         });
