@@ -230,17 +230,38 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
   const [rejectNotes, setRejectNotes] = useState("");
   const [moreInfoNotes, setMoreInfoNotes] = useState("");
 
+  const [editApproveNotes, setEditApproveNotes] = useState("");
+  const [correctedJsonText, setCorrectedJsonText] = useState("");
+  const [correctedJsonError, setCorrectedJsonError] = useState<string | null>(
+    null,
+  );
+
   const actionInFlight = useDashboardStore(
     (state) => state.reviewTaskActionInFlight,
   );
+
   const startReviewTask = useDashboardStore((state) => state.startReviewTask);
   const approveReviewTask = useDashboardStore((state) => state.approveReviewTask);
   const rejectReviewTask = useDashboardStore((state) => state.rejectReviewTask);
+
   const requestMoreInfoReviewTask = useDashboardStore(
     (state) => state.requestMoreInfoReviewTask,
   );
 
+  const editAndApproveReviewTask = useDashboardStore(
+    (state) => state.editAndApproveReviewTask,
+  );
+
   const isBusy = actionInFlight !== null;
+
+  useEffect(() => {
+    if (task.status !== "IN_REVIEW") {
+      return;
+    }
+
+    setCorrectedJsonText(JSON.stringify(task.run.extractedJson ?? {}, null, 2));
+    setCorrectedJsonError(null);
+  }, [task.id, task.status, task.run.extractedJson]);
 
   const handleStart = () => {
     void startReviewTask(task.id);
@@ -251,6 +272,26 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
       reviewerName,
       notes: approveNotes,
     });
+  };
+
+  const handleEditAndApprove = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      const correctedJson = JSON.parse(correctedJsonText);
+
+      setCorrectedJsonError(null);
+
+      void editAndApproveReviewTask(task.id, {
+        correctedJson,
+        reviewerName,
+        notes: editApproveNotes,
+      });
+    } catch {
+      setCorrectedJsonError(
+        "Corrected JSON is not valid JSON. Fix the syntax and try again.",
+      );
+    }
   };
 
   const handleReject = (event: FormEvent<HTMLFormElement>) => {
@@ -276,7 +317,8 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
       <h2 className="text-lg font-semibold text-gray-950">Decision panel</h2>
 
       <p className="mt-1 text-sm text-gray-600">
-        Start review first, then choose a decision.
+        Start review first, then approve, edit and approve, reject, or request
+        more information.
       </p>
 
       {task.status === "PENDING" ? (
@@ -308,6 +350,7 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
             <h3 className="text-sm font-semibold text-green-800">
               Approve as-is
             </h3>
+
             <p className="mt-1 text-sm text-green-700">
               Use this when the extracted JSON is acceptable without edits.
             </p>
@@ -330,10 +373,58 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
           </div>
 
           <form
+            onSubmit={handleEditAndApprove}
+            className="rounded-xl border border-blue-100 bg-blue-50 p-4"
+          >
+            <h3 className="text-sm font-semibold text-blue-800">
+              Edit and approve
+            </h3>
+
+            <p className="mt-1 text-sm text-blue-700">
+              Edit the extracted JSON below. The original AI output stays
+              unchanged; your correction is stored as a review decision.
+            </p>
+
+            <textarea
+              value={correctedJsonText}
+              onChange={(event) => {
+                setCorrectedJsonText(event.target.value);
+                setCorrectedJsonError(null);
+              }}
+              spellCheck={false}
+              className="mt-3 min-h-[420px] w-full rounded-lg border border-blue-200 bg-white px-3 py-2 font-mono text-xs text-gray-950 placeholder:text-gray-400 outline-none focus:border-blue-400"
+            />
+
+            {correctedJsonError ? (
+              <div className="mt-3 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {correctedJsonError}
+              </div>
+            ) : null}
+
+            <textarea
+              value={editApproveNotes}
+              onChange={(event) => setEditApproveNotes(event.target.value)}
+              placeholder="Optional correction notes..."
+              className="mt-3 min-h-20 w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-blue-400"
+            />
+
+            <button
+              type="submit"
+              disabled={isBusy}
+              className="mt-3 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
+            >
+              {actionInFlight === "edit_and_approve"
+                ? "Saving correction..."
+                : "Edit & approve"}
+            </button>
+          </form>
+
+          <form
             onSubmit={handleReject}
             className="rounded-xl border border-red-100 bg-red-50 p-4"
           >
             <h3 className="text-sm font-semibold text-red-800">Reject</h3>
+
             <p className="mt-1 text-sm text-red-700">
               Reject when the extraction cannot be accepted. Notes are required.
             </p>
@@ -362,6 +453,7 @@ function DecisionPanel({ task }: { task: ReviewTaskRecord }) {
             <h3 className="text-sm font-semibold text-orange-800">
               Request more info
             </h3>
+
             <p className="mt-1 text-sm text-orange-700">
               Use this when the claim needs missing evidence or clarification.
               Notes are required.
@@ -446,7 +538,7 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
         <header className="space-y-4">
           <div>
             <p className="text-sm font-medium text-gray-500">
-              Week 2 Day 5 · Human Review Detail
+              Edit and Approve
             </p>
 
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950">
@@ -454,8 +546,8 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
             </h1>
 
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Open a validation failure, inspect the AI output, and record a
-              human decision.
+              Open a validation failure, inspect the AI output, correct the JSON,
+              and store a human-reviewed decision.
             </p>
           </div>
 
@@ -534,6 +626,13 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
                   title="Original extracted JSON"
                   value={task.run.extractedJson}
                 />
+
+                {task.decisions[0]?.correctedJson ? (
+                  <JsonPanel
+                    title="Latest human-corrected JSON"
+                    value={task.decisions[0].correctedJson}
+                  />
+                ) : null}
 
                 <JsonPanel
                   title="Validation JSON"
