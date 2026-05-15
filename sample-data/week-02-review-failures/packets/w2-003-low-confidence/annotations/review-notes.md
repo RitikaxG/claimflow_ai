@@ -2,12 +2,16 @@
 
 ## Scenario
 
-Clean FNOL email with all required fields.
+The extracted claim has all required fields, but overallConfidence is below the review threshold.
 
 ## Expected behavior
 
-The run should complete successfully.
+Validation should mark the run as NEEDS_REVIEW because overallConfidence is below 0.75.
 
 ## Human review
 
-No review task should be created.
+A ReviewTask should be created with status PENDING.
+
+## Reviewer action
+
+Reviewer should inspect the extracted JSON against the source email. If the fields are correct, this can later be approved by a human reviewer.

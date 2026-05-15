@@ -1,17 +1,17 @@
-CLAIMFLOW_PACKET_ID: w2-010-clean-completed
+CLAIMFLOW_PACKET_ID: w2-003-low-confidence
 
-Subject: Motor claim intimation for CLM-W2-010
+Subject: Motor claim intimation for CLM-W2-003
 
 Hello Claims Team,
 
 I want to report a motor insurance claim.
 
-Claim Number: CLM-W2-010
-Policy Number: POL-W2-010
+Claim Number: CLM-W2-003
+Policy Number: POL-W2-003
 Insured Name: Asha Mehta
 Claimant Name: Asha Mehta
-Email: asha.w2.010@example.com
-Phone: +91-9000000010
+Email: asha.w2.003@example.com
+Phone: +91-9000000003
 
 Vehicle Registration: MH12AB4421
 Vehicle Make: Maruti
@@ -33,6 +33,8 @@ Claim Form Attached: Yes
 Damage Photo Attached: Yes
 Repair Estimate Attached: Yes
 Police Report Attached: No
+
+Note: This packet simulates low AI confidence even though the email has all required fields.
 
 Regards,
 Asha Mehta

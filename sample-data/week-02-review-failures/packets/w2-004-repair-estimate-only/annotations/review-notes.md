@@ -2,12 +2,16 @@
 
 ## Scenario
 
-Clean FNOL email with all required fields.
+The uploaded document is only a repair estimate. It is not a complete claim form.
 
 ## Expected behavior
 
-The run should complete successfully.
+Validation should mark the run as NEEDS_REVIEW because documentType is repair_estimate and claimForm is required evidence.
 
 ## Human review
 
-No review task should be created.
+A ReviewTask should be created with status PENDING.
+
+## Reviewer action
+
+Reviewer should request or attach the original claim form before approving the claim.

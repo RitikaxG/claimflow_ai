@@ -1,0 +1,34 @@
+CLAIMFLOW_PACKET_ID: w2-004-repair-estimate-only
+
+Document Type: Repair Estimate
+
+Garage: Pune Auto Works
+Estimate Number: EST-W2-004
+Claim Number: CLM-W2-004
+Policy Number: POL-W2-004
+
+Customer Name: Asha Mehta
+Vehicle Registration: MH12AB4421
+Vehicle Make: Maruti
+Vehicle Model: Baleno
+Vehicle Year: 2021
+
+Reported Incident Date: 2026-05-01
+Reported Incident Location: Pune, Maharashtra
+Reported Loss Type: Own Damage
+Reported Description: Vehicle front bumper and left headlamp damaged after impact with divider.
+
+Damaged Parts:
+- front bumper
+- left headlamp
+
+Damage Severity: moderate
+Estimated Repair Cost: 18500 INR
+
+Attached Documents:
+Claim Form: No
+Damage Photos: No
+Repair Estimate: Yes
+Police Report: No
+
+Note: This packet intentionally contains only the repair estimate. The original claim form is missing.

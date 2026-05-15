@@ -1,17 +1,17 @@
-CLAIMFLOW_PACKET_ID: w2-010-clean-completed
+CLAIMFLOW_PACKET_ID: w2-002-missing-incident-location
 
-Subject: Motor claim intimation for CLM-W2-010
+Subject: Motor claim intimation for CLM-W2-002
 
 Hello Claims Team,
 
 I want to report a motor insurance claim.
 
-Claim Number: CLM-W2-010
-Policy Number: POL-W2-010
+Claim Number: CLM-W2-002
+Policy Number: POL-W2-002
 Insured Name: Asha Mehta
 Claimant Name: Asha Mehta
-Email: asha.w2.010@example.com
-Phone: +91-9000000010
+Email: asha.w2.002@example.com
+Phone: +91-9000000002
 
 Vehicle Registration: MH12AB4421
 Vehicle Make: Maruti

@@ -2,10 +2,43 @@
   "documentType": "repair_estimate",
   "claimNumber": "CLM-W2-004",
   "policyNumber": "POL-W2-004",
+  "insuredName": "Asha Mehta",
+  "claimantName": "Asha Mehta",
+  "contactEmail": null,
+  "contactPhone": null,
+  "vehicle": {
+    "registrationNumber": "MH12AB4421",
+    "make": "Maruti",
+    "model": "Baleno",
+    "year": "2021",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-01",
+    "incidentTime": null,
+    "incidentLocation": "Pune, Maharashtra",
+    "lossType": "own_damage",
+    "description": "Vehicle front bumper and left headlamp damaged after impact with divider."
+  },
+  "damage": {
+    "damagedParts": ["front bumper", "left headlamp"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 18500,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
   "supportingDocuments": {
     "claimForm": false,
     "damagePhoto": false,
     "repairEstimate": true,
     "policeReport": false
-  }
+  },
+  "missingEvidence": ["claimForm"],
+  "overallConfidence": 0.88
 }

@@ -1,6 +1,6 @@
-CLAIMFLOW_PACKET_ID: CLAIMFLOW_PACKET_ID: w2-001-missing-policy-number
+CLAIMFLOW_PACKET_ID: w2-001-missing-policy-number
 
-Subject: Motor claim intimation for CLM-W2-010
+Subject: Motor claim intimation for CLM-W2-001
 
 Hello Claims Team,
 
@@ -9,8 +9,8 @@ I want to report a motor insurance claim.
 Claim Number: CLM-W2-001
 Insured Name: Asha Mehta
 Claimant Name: Asha Mehta
-Email: asha.w2.010@example.com
-Phone: +91-9000000010
+Email: asha.w2.001@example.com
+Phone: +91-9000000001
 
 Vehicle Registration: MH12AB4421
 Vehicle Make: Maruti

@@ -1,18 +1,25 @@
 {
   "run": {
-    "status": "COMPLETED"
+    "status": "NEEDS_REVIEW"
   },
   "reviewTask": {
-    "shouldExist": false
+    "shouldExist": true,
+    "status": "PENDING",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": [],
+      "conflicts": [],
+      "warnings": [
+        {
+          "field": "documentType",
+          "message": "Document is a repair estimate, not a complete auto insurance claim form.",
+          "severity": "warning",
+          "ruleId": "DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY"
+        }
+      ],
+      "requiredEvidence": ["claimForm"],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
   },
-  "extractionEvents": [
-    "DOCUMENT_UPLOADED",
-    "EXTRACTION_STARTED",
-    "MODEL_RESPONSE_RECEIVED",
-    "EXTRACTION_COMPLETED",
-    "VALIDATION_STARTED",
-    "VALIDATION_COMPLETED",
-    "RUN_COMPLETED"
-  ],
-  "reviewEvents": []
+  "reviewEvents": ["REVIEW_TASK_CREATED"]
 }

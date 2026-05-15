@@ -6,8 +6,8 @@
     {
       "field": "overallConfidence",
       "message": "Extraction confidence is below the review threshold.",
-      "severity":"warning",
-      "ruleId":"LOW_CONFIDENCE_REVIEW"
+      "severity": "warning",
+      "ruleId": "LOW_CONFIDENCE_REVIEW"
     }
   ],
   "requiredEvidence": [],

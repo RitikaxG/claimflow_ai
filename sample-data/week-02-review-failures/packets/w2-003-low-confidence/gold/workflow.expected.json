@@ -4,12 +4,19 @@
   },
   "reviewTask": {
     "shouldExist": true,
-    "status":"PENDING",
-    "priority":"NORMAL",
+    "status": "PENDING",
+    "priority": "NORMAL",
     "reasonJson": {
       "missingFields": [],
       "conflicts": [],
-      "warnings": [],
+      "warnings": [
+        {
+          "field": "overallConfidence",
+          "message": "Extraction confidence is below the review threshold.",
+          "severity": "warning",
+          "ruleId": "LOW_CONFIDENCE_REVIEW"
+        }
+      ],
       "requiredEvidence": [],
       "sourceFinalStatus": "NEEDS_REVIEW"
     }

@@ -1,16 +1,19 @@
 {
-  "packetId": "w2-010-clean-completed",
-  "claimId": "CLM-W2-010",
-  "scenario": "Clean FNOL email with all required fields present",
+  "packetId": "w2-004-repair-estimate-only",
+  "claimId": "CLM-W2-004",
+  "scenario": "Uploaded document is only a repair estimate and not a complete claim form",
   "sourceType": "EMAIL_TEXT",
-  "documentPath": "documents/fnol-email.txt",
+  "documentPath": "documents/repair-estimate.txt",
   "mockBehavior": "RETURN_GOLD_EXTRACTION",
   "expected": {
-    "runStatusAfterValidation": "COMPLETED",
-    "reviewTaskShouldExist": false,
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatus": "PENDING",
+    "reviewTaskPriority": "NORMAL",
     "missingFields": [],
     "conflicts": [],
-    "requiredEvidence": [],
-    "reviewEvents": []
+    "warnings": ["DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY"],
+    "requiredEvidence": ["claimForm"],
+    "reviewEvents": ["REVIEW_TASK_CREATED"]
   }
 }
