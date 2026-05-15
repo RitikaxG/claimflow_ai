@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-005-third-party-no-police-report
+
+Subject: Third-party motor claim intimation for CLM-W2-005
+
+Hello Claims Team,
+
+I want to report a third-party motor insurance claim.
+
+Claim Number: CLM-W2-005
+Policy Number: POL-W2-005
+Insured Name: Nikhil Rao
+Claimant Name: Nikhil Rao
+Email: nikhil.w2.005@example.com
+Phone: +91-9000000005
+
+Vehicle Registration: DL04CP2198
+Vehicle Make: Hyundai
+Vehicle Model: i20
+Vehicle Year: 2020
+
+Incident Date: 2026-05-03
+Incident Time: 11:15
+Incident Location: Gurgaon, Haryana
+Loss Type: Third Party
+Description: My vehicle hit another parked car while reversing. The other party is asking for repair compensation.
+
+Damaged Parts: rear bumper, right tail lamp
+Damage Severity: moderate
+Estimated Repair Cost: 32000 INR
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: Yes
+Repair Estimate Attached: Yes
+Police Report Attached: No
+
+Regards,
+Nikhil Rao

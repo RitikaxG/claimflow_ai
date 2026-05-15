@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-013-edit-and-approve
+
+Subject: Motor claim intimation for CLM-W2-013
+
+Hello Claims Team,
+
+I want to report a motor insurance claim.
+
+Claim Number: CLM-W2-013
+Policy Number: POL-W2-013
+Insured Name: Dev Arora
+Claimant Name: Dev Arora
+Email: dev.w2.013@example.com
+Phone: +91-9000000013
+
+Vehicle Registration: HR26LM9012
+Vehicle Make: Mahindra
+Vehicle Model: XUV300
+Vehicle Year: 2021
+
+Incident Date: 2026-05-09
+Incident Time: 19:05
+Incident Location: Noida, Uttar Pradesh
+Loss Type: Own Damage
+Description: The vehicle was damaged after hitting a divider near a flyover. Front grille and bumper were damaged.
+
+Damaged Parts: front grille, front bumper
+Damage Severity: moderate
+Estimated Repair Cost: 29000 INR
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: Yes
+Repair Estimate Attached: Yes
+Police Report Attached: No
+
+Regards,
+Dev Arora

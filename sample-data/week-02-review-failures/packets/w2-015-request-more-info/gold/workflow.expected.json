@@ -1,0 +1,36 @@
+{
+  "run": {
+    "statusAfterValidation": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "statusAfterValidation": "PENDING",
+    "statusAfterStart": "IN_REVIEW",
+    "statusAfterDecision": "NEEDS_MORE_INFO",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": [],
+      "conflicts": [],
+      "warnings": [
+        {
+          "field": "supportingDocuments.policeReport",
+          "message": "Police report is recommended for third-party claims.",
+          "severity": "warning",
+          "ruleId": "THIRD_PARTY_POLICE_REPORT_RECOMMENDED"
+        }
+      ],
+      "requiredEvidence": ["policeReport"],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewDecision": {
+    "decision": "REQUEST_MORE_INFO",
+    "notesRequired": true,
+    "expectedNotesIncludes": "Please upload police report"
+  },
+  "reviewEvents": [
+    "REVIEW_TASK_CREATED",
+    "REVIEW_STARTED",
+    "REVIEW_MORE_INFO_REQUESTED"
+  ]
+}

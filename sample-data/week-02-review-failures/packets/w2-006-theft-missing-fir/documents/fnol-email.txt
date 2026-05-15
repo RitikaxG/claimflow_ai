@@ -1,0 +1,37 @@
+CLAIMFLOW_PACKET_ID: w2-006-theft-missing-fir
+
+Subject: Theft claim intimation for CLM-W2-006
+
+Hello Claims Team,
+
+I want to report a theft claim.
+
+Claim Number: CLM-W2-006
+Policy Number: POL-W2-006
+Insured Name: Priya Shah
+Claimant Name: Priya Shah
+Email: priya.w2.006@example.com
+Phone: +91-9000000006
+
+Vehicle Registration: KA03MN7788
+Vehicle Make: Honda
+Vehicle Model: City
+Vehicle Year: 2019
+
+Incident Date: 2026-05-04
+Incident Time: 22:45
+Incident Location: Indiranagar, Bengaluru
+Loss Type: Theft
+Description: The vehicle was parked outside my apartment building at night and was missing the next morning.
+
+Police Reported: Yes
+Police Station: Indiranagar Police Station
+FIR Number: Not available yet
+Police Report Attached: No
+
+Claim Form Attached: Yes
+Damage Photo Attached: No
+Repair Estimate Attached: No
+
+Regards,
+Priya Shah

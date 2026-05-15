@@ -1,0 +1,15 @@
+{
+  "isValid": false,
+  "missingFields": [],
+  "conflicts": [
+    {
+      "field": "incident.lossType",
+      "message": "Loss type is unknown.",
+      "severity": "error",
+      "ruleId": "LOSS_TYPE_UNKNOWN"
+    }
+  ],
+  "warnings": [],
+  "requiredEvidence": [],
+  "finalStatus": "NEEDS_REVIEW"
+}

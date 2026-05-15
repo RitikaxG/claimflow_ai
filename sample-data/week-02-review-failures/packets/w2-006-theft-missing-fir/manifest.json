@@ -1,0 +1,19 @@
+{
+  "packetId": "w2-006-theft-missing-fir",
+  "claimId": "CLM-W2-006",
+  "scenario": "Theft claim is missing FIR number and police report evidence",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatus": "PENDING",
+    "reviewTaskPriority": "NORMAL",
+    "missingFields": ["police.firNumber"],
+    "conflicts": [],
+    "warnings": ["THEFT_POLICE_REPORT_REQUIRED"],
+    "requiredEvidence": ["firNumber", "policeReport"],
+    "reviewEvents": ["REVIEW_TASK_CREATED"]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-007",
+  "policyNumber": "POL-W2-007",
+  "insuredName": "Rohan Kapoor",
+  "claimantName": "Rohan Kapoor",
+  "contactEmail": "rohan.w2.007@example.com",
+  "contactPhone": "+91-9000000007",
+  "vehicle": {
+    "registrationNumber": "MH14CD7712",
+    "make": "Tata",
+    "model": "Nexon",
+    "year": "2022",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-05",
+    "incidentTime": "09:20",
+    "incidentLocation": "Mumbai, Maharashtra",
+    "lossType": "own_damage",
+    "description": "The vehicle scraped against a boundary wall while parking. Left side door and mirror were damaged."
+  },
+  "damage": {
+    "damagedParts": ["left door", "left mirror"],
+    "damageSeverity": "minor",
+    "estimatedRepairCost": 0,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.91
+}

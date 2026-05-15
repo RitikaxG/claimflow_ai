@@ -1,0 +1,23 @@
+{
+  "packetId": "w2-015-request-more-info",
+  "claimId": "CLM-W2-015",
+  "scenario": "Insufficient evidence requires reviewer to request more information",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatusAfterValidation": "PENDING",
+    "reviewTaskStatusAfterStart": "IN_REVIEW",
+    "reviewAction": "REQUEST_MORE_INFO",
+    "reviewTaskStatusAfterDecision": "NEEDS_MORE_INFO",
+    "decision": "REQUEST_MORE_INFO",
+    "notesRequired": true,
+    "reviewEvents": [
+      "REVIEW_TASK_CREATED",
+      "REVIEW_STARTED",
+      "REVIEW_MORE_INFO_REQUESTED"
+    ]
+  }
+}

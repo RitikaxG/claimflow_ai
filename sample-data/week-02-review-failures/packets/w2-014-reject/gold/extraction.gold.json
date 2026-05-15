@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-014",
+  "policyNumber": "POL-W2-014",
+  "insuredName": null,
+  "claimantName": null,
+  "contactEmail": "unknown.w2.014@example.com",
+  "contactPhone": "+91-9000000014",
+  "vehicle": {
+    "registrationNumber": "MH12AB4421",
+    "make": "Maruti",
+    "model": "Baleno",
+    "year": "2021",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-10",
+    "incidentTime": "02:30",
+    "incidentLocation": "Pune, Maharashtra",
+    "lossType": "own_damage",
+    "description": "The claimant says the accident happened late at night but refuses to provide owner details, garage details, or photos."
+  },
+  "damage": {
+    "damagedParts": ["front bumper"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 18500,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": false,
+    "damagePhoto": false,
+    "repairEstimate": false,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.83
+}

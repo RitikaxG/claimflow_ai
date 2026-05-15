@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-009",
+  "policyNumber": "POL-W2-009",
+  "insuredName": "Meera Iyer",
+  "claimantName": "Meera Iyer",
+  "contactEmail": "meera.w2.009@example.com",
+  "contactPhone": "+91-9000000009",
+  "vehicle": {
+    "registrationNumber": "GJ01GH8821",
+    "make": "Kia",
+    "model": "Sonet",
+    "year": "2022",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-07",
+    "incidentTime": "13:40",
+    "incidentLocation": "Ahmedabad, Gujarat",
+    "lossType": "unknown",
+    "description": "The vehicle was involved in a confusing incident near a service lane. I am not sure whether this should be own damage or third-party."
+  },
+  "damage": {
+    "damagedParts": ["front bumper", "right fender"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 27500,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.86
+}

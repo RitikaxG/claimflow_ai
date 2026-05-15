@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-013",
+  "policyNumber": null,
+  "insuredName": "Dev Arora",
+  "claimantName": "Dev Arora",
+  "contactEmail": "dev.w2.013@example.com",
+  "contactPhone": "+91-9000000013",
+  "vehicle": {
+    "registrationNumber": "HR26LM9012",
+    "make": "Mahindra",
+    "model": "XUV300",
+    "year": "2021",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-09",
+    "incidentTime": "19:05",
+    "incidentLocation": "Noida, Uttar Pradesh",
+    "lossType": "own_damage",
+    "description": "The vehicle was damaged after hitting a divider near a flyover. Front grille and bumper were damaged."
+  },
+  "damage": {
+    "damagedParts": ["front grille", "front bumper"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 29000,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.9
+}

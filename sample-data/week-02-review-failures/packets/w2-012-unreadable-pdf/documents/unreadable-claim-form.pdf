@@ -1,0 +1,7 @@
+CLAIMFLOW_PACKET_ID: w2-012-unreadable-pdf
+
+This is intentionally not a valid readable PDF.
+
+The mock extraction layer should detect packetId w2-012-unreadable-pdf and throw an extraction error that includes the word "unreadable".
+
+Do not use this as a real PDF fixture.

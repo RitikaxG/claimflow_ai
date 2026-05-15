@@ -1,0 +1,20 @@
+{
+  "packetId": "w2-011-duplicate-email",
+  "claimId": "CLM-W2-011",
+  "scenario": "Same email text is uploaded twice and should be detected as duplicate",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "firstUpload": {
+      "duplicate": false,
+      "runStatusAfterValidation": "COMPLETED",
+      "reviewTaskShouldExist": false
+    },
+    "secondUpload": {
+      "duplicate": true,
+      "restored": false,
+      "event": "DUPLICATE_UPLOAD_DETECTED"
+    }
+  }
+}

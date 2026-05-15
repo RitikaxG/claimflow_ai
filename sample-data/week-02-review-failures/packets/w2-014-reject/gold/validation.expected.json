@@ -1,0 +1,8 @@
+{
+  "isValid": false,
+  "missingFields": ["claimantName_or_insuredName"],
+  "conflicts": [],
+  "warnings": [],
+  "requiredEvidence": [],
+  "finalStatus": "NEEDS_REVIEW"
+}

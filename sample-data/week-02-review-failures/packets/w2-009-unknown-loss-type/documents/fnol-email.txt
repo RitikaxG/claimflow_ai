@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-009-unknown-loss-type
+
+Subject: Motor claim intimation for CLM-W2-009
+
+Hello Claims Team,
+
+I want to report a motor insurance claim but I am not sure how to classify the loss.
+
+Claim Number: CLM-W2-009
+Policy Number: POL-W2-009
+Insured Name: Meera Iyer
+Claimant Name: Meera Iyer
+Email: meera.w2.009@example.com
+Phone: +91-9000000009
+
+Vehicle Registration: GJ01GH8821
+Vehicle Make: Kia
+Vehicle Model: Sonet
+Vehicle Year: 2022
+
+Incident Date: 2026-05-07
+Incident Time: 13:40
+Incident Location: Ahmedabad, Gujarat
+Loss Type: Not sure
+Description: The vehicle was involved in a confusing incident near a service lane. I am not sure whether this should be own damage or third-party.
+
+Damaged Parts: front bumper, right fender
+Damage Severity: moderate
+Estimated Repair Cost: 27500 INR
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: Yes
+Repair Estimate Attached: Yes
+Police Report Attached: No
+
+Regards,
+Meera Iyer

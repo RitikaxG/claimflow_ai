@@ -1,0 +1,15 @@
+{
+  "run": {
+    "status": "FAILED",
+    "errorMessageIncludes": "unreadable"
+  },
+  "reviewTask": {
+    "shouldExist": false
+  },
+  "extractionEvents": [
+    "DOCUMENT_UPLOADED",
+    "EXTRACTION_STARTED",
+    "RUN_FAILED"
+  ],
+  "reviewEvents": []
+}

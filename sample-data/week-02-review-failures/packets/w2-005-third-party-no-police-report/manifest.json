@@ -1,0 +1,19 @@
+{
+  "packetId": "w2-005-third-party-no-police-report",
+  "claimId": "CLM-W2-005",
+  "scenario": "Third-party claim is submitted without police report",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatus": "PENDING",
+    "reviewTaskPriority": "NORMAL",
+    "missingFields": [],
+    "conflicts": [],
+    "warnings": ["THIRD_PARTY_POLICE_REPORT_RECOMMENDED"],
+    "requiredEvidence": ["policeReport"],
+    "reviewEvents": ["REVIEW_TASK_CREATED"]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "packetId": "w2-008-currency-missing",
+  "claimId": "CLM-W2-008",
+  "scenario": "Repair cost is present but currency is missing",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatus": "PENDING",
+    "reviewTaskPriority": "NORMAL",
+    "missingFields": [],
+    "conflicts": ["CURRENCY_REQUIRED_WITH_REPAIR_COST"],
+    "warnings": [],
+    "requiredEvidence": [],
+    "reviewEvents": ["REVIEW_TASK_CREATED"]
+  }
+}

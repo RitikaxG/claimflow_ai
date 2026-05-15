@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-005",
+  "policyNumber": "POL-W2-005",
+  "insuredName": "Nikhil Rao",
+  "claimantName": "Nikhil Rao",
+  "contactEmail": "nikhil.w2.005@example.com",
+  "contactPhone": "+91-9000000005",
+  "vehicle": {
+    "registrationNumber": "DL04CP2198",
+    "make": "Hyundai",
+    "model": "i20",
+    "year": "2020",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-03",
+    "incidentTime": "11:15",
+    "incidentLocation": "Gurgaon, Haryana",
+    "lossType": "third_party",
+    "description": "My vehicle hit another parked car while reversing. The other party is asking for repair compensation."
+  },
+  "damage": {
+    "damagedParts": ["rear bumper", "right tail lamp"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 32000,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.9
+}

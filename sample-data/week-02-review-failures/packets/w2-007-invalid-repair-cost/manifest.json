@@ -1,0 +1,19 @@
+{
+  "packetId": "w2-007-invalid-repair-cost",
+  "claimId": "CLM-W2-007",
+  "scenario": "Repair cost is zero, which is invalid",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatus": "PENDING",
+    "reviewTaskPriority": "NORMAL",
+    "missingFields": [],
+    "conflicts": ["INVALID_REPAIR_COST"],
+    "warnings": [],
+    "requiredEvidence": [],
+    "reviewEvents": ["REVIEW_TASK_CREATED"]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "firstUpload": {
+    "duplicate": false,
+    "run": {
+      "status": "COMPLETED"
+    },
+    "reviewTask": {
+      "shouldExist": false
+    },
+    "extractionEvents": [
+      "DOCUMENT_UPLOADED",
+      "EXTRACTION_STARTED",
+      "MODEL_RESPONSE_RECEIVED",
+      "EXTRACTION_COMPLETED",
+      "VALIDATION_STARTED",
+      "VALIDATION_COMPLETED",
+      "RUN_COMPLETED"
+    ],
+    "reviewEvents": []
+  },
+  "secondUpload": {
+    "duplicate": true,
+    "restored": false,
+    "expectedEvent": "DUPLICATE_UPLOAD_DETECTED",
+    "shouldReturnExistingDocument": true,
+    "shouldReturnExistingRun": true
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-006",
+  "policyNumber": "POL-W2-006",
+  "insuredName": "Priya Shah",
+  "claimantName": "Priya Shah",
+  "contactEmail": "priya.w2.006@example.com",
+  "contactPhone": "+91-9000000006",
+  "vehicle": {
+    "registrationNumber": "KA03MN7788",
+    "make": "Honda",
+    "model": "City",
+    "year": "2019",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-04",
+    "incidentTime": "22:45",
+    "incidentLocation": "Indiranagar, Bengaluru",
+    "lossType": "theft",
+    "description": "The vehicle was parked outside my apartment building at night and was missing the next morning."
+  },
+  "damage": {
+    "damagedParts": [],
+    "damageSeverity": "unknown",
+    "estimatedRepairCost": null,
+    "currency": null
+  },
+  "police": {
+    "wasReportedToPolice": true,
+    "policeStation": "Indiranagar Police Station",
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": false,
+    "repairEstimate": false,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.89
+}

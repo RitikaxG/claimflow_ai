@@ -1,0 +1,36 @@
+{
+  "run": {
+    "statusAfterValidation": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "statusAfterValidation": "PENDING",
+    "statusAfterStart": "IN_REVIEW",
+    "statusAfterDecision": "EDITED_AND_APPROVED",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": ["policyNumber"],
+      "conflicts": [],
+      "warnings": [],
+      "requiredEvidence": [],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewDecision": {
+    "decision": "EDIT_AND_APPROVE",
+    "correctedJsonShouldExist": true,
+    "correctedJsonPath": "gold/corrected-extraction.expected.json",
+    "correctedValidationJsonShouldExist": true,
+    "correctedValidationExpected": {
+      "finalStatus": "COMPLETED",
+      "humanApproved": true,
+      "approvedByReviewer": true
+    },
+    "notes": "Policy number corrected from source email."
+  },
+  "reviewEvents": [
+    "REVIEW_TASK_CREATED",
+    "REVIEW_STARTED",
+    "REVIEW_EDITED_AND_APPROVED"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "run": {
+    "status": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "status": "PENDING",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": [],
+      "conflicts": [
+        {
+          "field": "damage.estimatedRepairCost",
+          "message": "Estimated repair cost must be greater than 0",
+          "severity": "error",
+          "ruleId": "INVALID_REPAIR_COST"
+        }
+      ],
+      "warnings": [],
+      "requiredEvidence": [],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewEvents": ["REVIEW_TASK_CREATED"]
+}

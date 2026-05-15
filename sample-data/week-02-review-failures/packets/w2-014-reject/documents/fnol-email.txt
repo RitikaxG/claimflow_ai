@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-014-reject
+
+Subject: Urgent claim request for CLM-W2-014
+
+Hello Claims Team,
+
+Please process this claim urgently.
+
+Claim Number: CLM-W2-014
+Policy Number: POL-W2-014
+Insured Name: Not provided
+Claimant Name: Not provided
+Email: unknown.w2.014@example.com
+Phone: +91-9000000014
+
+Vehicle Registration: MH12AB4421
+Vehicle Make: Maruti
+Vehicle Model: Baleno
+Vehicle Year: 2021
+
+Incident Date: 2026-05-10
+Incident Time: 02:30
+Incident Location: Pune, Maharashtra
+Loss Type: Own Damage
+Description: The claimant says the accident happened late at night but refuses to provide owner details, garage details, or photos.
+
+Damaged Parts: front bumper
+Damage Severity: moderate
+Estimated Repair Cost: 18500 INR
+
+Police Reported: No
+Claim Form Attached: No
+Damage Photo Attached: No
+Repair Estimate Attached: No
+Police Report Attached: No
+
+Regards,
+Unknown Sender

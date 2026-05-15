@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-015-request-more-info
+
+Subject: Third-party claim intimation for CLM-W2-015
+
+Hello Claims Team,
+
+I want to report a third-party motor insurance claim.
+
+Claim Number: CLM-W2-015
+Policy Number: POL-W2-015
+Insured Name: Sana Ali
+Claimant Name: Sana Ali
+Email: sana.w2.015@example.com
+Phone: +91-9000000015
+
+Vehicle Registration: RJ14NP7760
+Vehicle Make: Renault
+Vehicle Model: Kiger
+Vehicle Year: 2022
+
+Incident Date: 2026-05-11
+Incident Time: 17:35
+Incident Location: Jaipur, Rajasthan
+Loss Type: Third Party
+Description: My vehicle collided with another vehicle at a traffic signal. The other driver is requesting compensation, but I have not uploaded the police report yet.
+
+Damaged Parts: front bumper, number plate
+Damage Severity: moderate
+Estimated Repair Cost: 36000 INR
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: No
+Repair Estimate Attached: No
+Police Report Attached: No
+
+Regards,
+Sana Ali

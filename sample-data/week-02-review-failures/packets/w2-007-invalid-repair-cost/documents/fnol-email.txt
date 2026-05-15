@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-007-invalid-repair-cost
+
+Subject: Motor claim intimation for CLM-W2-007
+
+Hello Claims Team,
+
+I want to report a motor insurance claim.
+
+Claim Number: CLM-W2-007
+Policy Number: POL-W2-007
+Insured Name: Rohan Kapoor
+Claimant Name: Rohan Kapoor
+Email: rohan.w2.007@example.com
+Phone: +91-9000000007
+
+Vehicle Registration: MH14CD7712
+Vehicle Make: Tata
+Vehicle Model: Nexon
+Vehicle Year: 2022
+
+Incident Date: 2026-05-05
+Incident Time: 09:20
+Incident Location: Mumbai, Maharashtra
+Loss Type: Own Damage
+Description: The vehicle scraped against a boundary wall while parking. Left side door and mirror were damaged.
+
+Damaged Parts: left door, left mirror
+Damage Severity: minor
+Estimated Repair Cost: 0 INR
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: Yes
+Repair Estimate Attached: Yes
+Police Report Attached: No
+
+Regards,
+Rohan Kapoor

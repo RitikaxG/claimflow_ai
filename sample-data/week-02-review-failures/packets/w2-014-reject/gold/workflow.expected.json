@@ -1,0 +1,29 @@
+{
+  "run": {
+    "statusAfterValidation": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "statusAfterValidation": "PENDING",
+    "statusAfterStart": "IN_REVIEW",
+    "statusAfterDecision": "REJECTED",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": ["claimantName_or_insuredName"],
+      "conflicts": [],
+      "warnings": [],
+      "requiredEvidence": [],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewDecision": {
+    "decision": "REJECT",
+    "notesRequired": true,
+    "expectedNotesIncludes": "Suspicious claimant details"
+  },
+  "reviewEvents": [
+    "REVIEW_TASK_CREATED",
+    "REVIEW_STARTED",
+    "REVIEW_REJECTED"
+  ]
+}

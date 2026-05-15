@@ -1,0 +1,15 @@
+{
+  "isValid": false,
+  "missingFields": ["police.firNumber"],
+  "conflicts": [],
+  "warnings": [
+    {
+      "field": "supportingDocuments.policeReport",
+      "message": "Police report is required or strongly recommended for theft claims.",
+      "severity": "warning",
+      "ruleId": "THEFT_POLICE_REPORT_REQUIRED"
+    }
+  ],
+  "requiredEvidence": ["firNumber", "policeReport"],
+  "finalStatus": "NEEDS_REVIEW"
+}

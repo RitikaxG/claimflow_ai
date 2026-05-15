@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-011-duplicate-email
+
+Subject: Motor claim intimation for CLM-W2-011
+
+Hello Claims Team,
+
+I want to report a motor insurance claim.
+
+Claim Number: CLM-W2-011
+Policy Number: POL-W2-011
+Insured Name: Kavya Menon
+Claimant Name: Kavya Menon
+Email: kavya.w2.011@example.com
+Phone: +91-9000000011
+
+Vehicle Registration: KL07JK4412
+Vehicle Make: Suzuki
+Vehicle Model: Swift
+Vehicle Year: 2020
+
+Incident Date: 2026-05-08
+Incident Time: 10:10
+Incident Location: Kochi, Kerala
+Loss Type: Own Damage
+Description: The vehicle hit a roadside pole while reversing. Rear bumper and boot lid were damaged.
+
+Damaged Parts: rear bumper, boot lid
+Damage Severity: moderate
+Estimated Repair Cost: 21000 INR
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: Yes
+Repair Estimate Attached: Yes
+Police Report Attached: No
+
+Regards,
+Kavya Menon

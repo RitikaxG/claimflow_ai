@@ -1,0 +1,25 @@
+{
+  "run": {
+    "status": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "status": "PENDING",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": [],
+      "conflicts": [],
+      "warnings": [
+        {
+          "field": "supportingDocuments.policeReport",
+          "message": "Police report is recommended for third-party claims.",
+          "severity": "warning",
+          "ruleId": "THIRD_PARTY_POLICE_REPORT_RECOMMENDED"
+        }
+      ],
+      "requiredEvidence": ["policeReport"],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewEvents": ["REVIEW_TASK_CREATED"]
+}

@@ -1,0 +1,39 @@
+CLAIMFLOW_PACKET_ID: w2-008-currency-missing
+
+Subject: Motor claim intimation for CLM-W2-008
+
+Hello Claims Team,
+
+I want to report a motor insurance claim.
+
+Claim Number: CLM-W2-008
+Policy Number: POL-W2-008
+Insured Name: Farah Khan
+Claimant Name: Farah Khan
+Email: farah.w2.008@example.com
+Phone: +91-9000000008
+
+Vehicle Registration: TN10EF5510
+Vehicle Make: Toyota
+Vehicle Model: Glanza
+Vehicle Year: 2021
+
+Incident Date: 2026-05-06
+Incident Time: 16:10
+Incident Location: Chennai, Tamil Nadu
+Loss Type: Own Damage
+Description: The vehicle was hit by falling debris during road repair work. Bonnet and windshield were damaged.
+
+Damaged Parts: bonnet, windshield
+Damage Severity: moderate
+Estimated Repair Cost: 24500
+Currency: Not mentioned
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: Yes
+Repair Estimate Attached: Yes
+Police Report Attached: No
+
+Regards,
+Farah Khan

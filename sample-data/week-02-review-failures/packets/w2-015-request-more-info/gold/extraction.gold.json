@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-015",
+  "policyNumber": "POL-W2-015",
+  "insuredName": "Sana Ali",
+  "claimantName": "Sana Ali",
+  "contactEmail": "sana.w2.015@example.com",
+  "contactPhone": "+91-9000000015",
+  "vehicle": {
+    "registrationNumber": "RJ14NP7760",
+    "make": "Renault",
+    "model": "Kiger",
+    "year": "2022",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-11",
+    "incidentTime": "17:35",
+    "incidentLocation": "Jaipur, Rajasthan",
+    "lossType": "third_party",
+    "description": "My vehicle collided with another vehicle at a traffic signal. The other driver is requesting compensation, but I have not uploaded the police report yet."
+  },
+  "damage": {
+    "damagedParts": ["front bumper", "number plate"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 36000,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": false,
+    "repairEstimate": false,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.88
+}

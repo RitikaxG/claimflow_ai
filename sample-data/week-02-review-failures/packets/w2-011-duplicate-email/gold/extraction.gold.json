@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-011",
+  "policyNumber": "POL-W2-011",
+  "insuredName": "Kavya Menon",
+  "claimantName": "Kavya Menon",
+  "contactEmail": "kavya.w2.011@example.com",
+  "contactPhone": "+91-9000000011",
+  "vehicle": {
+    "registrationNumber": "KL07JK4412",
+    "make": "Suzuki",
+    "model": "Swift",
+    "year": "2020",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-08",
+    "incidentTime": "10:10",
+    "incidentLocation": "Kochi, Kerala",
+    "lossType": "own_damage",
+    "description": "The vehicle hit a roadside pole while reversing. Rear bumper and boot lid were damaged."
+  },
+  "damage": {
+    "damagedParts": ["rear bumper", "boot lid"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 21000,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.94
+}

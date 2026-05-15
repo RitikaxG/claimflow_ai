@@ -1,0 +1,19 @@
+{
+  "packetId": "w2-012-unreadable-pdf",
+  "claimId": "CLM-W2-012",
+  "scenario": "Unreadable scanned PDF causes extraction failure",
+  "sourceType": "PDF",
+  "documentPath": "documents/unreadable-claim-form.pdf",
+  "mockBehavior": "THROW_EXTRACTION_ERROR",
+  "expected": {
+    "runStatusAfterExtraction": "FAILED",
+    "errorMessageIncludes": "unreadable",
+    "reviewTaskShouldExist": false,
+    "extractionEvents": [
+      "DOCUMENT_UPLOADED",
+      "EXTRACTION_STARTED",
+      "RUN_FAILED"
+    ],
+    "reviewEvents": []
+  }
+}

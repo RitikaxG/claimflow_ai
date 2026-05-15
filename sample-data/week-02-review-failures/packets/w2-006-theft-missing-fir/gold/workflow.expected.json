@@ -1,0 +1,25 @@
+{
+  "run": {
+    "status": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "status": "PENDING",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": ["police.firNumber"],
+      "conflicts": [],
+      "warnings": [
+        {
+          "field": "supportingDocuments.policeReport",
+          "message": "Police report is required or strongly recommended for theft claims.",
+          "severity": "warning",
+          "ruleId": "THEFT_POLICE_REPORT_REQUIRED"
+        }
+      ],
+      "requiredEvidence": ["firNumber", "policeReport"],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewEvents": ["REVIEW_TASK_CREATED"]
+}

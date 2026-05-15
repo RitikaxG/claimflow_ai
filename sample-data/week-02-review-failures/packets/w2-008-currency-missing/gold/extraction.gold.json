@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-008",
+  "policyNumber": "POL-W2-008",
+  "insuredName": "Farah Khan",
+  "claimantName": "Farah Khan",
+  "contactEmail": "farah.w2.008@example.com",
+  "contactPhone": "+91-9000000008",
+  "vehicle": {
+    "registrationNumber": "TN10EF5510",
+    "make": "Toyota",
+    "model": "Glanza",
+    "year": "2021",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-06",
+    "incidentTime": "16:10",
+    "incidentLocation": "Chennai, Tamil Nadu",
+    "lossType": "own_damage",
+    "description": "The vehicle was hit by falling debris during road repair work. Bonnet and windshield were damaged."
+  },
+  "damage": {
+    "damagedParts": ["bonnet", "windshield"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 24500,
+    "currency": null
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.89
+}

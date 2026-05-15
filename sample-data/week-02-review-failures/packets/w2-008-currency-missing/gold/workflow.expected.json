@@ -1,0 +1,25 @@
+{
+  "run": {
+    "status": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "status": "PENDING",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": [],
+      "conflicts": [
+        {
+          "field": "damage.currency",
+          "message": "Currency is required when estimated repair cost is present",
+          "severity": "error",
+          "ruleId": "CURRENCY_REQUIRED_WITH_REPAIR_COST"
+        }
+      ],
+      "warnings": [],
+      "requiredEvidence": [],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewEvents": ["REVIEW_TASK_CREATED"]
+}

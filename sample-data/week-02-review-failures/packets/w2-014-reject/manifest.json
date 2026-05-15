@@ -1,0 +1,23 @@
+{
+  "packetId": "w2-014-reject",
+  "claimId": "CLM-W2-014",
+  "scenario": "Suspicious claim is rejected by human reviewer",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatusAfterValidation": "PENDING",
+    "reviewTaskStatusAfterStart": "IN_REVIEW",
+    "reviewAction": "REJECT",
+    "reviewTaskStatusAfterDecision": "REJECTED",
+    "decision": "REJECT",
+    "notesRequired": true,
+    "reviewEvents": [
+      "REVIEW_TASK_CREATED",
+      "REVIEW_STARTED",
+      "REVIEW_REJECTED"
+    ]
+  }
+}

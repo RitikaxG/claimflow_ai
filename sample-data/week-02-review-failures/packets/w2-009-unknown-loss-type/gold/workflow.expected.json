@@ -1,0 +1,25 @@
+{
+  "run": {
+    "status": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "status": "PENDING",
+    "priority": "NORMAL",
+    "reasonJson": {
+      "missingFields": [],
+      "conflicts": [
+        {
+          "field": "incident.lossType",
+          "message": "Loss type is unknown.",
+          "severity": "error",
+          "ruleId": "LOSS_TYPE_UNKNOWN"
+        }
+      ],
+      "warnings": [],
+      "requiredEvidence": [],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewEvents": ["REVIEW_TASK_CREATED"]
+}

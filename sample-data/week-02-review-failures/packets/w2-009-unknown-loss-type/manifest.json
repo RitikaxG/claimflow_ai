@@ -1,0 +1,19 @@
+{
+  "packetId": "w2-009-unknown-loss-type",
+  "claimId": "CLM-W2-009",
+  "scenario": "Loss type cannot be classified from the email",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "reviewTaskStatus": "PENDING",
+    "reviewTaskPriority": "NORMAL",
+    "missingFields": [],
+    "conflicts": ["LOSS_TYPE_UNKNOWN"],
+    "warnings": [],
+    "requiredEvidence": [],
+    "reviewEvents": ["REVIEW_TASK_CREATED"]
+  }
+}
