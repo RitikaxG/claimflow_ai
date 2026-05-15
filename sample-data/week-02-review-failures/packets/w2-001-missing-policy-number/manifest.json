@@ -1,0 +1,16 @@
+{
+  "packetId": "w2-001-missing-policy-number",
+  "claimId": "CLM-W2-001",
+  "scenario": "Clean FNOL email with all required fields present",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "NEEDS_REVIEW",
+    "reviewTaskShouldExist": true,
+    "missingFields": ["policyNumber"],
+    "conflicts": [],
+    "requiredEvidence": [],
+    "reviewEvents": []
+  }
+}

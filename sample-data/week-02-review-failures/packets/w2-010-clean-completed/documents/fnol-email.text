@@ -1,0 +1,38 @@
+CLAIMFLOW_PACKET_ID: w2-010-clean-completed
+
+Subject: Motor claim intimation for CLM-W2-010
+
+Hello Claims Team,
+
+I want to report a motor insurance claim.
+
+Claim Number: CLM-W2-010
+Policy Number: POL-W2-010
+Insured Name: Asha Mehta
+Claimant Name: Asha Mehta
+Email: asha.w2.010@example.com
+Phone: +91-9000000010
+
+Vehicle Registration: MH12AB4421
+Vehicle Make: Maruti
+Vehicle Model: Baleno
+Vehicle Year: 2021
+
+Incident Date: 2026-05-01
+Incident Time: 18:30
+Incident Location: Pune, Maharashtra
+Loss Type: Own Damage
+Description: The vehicle hit a divider during heavy rain. Front bumper and left headlamp were damaged.
+
+Damaged Parts: front bumper, left headlamp
+Damage Severity: moderate
+Estimated Repair Cost: 18500 INR
+
+Police Reported: No
+Claim Form Attached: Yes
+Damage Photo Attached: Yes
+Repair Estimate Attached: Yes
+Police Report Attached: No
+
+Regards,
+Asha Mehta

@@ -1,0 +1,11 @@
+{
+  "documentType": "repair_estimate",
+  "claimNumber": "CLM-W2-004",
+  "policyNumber": "POL-W2-004",
+  "supportingDocuments": {
+    "claimForm": false,
+    "damagePhoto": false,
+    "repairEstimate": true,
+    "policeReport": false
+  }
+}

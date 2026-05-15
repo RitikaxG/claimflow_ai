@@ -1,0 +1,16 @@
+{
+  "packetId": "w2-010-clean-completed",
+  "claimId": "CLM-W2-010",
+  "scenario": "Clean FNOL email with all required fields present",
+  "sourceType": "EMAIL_TEXT",
+  "documentPath": "documents/fnol-email.txt",
+  "mockBehavior": "RETURN_GOLD_EXTRACTION",
+  "expected": {
+    "runStatusAfterValidation": "COMPLETED",
+    "reviewTaskShouldExist": false,
+    "missingFields": [],
+    "conflicts": [],
+    "requiredEvidence": [],
+    "reviewEvents": []
+  }
+}

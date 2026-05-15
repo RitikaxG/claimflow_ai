@@ -1,0 +1,44 @@
+{
+  "documentType": "claim_email",
+  "claimNumber": "CLM-W2-001",
+  "policyNumber": null,
+  "insuredName": "Asha Mehta",
+  "claimantName": "Asha Mehta",
+  "contactEmail": "asha.w2.010@example.com",
+  "contactPhone": "+91-9000000010",
+  "vehicle": {
+    "registrationNumber": "MH12AB4421",
+    "make": "Maruti",
+    "model": "Baleno",
+    "year": "2021",
+    "engineNumber": null,
+    "chassisNumber": null
+  },
+  "incident": {
+    "incidentDate": "2026-05-01",
+    "incidentTime": "18:30",
+    "incidentLocation": "Pune, Maharashtra",
+    "lossType": "own_damage",
+    "description": "The vehicle hit a divider during heavy rain. Front bumper and left headlamp were damaged."
+  },
+  "damage": {
+    "damagedParts": ["front bumper", "left headlamp"],
+    "damageSeverity": "moderate",
+    "estimatedRepairCost": 18500,
+    "currency": "INR"
+  },
+  "police": {
+    "wasReportedToPolice": false,
+    "policeStation": null,
+    "firNumber": null,
+    "reportDate": null
+  },
+  "supportingDocuments": {
+    "claimForm": true,
+    "damagePhoto": true,
+    "repairEstimate": true,
+    "policeReport": false
+  },
+  "missingEvidence": [],
+  "overallConfidence": 0.93
+}

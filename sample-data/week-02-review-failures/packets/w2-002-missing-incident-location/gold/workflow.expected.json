@@ -1,0 +1,18 @@
+{
+  "run": {
+    "status": "NEEDS_REVIEW"
+  },
+  "reviewTask": {
+    "shouldExist": true,
+    "status":"PENDING",
+    "priority":"NORMAL",
+    "reasonJson": {
+      "missingFields": ["incident.incidentLocation"],
+      "conflicts": [],
+      "warnings": [],
+      "requiredEvidence": [],
+      "sourceFinalStatus": "NEEDS_REVIEW"
+    }
+  },
+  "reviewEvents": ["REVIEW_TASK_CREATED"]
+}

@@ -1,0 +1,15 @@
+{
+  "isValid": false,
+  "missingFields": [],
+  "conflicts": [],
+  "warnings": [
+    {
+      "field": "documentType",
+      "message": "Document is a repair estimate, not a complete auto insurance claim form.",
+      "severity": "warning",
+      "ruleId": "DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY"
+    }
+  ],
+  "requiredEvidence": ["claimForm"],
+  "finalStatus": "NEEDS_REVIEW"
+}

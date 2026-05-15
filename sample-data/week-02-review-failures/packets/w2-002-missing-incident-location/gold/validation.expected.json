@@ -1,0 +1,8 @@
+{
+  "isValid": false,
+  "missingFields": ["incident.incidentLocation"],
+  "conflicts": [],
+  "warnings": [],
+  "requiredEvidence": [],
+  "finalStatus": "NEEDS_REVIEW"
+}

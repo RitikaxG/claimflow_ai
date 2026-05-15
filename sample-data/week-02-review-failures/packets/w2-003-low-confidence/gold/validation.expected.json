@@ -1,0 +1,15 @@
+{
+  "isValid": false,
+  "missingFields": [],
+  "conflicts": [],
+  "warnings": [
+    {
+      "field": "overallConfidence",
+      "message": "Extraction confidence is below the review threshold.",
+      "severity":"warning",
+      "ruleId":"LOW_CONFIDENCE_REVIEW"
+    }
+  ],
+  "requiredEvidence": [],
+  "finalStatus": "NEEDS_REVIEW"
+}
