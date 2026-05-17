@@ -68,7 +68,7 @@ eval-results/week-1-eval.md
 eval-results/week-1-eval.json
 ```
 
-![Week 2 Eval Result](../../images/eval-results-week1.png)
+![Week 1 Eval Result](../../images/eval-results-week1.png)
 
 Summary:
 
