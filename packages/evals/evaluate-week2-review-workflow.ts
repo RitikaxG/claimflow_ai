@@ -243,9 +243,20 @@ async function readRunFromDb(runId: string) {
 
 function compareValidation(
   expectedValidation: Record<string, unknown>,
-  actualValidation: Record<string, unknown>,
+  actualValidationRaw: unknown,
   blockers: string[],
 ) {
+  if (!actualValidationRaw || typeof actualValidationRaw !== "object") {
+    blockers.push(
+      `validationJson is missing or invalid. Expected validationJson object, got ${String(
+        actualValidationRaw,
+      )}`,
+    );
+    return;
+  }
+
+  const actualValidation = actualValidationRaw as Record<string, unknown>;
+
   const expectedFinalStatus = expectedValidation.finalStatus;
   const actualFinalStatus = actualValidation.finalStatus;
 
@@ -646,6 +657,14 @@ async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
     `${WEB_BASE_URL}/api/extraction-runs/${runId}/validate`,
   );
 
+  if (!validateResult.ok) {
+    blockers.push(
+      `Validate failed. HTTP ${validateResult.status}: ${JSON.stringify(
+        validateResult.json,
+      )}`,
+    );
+  }
+
   assertCondition(
     validateResult.ok,
     blockers,
@@ -655,6 +674,12 @@ async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
   );
 
   let runAfterValidate = await readRunFromDb(runId);
+
+  if (runAfterValidate && !runAfterValidate.validationJson) {
+    blockers.push(
+      `Run has no validationJson after validate. Current run.status=${runAfterValidate.status}, errorMessage=${runAfterValidate.errorMessage}`,
+    );
+  }
 
   assertCondition(
     Boolean(runAfterValidate),
@@ -682,12 +707,11 @@ async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
       validationExpectedPath,
     );
 
-    const actualValidation = runAfterValidate.validationJson as Record<
-      string,
-      unknown
-    >;
-
-    compareValidation(expectedValidation, actualValidation, blockers);
+    compareValidation(
+      expectedValidation,
+      runAfterValidate.validationJson,
+      blockers,
+    );
   }
 
   let workflowExpected: Record<string, any> | null = null;
@@ -841,6 +865,7 @@ async function main() {
   const results: PacketEvalResult[] = [];
 
   for (const packetDir of packetDirs) {
+    console.log(`Evaluating ${path.basename(packetDir)}...`);
     const result = await evaluatePacket(packetDir);
     results.push(result);
 
