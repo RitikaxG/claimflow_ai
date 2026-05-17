@@ -44,8 +44,7 @@ ReviewTask.reasonJson = validation reasons
 ReviewEvent.type = REVIEW_TASK_CREATED
 ```
 
-This means AI validation no longer only flags a run.  
-It opens real work for a human reviewer.
+This means AI validation no longer only flags a run. It opens real work for a human reviewer.
 
 ---
 
@@ -54,9 +53,8 @@ It opens real work for a human reviewer.
 Implemented review task backend APIs:
 
 ```txt
-GET  /api/review-tasks
-GET  /api/review-tasks/[taskId]
-
+GET /api/review-tasks
+GET /api/review-tasks/[taskId]
 POST /api/review-tasks/[taskId]/start
 POST /api/review-tasks/[taskId]/approve
 POST /api/review-tasks/[taskId]/edit-and-approve
@@ -82,16 +80,13 @@ Supported transitions:
 
 ```txt
 PENDING → IN_REVIEW
-
 IN_REVIEW → APPROVED
 IN_REVIEW → EDITED_AND_APPROVED
 IN_REVIEW → REJECTED
 IN_REVIEW → NEEDS_MORE_INFO
 ```
 
-Invalid transitions return `409`.
-
-This prevents unsafe actions like approving a task that was already rejected.
+Invalid transitions return `409`. This prevents unsafe actions like approving a task that was already rejected.
 
 ---
 
@@ -165,7 +160,9 @@ ReviewDecision.correctedValidationJson
 This keeps a clean audit trail:
 
 ```txt
-AI output → human correction → final decision
+AI output
+→ human correction
+→ final decision
 ```
 
 ---
@@ -190,6 +187,78 @@ view corrected validation after approval
 
 ---
 
+### 8. Review workflow failure dataset
+
+Added a controlled Week 2 dataset:
+
+```txt
+sample-data/week-02-review-failures/
+```
+
+The dataset contains 15 synthetic review packets covering:
+
+```txt
+missing required fields
+low confidence extraction
+repair-estimate-only uploads
+third-party claims without police report
+missing FIR for theft claims
+invalid repair cost
+missing currency
+unknown loss type
+clean completed claim
+duplicate email upload
+unreadable PDF failure
+edit-and-approve decision
+reject decision
+request-more-info decision
+```
+
+Each packet stores source input, gold extraction/validation expectations, workflow expectations, and review notes.
+
+---
+
+### 9. Week 2 review workflow eval
+
+Added a repeatable Week 2 eval:
+
+```txt
+bun run eval:week2:review
+```
+
+The eval executes the workflow against the synthetic packets:
+
+```txt
+upload packet
+→ extract
+→ validate
+→ assert run state
+→ assert review task state
+→ run reviewer action when required
+→ assert ReviewDecision
+→ assert ReviewEvent
+→ write eval report
+```
+
+Eval report files:
+
+```txt
+sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.md
+sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.json
+```
+
+Current result:
+
+```txt
+Total packets: 15
+Passed: 15
+Failed: 0
+review_routing_accuracy: 100.0%
+false_approval_rate: 0% when no risky packet was marked COMPLETED
+```
+
+---
+
 ## What this proves
 
 Week 2 proves that ClaimFlow AI can handle bad or incomplete AI output safely.
@@ -202,6 +271,14 @@ Bad AI output
 → is validated again
 → final decision is stored
 → original AI output remains auditable
+```
+
+The eval now proves this beyond the UI demo:
+
+```txt
+15 controlled failure/review packets
+→ 15 passed workflow assertions
+→ no unsafe review routing failures
 ```
 
 ---
@@ -219,4 +296,4 @@ NEEDS_REVIEW validation
 → corrected JSON stored separately
 ```
 
-Week 2 is complete.
+Week 2 is complete and has evaluation evidence.

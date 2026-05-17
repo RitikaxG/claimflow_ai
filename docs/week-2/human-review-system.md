@@ -26,9 +26,9 @@ The review system separates AI workflow state from human review state.
 
 ```txt
 ExtractionRun = AI extraction + validation result
-ReviewTask    = human work item
+ReviewTask = human work item
 ReviewDecision = final human decision
-ReviewEvent   = human review audit timeline
+ReviewEvent = human review audit timeline
 ```
 
 ![Human-in-loop architecture](./images/human-in-loop-architecture.png)
@@ -47,7 +47,7 @@ ReviewDecision
 ReviewEvent
 ```
 
-This lets the system keep:
+This lets the system keep these separately:
 
 ```txt
 original AI output
@@ -57,8 +57,6 @@ human decision
 corrected JSON
 review audit events
 ```
-
-separate from each other.
 
 ![Database schema](./images/db-schema.png)
 
@@ -88,7 +86,6 @@ The review task follows a strict state machine.
 
 ```txt
 PENDING → IN_REVIEW
-
 IN_REVIEW → APPROVED
 IN_REVIEW → EDITED_AND_APPROVED
 IN_REVIEW → REJECTED
@@ -163,7 +160,6 @@ Reviewer edits extracted JSON
 ```
 
 ![Edit and approve 1](./images/edit-and-approve-1.png)
-
 ![Edit and approve 2](./images/edit-and-approve-2.png)
 
 ---
@@ -235,7 +231,6 @@ POST /api/review-tasks/[taskId]/reject
 ```
 
 ![Reject flow 1](./images/reject-1.png)
-
 ![Reject flow 2](./images/reject-2.png)
 
 ---
@@ -255,7 +250,6 @@ POST /api/review-tasks/[taskId]/request-more-info
 ```
 
 ![Request more info 1](./images/request-more-info-1.png)
-
 ![Request more info 2](./images/request-more-info-2.png)
 
 ---
@@ -282,8 +276,8 @@ ReviewTask creation when NEEDS_REVIEW
 ### Review routes
 
 ```txt
-GET  /api/review-tasks
-GET  /api/review-tasks/[taskId]
+GET /api/review-tasks
+GET /api/review-tasks/[taskId]
 POST /api/review-tasks/[taskId]/start
 POST /api/review-tasks/[taskId]/approve
 POST /api/review-tasks/[taskId]/edit-and-approve
@@ -352,6 +346,58 @@ S3 later = large artifacts / production storage
 
 ---
 
+## 14. Evaluation evidence
+
+Week 2 is now backed by a synthetic review workflow failure dataset and a repeatable eval.
+
+Dataset:
+
+```txt
+sample-data/week-02-review-failures/
+```
+
+Eval command:
+
+```bash
+bun run eval:week2:review
+```
+
+Eval reports:
+
+```txt
+sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.md
+sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.json
+```
+
+Current result:
+
+```txt
+Total packets: 15
+Passed: 15
+Failed: 0
+review_routing_accuracy: 100.0%
+```
+
+The eval checks that:
+
+```txt
+missing-field packets create ReviewTask
+low-confidence packets create ReviewTask
+repair-estimate-only packets create ReviewTask
+third-party/police-report packets create ReviewTask
+unreadable PDF fails without creating ReviewTask
+clean claim completes without review
+duplicate upload is detected
+edit-and-approve creates final corrected decision
+reject creates rejected decision
+request-more-info creates needs-more-info decision
+review events are stored
+```
+
+This means Week 2 is no longer proven only by screenshots or manual demo. It has a regression dataset that can be rerun before Week 3 changes.
+
+---
+
 ## Final Week 2 summary
 
 Week 2 proves:
@@ -374,3 +420,5 @@ NEEDS_REVIEW
 → APPROVED / EDITED_AND_APPROVED / REJECTED / NEEDS_MORE_INFO
 → ReviewDecision + ReviewEvent
 ```
+
+The Week 2 eval proves the workflow across 15 controlled synthetic failure/review packets.

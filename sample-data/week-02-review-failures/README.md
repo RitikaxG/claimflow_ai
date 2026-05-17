@@ -2,7 +2,7 @@
 
 This folder contains controlled synthetic claim packets for testing the Week 2 human review workflow in ClaimFlow AI.
 
-The goal of this dataset is not to train a model. The goal is to verify that bad, incomplete, low-confidence, conflicting, duplicate, or failed extraction cases move through the correct workflow states.
+The goal of this dataset is not to train a model. The goal is to verify that bad, incomplete, low-confidence, conflicting, duplicate, failed extraction, or human-decision cases move through the correct workflow states.
 
 ## What this dataset tests
 
@@ -161,12 +161,71 @@ For `NEEDS_REVIEW` packets, validation should create:
 - `ReviewTask.reasonJson` containing missing fields, conflicts, warnings, and required evidence
 - `ReviewEvent.type = REVIEW_TASK_CREATED`
 
-For review-decision packets, the workflow should also test:
+For review-decision packets, the workflow also tests:
 
 - `REVIEW_STARTED`
 - `REVIEW_EDITED_AND_APPROVED`
 - `REVIEW_REJECTED`
 - `REVIEW_MORE_INFO_REQUESTED`
+
+## Eval results
+
+Latest Week 2 eval reports live in:
+
+```txt
+eval-results/week-2-review-workflow-eval.md
+eval-results/week-2-review-workflow-eval.json
+```
+
+Current result:
+
+- Total packets: 15
+- Passed: 15
+- Failed: 0
+- Review routing accuracy: 100.0%
+- False approval rate: 0% when no risky packet is incorrectly marked `COMPLETED`
+
+The eval verifies the full workflow path:
+
+```txt
+upload packet
+→ extract
+→ validate
+→ assert ExtractionRun.status
+→ assert ReviewTask existence/status/reasonJson
+→ execute review action when required
+→ assert ReviewDecision
+→ assert ReviewEvent timeline
+→ write Markdown + JSON report
+```
+
+The eval covers:
+
+- unsafe packets route to `NEEDS_REVIEW`
+- clean packet completes without review
+- duplicate upload behavior is detected
+- unreadable PDF fails without creating review task
+- edit-and-approve reaches `EDITED_AND_APPROVED`
+- reject reaches `REJECTED`
+- request-more-info reaches `NEEDS_MORE_INFO`
+
+## How to run Week 2 eval
+
+From the repo root:
+
+```bash
+bun run eval:week2:review
+```
+
+Useful environment variables:
+
+```bash
+WEB_BASE_URL=http://localhost:3001
+WEEK2_REVIEW_DATASET_ROOT=sample-data/week-02-review-failures/packets
+EVAL_RESET_WEEK2_DATA=true
+```
+
+`EVAL_RESET_WEEK2_DATA` defaults to resetting Week 2 synthetic eval data. Set it to `false` only when you intentionally want to inspect accumulated local rows.
 
 ## Safety
 

@@ -657,14 +657,6 @@ async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
     `${WEB_BASE_URL}/api/extraction-runs/${runId}/validate`,
   );
 
-  if (!validateResult.ok) {
-    blockers.push(
-      `Validate failed. HTTP ${validateResult.status}: ${JSON.stringify(
-        validateResult.json,
-      )}`,
-    );
-  }
-
   assertCondition(
     validateResult.ok,
     blockers,
