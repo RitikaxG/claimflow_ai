@@ -46,6 +46,8 @@ source document
 
 Current result:
 
+![Week 1 Eval Result](../sample-data/images/eval-results-week1.png)
+
 - Samples evaluated: 5
 - Blockers: 0
 - Extraction schema passed for all samples
@@ -77,6 +79,9 @@ bad / incomplete / duplicate / failed / review-decision packet
 → optional reviewer action
 → assert database state
 ```
+
+
+![Week 2 Eval Result](../sample-data/images/eval-results-week2.png)
 
 Current result:
 
