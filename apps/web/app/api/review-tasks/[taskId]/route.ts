@@ -1,5 +1,6 @@
 import { prisma } from "@repo/db";
 import { NextResponse } from "next/server";
+import { getWorkflowDisplayStatus } from "../../../../lib/workflow/get-workflow-display-status";
 
 type Params = {
     params : Promise<{
@@ -45,5 +46,15 @@ export async function GET(_request : Request, { params } : Params){
         )
     }
 
-    return NextResponse.json({ reviewTask });
+    return NextResponse.json({
+        reviewTask: {
+            ...reviewTask,
+            workflowDisplayStatus: getWorkflowDisplayStatus({
+            status: reviewTask.run.status,
+            reviewTask: {
+                status: reviewTask.status,
+            },
+            }),
+        },
+    });
 }

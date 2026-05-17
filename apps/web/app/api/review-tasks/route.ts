@@ -2,6 +2,7 @@
 
 import { prisma } from "@repo/db";
 import { NextResponse } from "next/server";
+import { getWorkflowDisplayStatus } from "../../../lib/workflow/get-workflow-display-status";
 
 export async function GET(){
     const reviewTasks = await prisma.reviewTask.findMany({
@@ -39,5 +40,15 @@ export async function GET(){
         }
     });
 
-    return NextResponse.json({ reviewTasks });
+    const reviewTasksWithWorkflowStatus = reviewTasks.map((reviewTask) => ({
+    ...reviewTask,
+    workflowDisplayStatus: getWorkflowDisplayStatus({
+        status: reviewTask.run.status,
+        reviewTask: {
+        status: reviewTask.status,
+        },
+    }),
+    }));
+
+    return NextResponse.json({ reviewTasks: reviewTasksWithWorkflowStatus });
 }
