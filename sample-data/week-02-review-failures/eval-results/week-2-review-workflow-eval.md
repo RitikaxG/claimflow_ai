@@ -3,9 +3,9 @@
 ## Summary
 
 - Total packets: **15**
-- Passed: **12**
-- Failed: **3**
-- review_routing_accuracy: **80.0%**
+- Passed: **15**
+- Failed: **0**
+- review_routing_accuracy: **100.0%**
 - false_approval_rate: **0% if no risky packet was marked COMPLETED**
 
 ## Results
@@ -113,7 +113,7 @@ Unreadable scanned PDF causes extraction failure
 - run.status: FAILED
 - errorMessage: Mock extraction failed: unreadable document for packet w2-012-unreadable-pdf
 
-### FAIL w2-013-edit-and-approve
+### PASS w2-013-edit-and-approve
 
 AI misses policy number, human reviewer corrects JSON and approves
 
@@ -122,12 +122,7 @@ AI misses policy number, human reviewer corrects JSON and approves
 - reviewTask.status: EDITED_AND_APPROVED
 - missingFields: policyNumber
 
-Blockers:
-- reviewTask.status mismatch: expected undefined, got PENDING
-- Missing review event: REVIEW_STARTED
-- Missing review event: REVIEW_EDITED_AND_APPROVED
-
-### FAIL w2-014-reject
+### PASS w2-014-reject
 
 Suspicious claim is rejected by human reviewer
 
@@ -136,12 +131,7 @@ Suspicious claim is rejected by human reviewer
 - reviewTask.status: REJECTED
 - missingFields: claimantName_or_insuredName
 
-Blockers:
-- reviewTask.status mismatch: expected undefined, got PENDING
-- Missing review event: REVIEW_STARTED
-- Missing review event: REVIEW_REJECTED
-
-### FAIL w2-015-request-more-info
+### PASS w2-015-request-more-info
 
 Insufficient evidence requires reviewer to request more information
 
@@ -149,8 +139,3 @@ Insufficient evidence requires reviewer to request more information
 - run.status: NEEDS_REVIEW
 - reviewTask.status: NEEDS_MORE_INFO
 - warnings: THIRD_PARTY_POLICE_REPORT_RECOMMENDED
-
-Blockers:
-- reviewTask.status mismatch: expected undefined, got PENDING
-- Missing review event: REVIEW_STARTED
-- Missing review event: REVIEW_MORE_INFO_REQUESTED

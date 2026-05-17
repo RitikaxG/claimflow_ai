@@ -141,49 +141,37 @@
   {
     "packetId": "w2-013-edit-and-approve",
     "scenario": "AI misses policy number, human reviewer corrects JSON and approves",
-    "passed": false,
+    "passed": true,
     "lines": [
       "w2-013-edit-and-approve: AI misses policy number, human reviewer corrects JSON and approves",
       "  run.status: NEEDS_REVIEW",
       "  reviewTask.status: EDITED_AND_APPROVED",
       "  missingFields: policyNumber"
     ],
-    "blockers": [
-      "reviewTask.status mismatch: expected undefined, got PENDING",
-      "Missing review event: REVIEW_STARTED",
-      "Missing review event: REVIEW_EDITED_AND_APPROVED"
-    ]
+    "blockers": []
   },
   {
     "packetId": "w2-014-reject",
     "scenario": "Suspicious claim is rejected by human reviewer",
-    "passed": false,
+    "passed": true,
     "lines": [
       "w2-014-reject: Suspicious claim is rejected by human reviewer",
       "  run.status: NEEDS_REVIEW",
       "  reviewTask.status: REJECTED",
       "  missingFields: claimantName_or_insuredName"
     ],
-    "blockers": [
-      "reviewTask.status mismatch: expected undefined, got PENDING",
-      "Missing review event: REVIEW_STARTED",
-      "Missing review event: REVIEW_REJECTED"
-    ]
+    "blockers": []
   },
   {
     "packetId": "w2-015-request-more-info",
     "scenario": "Insufficient evidence requires reviewer to request more information",
-    "passed": false,
+    "passed": true,
     "lines": [
       "w2-015-request-more-info: Insufficient evidence requires reviewer to request more information",
       "  run.status: NEEDS_REVIEW",
       "  reviewTask.status: NEEDS_MORE_INFO",
       "  warnings: THIRD_PARTY_POLICE_REPORT_RECOMMENDED"
     ],
-    "blockers": [
-      "reviewTask.status mismatch: expected undefined, got PENDING",
-      "Missing review event: REVIEW_STARTED",
-      "Missing review event: REVIEW_MORE_INFO_REQUESTED"
-    ]
+    "blockers": []
   }
 ]

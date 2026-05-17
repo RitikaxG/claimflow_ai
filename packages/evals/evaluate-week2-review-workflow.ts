@@ -338,11 +338,13 @@ function assertWorkflow(
 
     if (!run.reviewTask) return;
 
-    assertCondition(
-      run.reviewTask.status === expectedReviewTask.status,
-      blockers,
-      `reviewTask.status mismatch: expected ${expectedReviewTask.status}, got ${run.reviewTask.status}`,
-    );
+    if (typeof expectedReviewTask.status === "string") {
+        assertCondition(
+            run.reviewTask.status === expectedReviewTask.status,
+            blockers,
+            `reviewTask.status mismatch: expected ${expectedReviewTask.status}, got ${run.reviewTask.status}`,
+        );
+    }
 
     if (expectedReviewTask.priority) {
       assertCondition(
@@ -389,19 +391,26 @@ function assertWorkflow(
       "Expected no ReviewTask, but one exists.",
     );
   }
+}
 
-  const expectedReviewEvents = workflowExpected.reviewEvents ?? [];
+function assertReviewEvents(
+  expectedEvents: unknown,
+  run: NonNullable<Awaited<ReturnType<typeof readRunFromDb>>>,
+  blockers: string[],
+) {
+  if (!Array.isArray(expectedEvents)) return;
 
-  if (Array.isArray(expectedReviewEvents) && expectedReviewEvents.length > 0) {
-    const actualReviewEvents = run.reviewTask?.events.map((event) => event.type) ?? [];
+  const actualReviewEvents =
+    run.reviewTask?.events.map((event) => String(event.type)) ?? [];
 
-    for (const expectedEvent of expectedReviewEvents) {
-      assertCondition(
-        actualReviewEvents.includes(expectedEvent),
-        blockers,
-        `Missing review event: ${expectedEvent}`,
-      );
-    }
+  for (const expectedEvent of expectedEvents) {
+    if (typeof expectedEvent !== "string") continue;
+
+    assertCondition(
+      actualReviewEvents.includes(expectedEvent),
+      blockers,
+      `Missing review event: ${expectedEvent}`,
+    );
   }
 }
 
@@ -512,6 +521,8 @@ async function executeReviewActionIfNeeded(
 
   blockers.push(`Unsupported reviewAction: ${String(reviewAction)}`);
 }
+
+
 
 async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
   const manifestPath = path.join(packetDir, "manifest.json");
@@ -679,12 +690,12 @@ async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
     compareValidation(expectedValidation, actualValidation, blockers);
   }
 
+  let workflowExpected: Record<string, any> | null = null;
+
   const workflowExpectedPath = path.join(packetDir, "gold/workflow.expected.json");
 
   if (await exists(workflowExpectedPath)) {
-    const workflowExpected = await readJson<Record<string, any>>(
-      workflowExpectedPath,
-    );
+    workflowExpected = await readJson<Record<string, any>>(workflowExpectedPath);
 
     assertWorkflow(workflowExpected, runAfterValidate, blockers);
   }
@@ -698,27 +709,38 @@ async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
 
   runAfterValidate = await readRunFromDb(runId);
 
-  if (runAfterValidate && manifest.expected.reviewTaskStatusAfterDecision) {
-    assertCondition(
-      runAfterValidate.reviewTask?.status ===
-        manifest.expected.reviewTaskStatusAfterDecision,
+  if (!runAfterValidate) {
+    blockers.push("Run not found after review action.");
+  } else {
+    if (manifest.expected.reviewTaskStatusAfterDecision) {
+      assertCondition(
+        runAfterValidate.reviewTask?.status ===
+          manifest.expected.reviewTaskStatusAfterDecision,
+        blockers,
+        `reviewTask final status mismatch: expected ${
+          manifest.expected.reviewTaskStatusAfterDecision
+        }, got ${runAfterValidate.reviewTask?.status}`,
+      );
+    }
+
+    if (manifest.expected.decision) {
+      assertCondition(
+        runAfterValidate.reviewTask?.decisions[0]?.decision ===
+          manifest.expected.decision,
+        blockers,
+        `latest decision mismatch: expected ${
+          manifest.expected.decision
+        }, got ${runAfterValidate.reviewTask?.decisions[0]?.decision}`,
+      );
+    }
+
+    assertReviewEvents(
+      manifest.expected.reviewEvents ?? workflowExpected?.reviewEvents,
+      runAfterValidate,
       blockers,
-      `reviewTask final status mismatch: expected ${
-        manifest.expected.reviewTaskStatusAfterDecision
-      }, got ${runAfterValidate.reviewTask?.status}`,
     );
   }
 
-  if (runAfterValidate && manifest.expected.decision) {
-    assertCondition(
-      runAfterValidate.reviewTask?.decisions[0]?.decision ===
-        manifest.expected.decision,
-      blockers,
-      `latest decision mismatch: expected ${
-        manifest.expected.decision
-      }, got ${runAfterValidate.reviewTask?.decisions[0]?.decision}`,
-    );
-  }
 
   lines.push(`  run.status: ${runAfterValidate?.status}`);
   lines.push(`  reviewTask.status: ${runAfterValidate?.reviewTask?.status ?? "-"}`);
