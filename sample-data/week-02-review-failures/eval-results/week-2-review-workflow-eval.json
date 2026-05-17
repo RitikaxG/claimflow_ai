@@ -1,0 +1,189 @@
+[
+  {
+    "packetId": "w2-001-missing-policy-number",
+    "scenario": "FNOL email is missing policy number",
+    "passed": true,
+    "lines": [
+      "w2-001-missing-policy-number: FNOL email is missing policy number",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING",
+      "  missingFields: policyNumber"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-002-missing-incident-location",
+    "scenario": "FNOL email is missing incident location",
+    "passed": true,
+    "lines": [
+      "w2-002-missing-incident-location: FNOL email is missing incident location",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING",
+      "  missingFields: incident.incidentLocation"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-003-low-confidence",
+    "scenario": "Extraction is complete but model confidence is below review threshold",
+    "passed": true,
+    "lines": [
+      "w2-003-low-confidence: Extraction is complete but model confidence is below review threshold",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING",
+      "  warnings: LOW_CONFIDENCE_REVIEW"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-004-repair-estimate-only",
+    "scenario": "Uploaded document is only a repair estimate and not a complete claim form",
+    "passed": true,
+    "lines": [
+      "w2-004-repair-estimate-only: Uploaded document is only a repair estimate and not a complete claim form",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING",
+      "  warnings: DOCUMENT_TYPE_REPAIR_ESTIMATE_ONLY"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-005-third-party-no-police-report",
+    "scenario": "Third-party claim is submitted without police report",
+    "passed": true,
+    "lines": [
+      "w2-005-third-party-no-police-report: Third-party claim is submitted without police report",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING",
+      "  warnings: THIRD_PARTY_POLICE_REPORT_RECOMMENDED"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-006-theft-missing-fir",
+    "scenario": "Theft claim is missing FIR number and police report evidence",
+    "passed": true,
+    "lines": [
+      "w2-006-theft-missing-fir: Theft claim is missing FIR number and police report evidence",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING",
+      "  missingFields: police.firNumber",
+      "  warnings: THEFT_POLICE_REPORT_REQUIRED"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-007-invalid-repair-cost",
+    "scenario": "Repair cost is zero, which is invalid",
+    "passed": true,
+    "lines": [
+      "w2-007-invalid-repair-cost: Repair cost is zero, which is invalid",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-008-currency-missing",
+    "scenario": "Repair cost is present but currency is missing",
+    "passed": true,
+    "lines": [
+      "w2-008-currency-missing: Repair cost is present but currency is missing",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-009-unknown-loss-type",
+    "scenario": "Loss type cannot be classified from the email",
+    "passed": true,
+    "lines": [
+      "w2-009-unknown-loss-type: Loss type cannot be classified from the email",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: PENDING"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-010-clean-completed",
+    "scenario": "Clean FNOL email with all required fields present",
+    "passed": true,
+    "lines": [
+      "w2-010-clean-completed: Clean FNOL email with all required fields present",
+      "  run.status: COMPLETED",
+      "  reviewTask.status: -"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-011-duplicate-email",
+    "scenario": "Same email text is uploaded twice and should be detected as duplicate",
+    "passed": true,
+    "lines": [
+      "w2-011-duplicate-email: Same email text is uploaded twice and should be detected as duplicate",
+      "  run.status: COMPLETED",
+      "  reviewTask.status: -"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-012-unreadable-pdf",
+    "scenario": "Unreadable scanned PDF causes extraction failure",
+    "passed": true,
+    "lines": [
+      "w2-012-unreadable-pdf: Unreadable scanned PDF causes extraction failure",
+      "  run.status: FAILED",
+      "  errorMessage: Mock extraction failed: unreadable document for packet w2-012-unreadable-pdf"
+    ],
+    "blockers": []
+  },
+  {
+    "packetId": "w2-013-edit-and-approve",
+    "scenario": "AI misses policy number, human reviewer corrects JSON and approves",
+    "passed": false,
+    "lines": [
+      "w2-013-edit-and-approve: AI misses policy number, human reviewer corrects JSON and approves",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: EDITED_AND_APPROVED",
+      "  missingFields: policyNumber"
+    ],
+    "blockers": [
+      "reviewTask.status mismatch: expected undefined, got PENDING",
+      "Missing review event: REVIEW_STARTED",
+      "Missing review event: REVIEW_EDITED_AND_APPROVED"
+    ]
+  },
+  {
+    "packetId": "w2-014-reject",
+    "scenario": "Suspicious claim is rejected by human reviewer",
+    "passed": false,
+    "lines": [
+      "w2-014-reject: Suspicious claim is rejected by human reviewer",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: REJECTED",
+      "  missingFields: claimantName_or_insuredName"
+    ],
+    "blockers": [
+      "reviewTask.status mismatch: expected undefined, got PENDING",
+      "Missing review event: REVIEW_STARTED",
+      "Missing review event: REVIEW_REJECTED"
+    ]
+  },
+  {
+    "packetId": "w2-015-request-more-info",
+    "scenario": "Insufficient evidence requires reviewer to request more information",
+    "passed": false,
+    "lines": [
+      "w2-015-request-more-info: Insufficient evidence requires reviewer to request more information",
+      "  run.status: NEEDS_REVIEW",
+      "  reviewTask.status: NEEDS_MORE_INFO",
+      "  warnings: THIRD_PARTY_POLICE_REPORT_RECOMMENDED"
+    ],
+    "blockers": [
+      "reviewTask.status mismatch: expected undefined, got PENDING",
+      "Missing review event: REVIEW_STARTED",
+      "Missing review event: REVIEW_MORE_INFO_REQUESTED"
+    ]
+  }
+]

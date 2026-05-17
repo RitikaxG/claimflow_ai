@@ -11,7 +11,8 @@
     "db:migrate": "bun --filter @repo/db db:migrate",
     "db:studio": "bun --filter @repo/db db:studio",
     "eval:week1:export": "bun --filter @repo/evals export:week1",
-    "eval:week1": "bun --filter @repo/evals eval:week1"
+    "eval:week1": "bun --filter @repo/evals eval:week1",
+    "eval:week2:review": "bun --filter @repo/evals eval:week2:review"
   },
   "devDependencies": {
     "prettier": "^3.6.0",
