@@ -369,6 +369,8 @@ sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.md
 sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.json
 ```
 
+![Week 2 Eval Result](../sample-data/images/eval-results-week2.png)
+
 Current result:
 
 ```txt
