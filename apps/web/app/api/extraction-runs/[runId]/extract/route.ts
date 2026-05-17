@@ -1,6 +1,7 @@
 import { DocumentSourceType, ExtractionEventType, Prisma, prisma } from "@repo/db";
 import { NextResponse } from "next/server";
 import { extractClaimFromPdf, extractClaimFromEmailText, type ClaimExtractionResult } from "@repo/ai";
+import { maybeLoadMockExtractionResult } from "../../../../../lib/testing/mock-extraction";
 
 type Params = {
     params : Promise<{
@@ -88,9 +89,13 @@ export async function POST(_request : Request, { params } : Params ){
 
         let extractedResult: ClaimExtractionResult;
 
-        if(run.document.sourceType === DocumentSourceType.PDF){
+        const mockResult = await maybeLoadMockExtractionResult(run.document);
+
+        if(mockResult){
+            extractedResult = mockResult;
+        } else if(run.document.sourceType === DocumentSourceType.PDF){
             if(!run.document.storagePath){
-                throw new Error("PDF storage path is missing from this document");
+                 throw new Error("PDF storage path is missing from this document");
             }
 
             extractedResult = await extractClaimFromPdf(run.document.storagePath);
@@ -99,10 +104,8 @@ export async function POST(_request : Request, { params } : Params ){
             if(!run.document.contentText || run.document.contentText.trim().length === 0){
                 throw new Error("Content Text missing from this document");
             }
-
             extractedResult = await extractClaimFromEmailText(run.document.contentText);
-        }
-        else{
+        }else{
             throw new Error(`Unsupported document source type ${run.document.sourceType}`);
         }
 
@@ -111,7 +114,7 @@ export async function POST(_request : Request, { params } : Params ){
                 data : {
                     runId : run.id,
                     type : ExtractionEventType.MODEL_RESPONSE_RECEIVED,
-                    message : "Gemini returned a structured extraction response.",
+                    message : "Extractor returned a structured extraction response.",
                     metadata : toPrismaJson({
                         model : extractedResult.model,
                         promptVersion : extractedResult.promptVersion,
