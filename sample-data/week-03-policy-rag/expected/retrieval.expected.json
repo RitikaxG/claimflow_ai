@@ -1,0 +1,11 @@
+{
+  "metric": "retrieval_hit_rate",
+  "description": "A question passes retrieval if all expectedRetrievedClauses appear in topK retrieved chunks.",
+  "topK": 5,
+  "minSimilarity": 0.72,
+  "rules": [
+    "If expectedRetrievedClauses is empty, the system should return INSUFFICIENT_EVIDENCE or NEEDS_REVIEW.",
+    "If expectedRetrievedClauses is non-empty, each required clause should appear in retrieved results.",
+    "Retrieved chunks must expose clauseId, chunkId, policyDocumentId, sourcePath, and similarity."
+  ]
+}

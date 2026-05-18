@@ -1,0 +1,8 @@
+{
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["COV-TH-001", "EV-TH-001"],
+  "expectedCitationRequired": true,
+  "expectedRefusal": false,
+  "falseApprovalAllowed": false,
+  "mustMentionMissingEvidence": ["FIR number", "police report"]
+}

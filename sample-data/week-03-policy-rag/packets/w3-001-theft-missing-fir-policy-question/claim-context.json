@@ -1,0 +1,36 @@
+{
+  "packetId": "w3-001-theft-missing-fir-policy-question",
+  "source": "synthetic",
+  "claim": {
+    "documentType": "claim_email",
+    "claimNumber": "W3-CLM-001",
+    "policyNumber": "POL-W3-001",
+    "insuredName": "Synthetic User One",
+    "claimantName": "Synthetic User One",
+    "vehicle": {
+      "registrationNumber": "SYN-W3-001",
+      "make": "Honda",
+      "model": "City",
+      "year": "2021"
+    },
+    "incident": {
+      "lossType": "theft",
+      "incidentDate": "2026-05-01",
+      "incidentLocation": "Jaipur",
+      "description": "Vehicle reported stolen from parking area."
+    },
+    "police": {
+      "wasReportedToPolice": true,
+      "policeStation": "Synthetic Police Station",
+      "firNumber": null,
+      "reportDate": "2026-05-02"
+    },
+    "supportingDocuments": {
+      "claimForm": true,
+      "damagePhoto": false,
+      "repairEstimate": false,
+      "policeReport": false
+    },
+    "missingEvidence": ["FIR number", "police report"]
+  }
+}

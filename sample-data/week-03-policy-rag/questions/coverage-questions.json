@@ -1,0 +1,125 @@
+[
+  {
+    "questionId": "W3-COV-001",
+    "packetId": "w3-001-theft-missing-fir-policy-question",
+    "question": "Is this theft claim ready for approval if the FIR number is missing?",
+    "expectedRetrievedClauses": ["COV-TH-001", "EV-TH-001"],
+    "expectedAnswerType": "NEEDS_REVIEW",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false,
+    "mustMentionMissingEvidence": ["FIR number", "police report"]
+  },
+  {
+    "questionId": "W3-COV-002",
+    "packetId": "w3-002-third-party-police-report-question",
+    "question": "Can this third-party claim be approved without police report evidence?",
+    "expectedRetrievedClauses": ["COV-TP-001", "EV-TP-001"],
+    "expectedAnswerType": "NEEDS_REVIEW",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false,
+    "mustMentionMissingEvidence": ["police report"]
+  },
+  {
+    "questionId": "W3-COV-003",
+    "packetId": "w3-003-repair-estimate-coverage-limit",
+    "question": "Can this high repair estimate be approved directly?",
+    "expectedRetrievedClauses": ["LIMIT-RP-001", "EV-OD-001"],
+    "expectedAnswerType": "NEEDS_REVIEW",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false,
+    "mustMentionMissingEvidence": ["insurer review"]
+  },
+  {
+    "questionId": "W3-COV-004",
+    "packetId": "w3-004-excluded-commercial-use",
+    "question": "Does the policy cover damage if the private vehicle was used for commercial delivery?",
+    "expectedRetrievedClauses": ["EX-COM-001"],
+    "expectedAnswerType": "NOT_COVERED",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-005",
+    "packetId": "w3-005-ambiguous-flood-damage",
+    "question": "Is this flood damage claim covered?",
+    "expectedRetrievedClauses": ["COV-OD-001", "EV-FLD-001"],
+    "expectedAnswerType": "NEEDS_REVIEW",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-006",
+    "packetId": null,
+    "question": "Is accidental own damage covered under this policy?",
+    "expectedRetrievedClauses": ["COV-OD-001", "EV-OD-001"],
+    "expectedAnswerType": "COVERED",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-007",
+    "packetId": null,
+    "question": "Is theft covered when police evidence is submitted?",
+    "expectedRetrievedClauses": ["COV-TH-001", "EV-TH-001"],
+    "expectedAnswerType": "COVERED",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-008",
+    "packetId": null,
+    "question": "Is the claim covered if the driver had no valid license?",
+    "expectedRetrievedClauses": ["EX-LIC-001"],
+    "expectedAnswerType": "NOT_COVERED",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-009",
+    "packetId": null,
+    "question": "Is the claim covered if the driver was intoxicated?",
+    "expectedRetrievedClauses": ["EX-ALC-001"],
+    "expectedAnswerType": "NOT_COVERED",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-010",
+    "packetId": null,
+    "question": "Does the policy cover normal wear and tear?",
+    "expectedRetrievedClauses": ["EX-WEAR-001"],
+    "expectedAnswerType": "NOT_COVERED",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-011",
+    "packetId": null,
+    "question": "Does this auto policy cover mobile phone screen damage?",
+    "expectedRetrievedClauses": [],
+    "expectedAnswerType": "NEEDS_REVIEW",
+    "expectedCitationRequired": false,
+    "expectedRefusal": true,
+    "falseApprovalAllowed": false
+  },
+  {
+    "questionId": "W3-COV-012",
+    "packetId": null,
+    "question": "Can the claim be approved using only a repair estimate?",
+    "expectedRetrievedClauses": ["LIMIT-RP-001", "EV-OD-001"],
+    "expectedAnswerType": "NEEDS_REVIEW",
+    "expectedCitationRequired": true,
+    "expectedRefusal": false,
+    "falseApprovalAllowed": false
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "allowedAnswerTypes": [
+    "COVERED",
+    "NOT_COVERED",
+    "PARTIALLY_COVERED",
+    "NEEDS_REVIEW"
+  ],
+  "rules": [
+    "Every non-refusal answer must include at least one citation.",
+    "Each citation must refer to a retrieved chunk.",
+    "A COVERED answer is invalid if required evidence is missing.",
+    "A NOT_COVERED answer must cite an exclusion clause.",
+    "An unsupported policy question must return NEEDS_REVIEW or refusal.",
+    "false_approval_rate must be 0."
+  ]
+}
