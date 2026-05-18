@@ -75,6 +75,25 @@ enum ExtractionEventType {
   RUN_FAILED
 }
 
+enum PolicySourceType {
+  SYNTHETIC_MARKDOWN
+  PUBLIC_PDF
+  PUBLIC_WEB
+  TEXT
+}
+
+enum CoverageDecision {
+  COVERED
+  NOT_COVERED
+  PARTIALLY_COVERED
+  NEEDS_REVIEW
+}
+
+enum RetrievalStatus {
+  ENOUGH_EVIDENCE
+  INSUFFICIENT_EVIDENCE
+}
+
 model Document {
   id String @id @default(cuid())
 
@@ -125,6 +144,7 @@ model ExtractionRun {
 
   events ExtractionEvent[]
   reviewTask ReviewTask?
+  coverageQuestion CoverageQuestions[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -214,4 +234,75 @@ model ReviewEvent {
   @@index([taskId])
   @@index([type])
   @@map("review_events")
+}
+
+model PolicyDocument {
+  id String @id @default(cuid())
+
+  title String
+  insurerName String?
+  productType String
+  version String
+
+  sourcePath String?
+  sourceType PolicySourceType @default(SYNTHETIC_MARKDOWN)
+  contentHash String?
+
+  chunks PolicyChunk[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productType])
+  @@index([version])
+  @@index([sourceType])
+  @@index([contentHash])
+  @@map("policy_documents")
+}
+
+model PolicyChunk {
+  id String @id @default(cuid())
+
+  policyDocumentId String
+  policyDocument PolicyDocument @relation(fields: [policyDocumentId], references: [id], onDelete: Cascade)
+
+  chunkIndex Int
+  sectionTitle String?
+  clauseId String?
+  pageNumber Int?
+
+  text String
+  tokenCount Int?
+
+  embedding Unsupported("vector(768)")?
+
+  createdAt DateTime @default(now())
+
+  @@unique([policyDocumentId,chunkIndex])
+  @@index([policyDocumentId])
+  @@index([clauseId])
+  @@map("policy_chunks")
+}
+
+model CoverageQuestions {
+  id String @id @default(cuid())
+
+  runId String
+  run ExtractionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  question String
+  normalizedQuery String?
+
+  retrievalStatus RetrievalStatus?
+  retrievalJson Json?
+  answerJson Json?
+
+  finalDecision CoverageDecision
+
+  createdAt DateTime @default(now())
+
+  @@index([runId])
+  @@index([finalDecision])
+  @@index([retrievalStatus])
+  @@map("coverage_questions")
 }
