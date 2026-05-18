@@ -1,0 +1,8 @@
+{
+  "expectedAnswerType": "NOT_COVERED",
+  "expectedRetrievedClauses": ["EX-COM-001"],
+  "expectedCitationRequired": true,
+  "expectedRefusal": false,
+  "falseApprovalAllowed": false,
+  "mustMentionExclusion": ["commercial use exclusion"]
+}

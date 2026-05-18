@@ -1,0 +1,8 @@
+{
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["COV-TP-001", "EV-TP-001"],
+  "expectedCitationRequired": true,
+  "expectedRefusal": false,
+  "falseApprovalAllowed": false,
+  "mustMentionMissingEvidence": ["police report"]
+}

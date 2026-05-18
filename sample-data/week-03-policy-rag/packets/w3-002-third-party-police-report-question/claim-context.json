@@ -1,0 +1,36 @@
+{
+  "packetId": "w3-002-third-party-police-report-question",
+  "source": "synthetic",
+  "claim": {
+    "documentType": "claim_email",
+    "claimNumber": "W3-CLM-002",
+    "policyNumber": "POL-W3-002",
+    "insuredName": "Synthetic User Two",
+    "claimantName": "Synthetic User Two",
+    "vehicle": {
+      "registrationNumber": "SYN-W3-002",
+      "make": "Hyundai",
+      "model": "i20",
+      "year": "2020"
+    },
+    "incident": {
+      "lossType": "third_party",
+      "incidentDate": "2026-05-03",
+      "incidentLocation": "Delhi",
+      "description": "Insured vehicle allegedly hit another parked vehicle. Third-party property damage is claimed."
+    },
+    "police": {
+      "wasReportedToPolice": false,
+      "policeStation": null,
+      "firNumber": null,
+      "reportDate": null
+    },
+    "supportingDocuments": {
+      "claimForm": true,
+      "damagePhoto": true,
+      "repairEstimate": false,
+      "policeReport": false
+    },
+    "missingEvidence": ["police report", "third-party details"]
+  }
+}

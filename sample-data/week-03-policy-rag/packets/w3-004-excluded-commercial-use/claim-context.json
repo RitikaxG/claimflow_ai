@@ -1,0 +1,41 @@
+{
+  "packetId": "w3-004-excluded-commercial-use",
+  "source": "synthetic",
+  "claim": {
+    "documentType": "claim_email",
+    "claimNumber": "W3-CLM-004",
+    "policyNumber": "POL-W3-004",
+    "insuredName": "Synthetic User Four",
+    "claimantName": "Synthetic User Four",
+    "vehicle": {
+      "registrationNumber": "SYN-W3-004",
+      "make": "Tata",
+      "model": "Nexon",
+      "year": "2023"
+    },
+    "incident": {
+      "lossType": "own_damage",
+      "incidentDate": "2026-05-07",
+      "incidentLocation": "Bengaluru",
+      "description": "Vehicle was damaged while being used for paid food delivery. Policy is private vehicle policy."
+    },
+    "usageAtIncident": {
+      "declaredUse": "private",
+      "actualUse": "commercial_delivery",
+      "commercialUseEndorsementPresent": false
+    },
+    "damage": {
+      "damagedParts": ["rear bumper", "tailgate"],
+      "damageSeverity": "moderate",
+      "estimatedRepairCost": 52000,
+      "currency": "INR"
+    },
+    "supportingDocuments": {
+      "claimForm": true,
+      "damagePhoto": true,
+      "repairEstimate": true,
+      "policeReport": false
+    },
+    "missingEvidence": []
+  }
+}

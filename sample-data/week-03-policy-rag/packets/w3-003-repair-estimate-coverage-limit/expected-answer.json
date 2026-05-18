@@ -1,0 +1,8 @@
+{
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["LIMIT-RP-001", "EV-OD-001"],
+  "expectedCitationRequired": true,
+  "expectedRefusal": false,
+  "falseApprovalAllowed": false,
+  "mustMentionMissingEvidence": ["insurer review"]
+}

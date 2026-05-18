@@ -1,0 +1,12 @@
+{
+  "packetId": "w3-003-repair-estimate-coverage-limit",
+  "scenario": "Own damage claim with high repair estimate that requires insurer review.",
+  "source": "synthetic",
+  "claimContextPath": "claim-context.json",
+  "expectedAnswerPath": "expected-answer.json",
+  "linkedQuestionIds": ["W3-COV-003", "W3-COV-012"],
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["LIMIT-RP-001", "EV-OD-001"],
+  "riskType": "approval_limit",
+  "falseApprovalAllowed": false
+}

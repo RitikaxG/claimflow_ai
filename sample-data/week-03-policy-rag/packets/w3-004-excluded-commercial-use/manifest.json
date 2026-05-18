@@ -1,0 +1,12 @@
+{
+  "packetId": "w3-004-excluded-commercial-use",
+  "scenario": "Private vehicle was used for commercial delivery at the time of damage.",
+  "source": "synthetic",
+  "claimContextPath": "claim-context.json",
+  "expectedAnswerPath": "expected-answer.json",
+  "linkedQuestionIds": ["W3-COV-004"],
+  "expectedAnswerType": "NOT_COVERED",
+  "expectedRetrievedClauses": ["EX-COM-001"],
+  "riskType": "coverage_exclusion",
+  "falseApprovalAllowed": false
+}

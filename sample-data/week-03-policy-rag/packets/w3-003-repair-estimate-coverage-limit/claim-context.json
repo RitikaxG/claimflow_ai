@@ -1,0 +1,42 @@
+{
+  "packetId": "w3-003-repair-estimate-coverage-limit",
+  "source": "synthetic",
+  "claim": {
+    "documentType": "repair_estimate",
+    "claimNumber": "W3-CLM-003",
+    "policyNumber": "POL-W3-003",
+    "insuredName": "Synthetic User Three",
+    "claimantName": "Synthetic User Three",
+    "vehicle": {
+      "registrationNumber": "SYN-W3-003",
+      "make": "Maruti Suzuki",
+      "model": "Brezza",
+      "year": "2022"
+    },
+    "incident": {
+      "lossType": "own_damage",
+      "incidentDate": "2026-05-05",
+      "incidentLocation": "Pune",
+      "description": "Vehicle front bumper, bonnet, and headlamp damaged after collision."
+    },
+    "damage": {
+      "damagedParts": ["front bumper", "bonnet", "left headlamp"],
+      "damageSeverity": "moderate",
+      "estimatedRepairCost": 125000,
+      "currency": "INR"
+    },
+    "police": {
+      "wasReportedToPolice": false,
+      "policeStation": null,
+      "firNumber": null,
+      "reportDate": null
+    },
+    "supportingDocuments": {
+      "claimForm": true,
+      "damagePhoto": true,
+      "repairEstimate": true,
+      "policeReport": false
+    },
+    "missingEvidence": ["insurer review"]
+  }
+}

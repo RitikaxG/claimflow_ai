@@ -1,0 +1,12 @@
+{
+  "packetId": "w3-005-ambiguous-flood-damage",
+  "scenario": "Flood damage may be covered, but evidence is incomplete and exclusion status is unclear.",
+  "source": "synthetic",
+  "claimContextPath": "claim-context.json",
+  "expectedAnswerPath": "expected-answer.json",
+  "linkedQuestionIds": ["W3-COV-005"],
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["COV-OD-001", "EV-FLD-001"],
+  "riskType": "ambiguous_coverage",
+  "falseApprovalAllowed": false
+}

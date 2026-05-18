@@ -1,0 +1,12 @@
+{
+  "packetId": "w3-002-third-party-police-report-question",
+  "scenario": "Third-party claim where police report evidence is missing.",
+  "source": "synthetic",
+  "claimContextPath": "claim-context.json",
+  "expectedAnswerPath": "expected-answer.json",
+  "linkedQuestionIds": ["W3-COV-002"],
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["COV-TP-001", "EV-TP-001"],
+  "riskType": "missing_evidence",
+  "falseApprovalAllowed": false
+}

@@ -1,0 +1,12 @@
+{
+  "packetId": "w3-001-theft-missing-fir-policy-question",
+  "scenario": "Theft claim where FIR number and police report evidence are missing.",
+  "source": "synthetic",
+  "claimContextPath": "claim-context.json",
+  "expectedAnswerPath": "expected-answer.json",
+  "linkedQuestionIds": ["W3-COV-001"],
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["COV-TH-001", "EV-TH-001"],
+  "riskType": "missing_evidence",
+  "falseApprovalAllowed": false
+}

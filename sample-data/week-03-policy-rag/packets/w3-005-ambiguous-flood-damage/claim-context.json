@@ -1,0 +1,42 @@
+{
+  "packetId": "w3-005-ambiguous-flood-damage",
+  "source": "synthetic",
+  "claim": {
+    "documentType": "claim_email",
+    "claimNumber": "W3-CLM-005",
+    "policyNumber": "POL-W3-005",
+    "insuredName": "Synthetic User Five",
+    "claimantName": "Synthetic User Five",
+    "vehicle": {
+      "registrationNumber": "SYN-W3-005",
+      "make": "Mahindra",
+      "model": "XUV300",
+      "year": "2021"
+    },
+    "incident": {
+      "lossType": "own_damage",
+      "incidentDate": "2026-05-09",
+      "incidentLocation": "Mumbai",
+      "description": "Vehicle engine stopped after driving through a waterlogged road. Claimant says flood damage caused the loss."
+    },
+    "damage": {
+      "damagedParts": ["engine", "electrical wiring"],
+      "damageSeverity": "severe",
+      "estimatedRepairCost": 98000,
+      "currency": "INR"
+    },
+    "floodEvidence": {
+      "waterloggingEvidenceProvided": false,
+      "damagePhotosProvided": true,
+      "inspectionReportProvided": false,
+      "exclusionStatusKnown": false
+    },
+    "supportingDocuments": {
+      "claimForm": true,
+      "damagePhoto": true,
+      "repairEstimate": true,
+      "policeReport": false
+    },
+    "missingEvidence": ["flood or waterlogging evidence", "inspection evidence", "confirmation that no exclusion applies"]
+  }
+}

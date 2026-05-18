@@ -1,0 +1,12 @@
+{
+  "expectedAnswerType": "NEEDS_REVIEW",
+  "expectedRetrievedClauses": ["COV-OD-001", "EV-FLD-001"],
+  "expectedCitationRequired": true,
+  "expectedRefusal": false,
+  "falseApprovalAllowed": false,
+  "mustMentionMissingEvidence": [
+    "flood or waterlogging evidence",
+    "inspection evidence",
+    "confirmation that no exclusion applies"
+  ]
+}
