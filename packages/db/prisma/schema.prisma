@@ -144,7 +144,7 @@ model ExtractionRun {
 
   events ExtractionEvent[]
   reviewTask ReviewTask?
-  coverageQuestion CoverageQuestions[]
+  coverageQuestions CoverageQuestion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -284,7 +284,7 @@ model PolicyChunk {
   @@map("policy_chunks")
 }
 
-model CoverageQuestions {
+model CoverageQuestion {
   id String @id @default(cuid())
 
   runId String
