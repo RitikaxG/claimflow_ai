@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^25.9.0"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -17,7 +18,6 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@types/node": "^25.9.0",
     "@repo/db":"workspace:*"
   }
 }
