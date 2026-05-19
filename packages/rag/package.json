@@ -1,0 +1,23 @@
+{
+  "name": "@repo/rag",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "load-policies": "bun --env-file ../db/.env load-policy-documents.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@types/node": "^25.9.0",
+    "@repo/db":"workspace:*"
+  }
+}
