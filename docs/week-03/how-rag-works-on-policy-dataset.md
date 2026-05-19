@@ -39,7 +39,7 @@ EX-COM-001
 LIMIT-RP-001
 ```
 
-The model should answer only from this knowledge base.
+The model should answer only from retrieved chunks from this knowledge base, not from the entire corpus or outside insurance knowledge.
 
 ## 2. Ingestion
 
@@ -89,6 +89,8 @@ contentHash
 
 This tells the system where each policy chunk came from.
 
+For the current synthetic dataset, `insurerName` can stay `null` because the policy files do not contain an `INSURER_NAME` field.
+
 ## 4. Chunking
 
 Chunking means splitting documents into smaller searchable pieces.
@@ -109,9 +111,11 @@ Becomes one chunk:
 {
   "clauseId": "EV-TH-001",
   "sectionTitle": "Theft claim evidence requirements",
-  "text": "Theft claims require a police FIR number or police report evidence..."
+  "text": "## CLAUSE EV-TH-001: Theft claim evidence requirements\n\nTheft claims require a police FIR number or police report evidence..."
 }
 ```
+
+The chunk text keeps the original markdown heading because the heading is useful for citation display, debugging, and answer grounding.
 
 Clause-based chunking is better here because answers can cite exact clause IDs.
 
@@ -160,6 +164,16 @@ Should be close to:
 EV-TH-001 theft claim evidence requirements
 ```
 
+For Week 3, ClaimFlow will use Gemini embeddings and store vectors in `policy_chunks.embedding`.
+
+The current DB column is:
+
+```txt
+embedding vector(768)
+```
+
+So the embedding implementation must use a 768-dimensional output, or the schema must be updated to match the model output dimension.
+
 ## 7. Vector storage
 
 Policy chunk embeddings are stored in Postgres using pgvector.
@@ -180,9 +194,9 @@ This lets the app run similarity search over policy clauses.
 
 ## 8. Query building
 
-Do not embed only the user question.
+For run-specific coverage questions, build a richer retrieval query from the user question plus claim context.
 
-Build a richer retrieval query from:
+Useful fields:
 
 ```txt
 user question
@@ -210,7 +224,9 @@ Retrieval query:
 theft claim approval FIR missing police report required evidence vehicle theft coverage
 ```
 
-This improves retrieval quality.
+This improves retrieval quality because the query contains both the user's intent and the claim facts.
+
+For generic policy questions where there is no claim context, embedding only the user question is acceptable.
 
 ## 9. Query embedding
 
@@ -240,7 +256,7 @@ Example output:
       "clauseId": "EV-TH-001",
       "sectionTitle": "Theft claim evidence requirements",
       "similarity": 0.84,
-      "text": "Theft claims require a police FIR number..."
+      "text": "## CLAUSE EV-TH-001: Theft claim evidence requirements\n\nTheft claims require a police FIR number..."
     }
   ]
 }
@@ -275,6 +291,12 @@ output schema
 
 Do not pass the entire policy corpus.
 
+Retrieved clauses explain what the policy says.
+
+Claim context explains what happened in the specific claim.
+
+The final answer needs both.
+
 ## 13. Grounded generation
 
 Grounded generation means the model answers only from retrieved chunks.
@@ -299,6 +321,7 @@ Expected output shape:
     {
       "clauseId": "EV-TH-001",
       "chunkId": "...",
+      "quote": "Theft claims require a police FIR number or police report evidence...",
       "relevance": "Requires FIR or police report evidence."
     }
   ],
