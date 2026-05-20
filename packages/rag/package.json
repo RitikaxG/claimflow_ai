@@ -15,9 +15,12 @@
   },
   "scripts": {
     "load-policies": "bun --env-file ../db/.env load-policy-documents.ts",
+    "embed-policies": "bun --env-file ../db/.env embed-policy-chunks.ts",
+    "smoke:vector-search": "bun --env-file ../db/.env smoke-test-vector-search.ts",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@repo/db":"workspace:*"
+    "@repo/db":"workspace:*",
+    "@repo/ai":"workspace:*"
   }
 }

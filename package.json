@@ -13,7 +13,8 @@
     "eval:week1:export": "bun --filter @repo/evals export:week1",
     "eval:week1": "bun --filter @repo/evals eval:week1",
     "eval:week2:review": "bun --filter @repo/evals eval:week2:review",
-    "rag:load-policies": "bun --filter @repo/rag load-policies"
+    "rag:load-policies": "bun --filter @repo/rag load-policies",
+    "rag:embed-policies": "bun --filter @repo/rag embed-policies"
   },
   "devDependencies": {
     "prettier": "^3.6.0",
