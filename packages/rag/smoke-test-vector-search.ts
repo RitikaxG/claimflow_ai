@@ -54,24 +54,18 @@ async function main() {
     vector,
   );
 
-  console.log(
-    JSON.stringify(
-      {
-        question,
-        embeddedChunkCount: embeddedCount,
-        matchCount: matches.length,
-        matches: matches.map((match) => ({
-          chunkId: match.chunkId,
-          clauseId: match.clauseId,
-          sectionTitle: match.sectionTitle,
-          policyTitle: match.policyTitle,
-          similarity: Number(match.similarity),
-          snippet: match.text.slice(0, 350),
-        })),
-      },
-      null,
-      2,
-    ),
+  console.log(`Question: ${question}`);
+  console.log(`Embedded chunks: ${embeddedCount}`);
+  console.log("");
+  
+  console.table(
+    matches.map((match, index) => ({
+        rank: index + 1,
+        clauseId: match.clauseId,
+        sectionTitle: match.sectionTitle,
+        policyTitle: match.policyTitle,
+        similarity: Number(match.similarity).toFixed(4),
+    })),
   );
 }
 
