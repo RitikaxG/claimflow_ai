@@ -6,6 +6,8 @@ import { chunkPolicyClauses } from "./chunk-policy-document";
 import { parsePolicyDocument } from "./parse-policy-document";
 import { WEEK3_POLICY_DOCS_ROOT, WEEK3_RAG_ROOT } from "./paths";
 
+const FORCE_POLICY_RELOAD = process.env.FORCE_POLICY_RELOAD === "true";
+
 function toPosixPath(filePath : string){
     return filePath.split(path.sep).join("/");
 };
@@ -51,6 +53,27 @@ async function loadPolicyFile(filePath : string){
                 sourcePath,
             }
         });
+
+        if(
+            existingPolicyDocument &&
+            existingPolicyDocument.contentHash === contentHash &&
+            !FORCE_POLICY_RELOAD
+        ){
+            const existingChunkCount = await tx.policyChunk.count({
+                where : {
+                    policyDocumentId : existingPolicyDocument.id
+                }
+            });
+
+            if(existingChunkCount > 0){
+                return {
+                    policyDocument : existingPolicyDocument,
+                    chunkCount : existingChunkCount,
+                    skipped : true,
+                    reason : "UNCHANGED_CONTENT_HASH"
+                }
+            }
+        }
 
         const policyDocument = existingPolicyDocument 
         ? await tx.policyDocument.update({
@@ -100,6 +123,10 @@ async function loadPolicyFile(filePath : string){
         return {
             policyDocument,
             chunkCount : chunks.length,
+            skipped : false,
+            reason : existingPolicyDocument ?
+            "CONTENT_CHANGED_OR_FORCE_RELOAD"
+            : "NEW_POLICY_DOCUMENT"
         }
     })
 }
@@ -113,6 +140,12 @@ async function main(){
 
     let documentCount = 0;
     let chunkCount = 0;
+    let skippedCount = 0;
+    let rebuiltCount = 0;
+
+    console.log("Policy loading started");
+    console.log(`FORCE_POLICY_RELOAD : ${FORCE_POLICY_RELOAD}`);
+    console.log("");
 
     for(const filePath of files){
         const result = await loadPolicyFile(filePath);
@@ -120,15 +153,32 @@ async function main(){
         documentCount += 1;
         chunkCount += result.chunkCount;
 
-        console.log(`Loaded policy : ${result.policyDocument.title}`);
+        if(result.skipped){
+            skippedCount += 1;
+        }else{
+            rebuiltCount += 1;
+        }
+
+        console.log(
+            `${result.skipped ? "Skipped" : "Loaded"} policy : ${result.policyDocument.title}`,
+        );
+        
         console.log(`sourcePath : ${result.policyDocument.sourcePath}`);
         console.log(`chunks : ${result.chunkCount}`);
+        console.log(`reason : ${result.reason}`)
         console.log("");
     }
 
     console.log("Policy loading complete.");
     console.log(`documents: ${documentCount}`);
     console.log(`chunks : ${chunkCount}`);
+    console.log(`skipped : ${skippedCount}`);
+    console.log(`Rebuilt : ${rebuiltCount}`);
+
+    if(skippedCount > 0){
+        console.log("");
+        console.log("Unchanged policies were skipped, so existing chunk embeddings were preserved.")
+    }
 }
 
 main()
