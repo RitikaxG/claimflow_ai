@@ -41,6 +41,12 @@ async function main(){
 
     console.log(`Found ${chunks.length} policy chunks without embeddings`);
 
+    if(chunks.length === 0){
+        console.log(`No embedding work needed. All policy chunks already have embeddings.`);
+    }
+
+    let embeddedCount = 0;
+
     for(const chunk of chunks){
         const embeddingInput = formatPolicyChunkForEmbedding({
             title : chunk.policyTitle,
@@ -61,10 +67,18 @@ async function main(){
             chunk.id,
         );
 
-        console.log(`Embedded chunk ${chunk.chunkIndex} : ${chunk.clauseId ?? chunk.id} - ${chunk.sectionTitle ?? "Untitled"}`);
-
-        console.log("Policy chunk embedding complete");
+        embeddedCount += 1;
+        
+        console.log(
+        `Embedded ${embeddedCount}/${chunks.length}: chunk ${chunk.chunkIndex} | ${
+            chunk.clauseId ?? chunk.id
+        } - ${chunk.sectionTitle ?? "Untitled"}`,
+        );
     }
+
+    console.log("");
+    console.log("Policy chunk embedding complete.");
+    console.log(`Embedded chunks: ${embeddedCount}`);
 }
 
 main()
