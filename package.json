@@ -14,7 +14,8 @@
     "eval:week1": "bun --filter @repo/evals eval:week1",
     "eval:week2:review": "bun --filter @repo/evals eval:week2:review",
     "rag:load-policies": "bun --filter @repo/rag load-policies",
-    "rag:embed-policies": "bun --filter @repo/rag embed-policies"
+    "rag:embed-policies": "bun --filter @repo/rag embed-policies",
+    "rag:smoke:retrieval-cases": "bun --filter @repo/rag smoke:retrieval-cases"
   },
   "devDependencies": {
     "prettier": "^3.6.0",

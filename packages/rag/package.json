@@ -18,6 +18,7 @@
     "embed-policies": "bun --env-file ../db/.env embedding/embed-policy-chunks.ts",
     "smoke:vector-search": "bun --env-file ../db/.env scripts/smoke-test-vector-search.ts",
     "smoke:policy-retrieval": "bun --env-file ../db/.env scripts/smoke-test-policy-retrieval.ts",
+    "smoke:retrieval-cases": "bun --env-file ../db/.env scripts/smoke-test-retrieval-cases.ts",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
