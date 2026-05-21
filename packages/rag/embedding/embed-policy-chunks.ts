@@ -10,7 +10,7 @@
 
 import { prisma } from "@repo/db";
 import { embedText, formatPolicyChunkForEmbedding } from "./embed-policy-text";
-import { toPgVector } from "./vector-sql";
+import { toPgVector } from "../utils/vector-sql";
 
 type PolicyChunkToEmbedRow = {
     id : string,

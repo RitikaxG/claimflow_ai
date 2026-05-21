@@ -1,8 +1,8 @@
 // query string -> embedding -> pg vector topK search
 
-import { embedText, formatQuestionForEmbedding } from "./embed-policy-text";
+import { embedText, formatQuestionForEmbedding } from "../embedding/embed-policy-text";
 import type { RetrievalQueryPlanItem, RetrievedPolicyChunk } from "./retrieval-types";
-import { toPgVector } from "./vector-sql";
+import { toPgVector } from "../utils/vector-sql";
 import { prisma } from "@repo/db";
 
 type RetrievedPolicyChunkRow = Omit<

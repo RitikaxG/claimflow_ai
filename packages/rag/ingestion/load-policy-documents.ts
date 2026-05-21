@@ -2,9 +2,9 @@ import crypto from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@repo/db";
-import { chunkPolicyClauses } from "./chunk-policy-document";
-import { parsePolicyDocument } from "./parse-policy-document";
-import { WEEK3_POLICY_DOCS_ROOT, WEEK3_RAG_ROOT } from "./paths";
+import { chunkPolicyClauses } from "../parsing/chunk-policy-document";
+import { parsePolicyDocument } from "../parsing/parse-policy-document";
+import { WEEK3_POLICY_DOCS_ROOT, WEEK3_RAG_ROOT } from "../paths";
 
 const FORCE_POLICY_RELOAD = process.env.FORCE_POLICY_RELOAD === "true";
 

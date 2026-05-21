@@ -1,7 +1,7 @@
 // Calls the Retrieval Orchestrator
 
 import { prisma } from "@repo/db";
-import { retrievePolicyEvidence } from "./retrieve-policy-evidence";
+import { retrievePolicyEvidence } from "./retrieval/retrieve-policy-evidence";
 
 async function main(){
     const question = 

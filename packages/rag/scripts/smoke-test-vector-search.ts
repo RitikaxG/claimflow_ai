@@ -1,6 +1,6 @@
 import { prisma } from "@repo/db";
-import { embedText, formatQuestionForEmbedding } from "./embed-policy-text";
-import { toPgVector } from "./vector-sql";
+import { embedText, formatQuestionForEmbedding } from "../embedding/embed-policy-text";
+import { toPgVector } from "../utils/vector-sql";
 
 type VectorSearchMatch = {
   chunkId: string;
