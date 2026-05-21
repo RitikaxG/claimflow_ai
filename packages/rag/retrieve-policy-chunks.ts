@@ -34,7 +34,7 @@ export async function retrievePolicyChunks ({
             ON pd.id = pc."policyDocumentId"
         WHERE pc.embedding IS NOT NULL
         ORDER BY pc.embedding <=> $1::vector
-        LIMIT $2;:int;
+        LIMIT $2::int;
         `,vector,safeTopK);
 
     return rows.map((row) => ({
