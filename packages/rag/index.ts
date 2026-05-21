@@ -8,3 +8,4 @@ export * from "./build-retrieval-query-plan";
 
 export * from "./merge-retrieval-results";
 export * from "./evaluate-retrieval-status";
+export * from "./retrieve-policy-evidence";

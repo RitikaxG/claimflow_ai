@@ -258,9 +258,7 @@ export function buildRetrievalQueryPlan({
         );
     }
 
-    const asksAboutCoverageOrExclusion = includesAny(combinedText,[
-        "covered",
-        "coverage",
+    const asksAboutExplicitExclusion = includesAny(combinedText, [
         "not covered",
         "excluded",
         "exclusion",
@@ -268,11 +266,9 @@ export function buildRetrievalQueryPlan({
         "rejected",
         "deny",
         "denied",
-        "approve",
-        "approval",
     ]);
 
-    if(asksAboutCoverageOrExclusion){
+    if(asksAboutExplicitExclusion){
         addExclusionQuery(
             plan,
             "claim exclusions not covered invalid license intoxication commercial use wear and tear mechanical breakdown",

@@ -17,6 +17,7 @@
     "load-policies": "bun --env-file ../db/.env load-policy-documents.ts",
     "embed-policies": "bun --env-file ../db/.env embed-policy-chunks.ts",
     "smoke:vector-search": "bun --env-file ../db/.env smoke-test-vector-search.ts",
+    "smoke:policy-retrieval": "bun --env-file ../db/.env smoke-test-policy-retrieval.ts",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
