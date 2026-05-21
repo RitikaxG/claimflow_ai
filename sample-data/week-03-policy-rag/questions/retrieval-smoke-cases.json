@@ -1,0 +1,79 @@
+[
+  {
+    "id": "retrieval-theft-missing-fir",
+    "question": "Is this theft claim ready for approval if FIR number is missing?",
+    "claimContext": {
+      "lossType": "theft",
+      "missingEvidence": ["FIR number"]
+    },
+    "expectedStatus": "ENOUGH_EVIDENCE",
+    "requiredTopClauses": ["EV-TH-001", "COV-TH-001"]
+  },
+  {
+    "id": "retrieval-generic-question-with-theft-context",
+    "question": "Is this claim ready for approval?",
+    "claimContext": {
+      "lossType": "theft",
+      "missingEvidence": ["FIR number", "police report"]
+    },
+    "expectedStatus": "ENOUGH_EVIDENCE",
+    "requiredTopClauses": ["EV-TH-001", "COV-TH-001"]
+  },
+  {
+    "id": "retrieval-third-party-documents",
+    "question": "What documents are required for a third-party claim?",
+    "claimContext": {
+      "lossType": "third_party",
+      "missingEvidence": ["police report"]
+    },
+    "expectedStatus": "ENOUGH_EVIDENCE",
+    "requiredTopClauses": ["EV-TP-001", "COV-TP-001"]
+  },
+  {
+    "id": "retrieval-commercial-use-exclusion",
+    "question": "Is commercial use covered under this private auto policy?",
+    "claimContext": {
+      "vehicleUse": "commercial delivery"
+    },
+    "expectedStatus": "ENOUGH_EVIDENCE",
+    "requiredTopClauses": ["EX-COM-001"]
+  },
+  {
+    "id": "retrieval-invalid-license-exclusion",
+    "question": "Will the claim be rejected if the driver had no valid license?",
+    "claimContext": {
+      "driverLicenseStatus": "invalid"
+    },
+    "expectedStatus": "ENOUGH_EVIDENCE",
+    "requiredTopClauses": ["EX-LIC-001"]
+  },
+  {
+    "id": "retrieval-repair-estimate-limit",
+    "question": "Is own damage repair estimate approval required for INR 90000?",
+    "claimContext": {
+      "lossType": "own_damage",
+      "repairEstimateAmount": 90000
+    },
+    "expectedStatus": "ENOUGH_EVIDENCE",
+    "requiredTopClauses": ["LIMIT-RP-001", "EV-OD-001"]
+  },
+  {
+    "id": "retrieval-flood-evidence",
+    "question": "Is this flood damage claim ready for approval?",
+    "claimContext": {
+      "lossType": "flood_damage",
+      "missingEvidence": ["inspection evidence", "waterlogging photos"]
+    },
+    "expectedStatus": "ENOUGH_EVIDENCE",
+    "requiredTopClauses": ["COV-OD-001", "EV-FLD-001"]
+  },
+  {
+    "id": "retrieval-unsupported-racing-performance",
+    "question": "Does this policy cover engine tuning for racing performance?",
+    "claimContext": {
+      "lossType": "vehicle_modification"
+    },
+    "expectedStatus": "INSUFFICIENT_EVIDENCE",
+    "requiredTopClauses": []
+  }
+]
