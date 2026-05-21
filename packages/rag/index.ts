@@ -6,3 +6,5 @@ export * from "./retrieval-types";
 export * from "./retrieve-policy-chunks";
 export * from "./build-retrieval-query-plan";
 
+export * from "./merge-retrieval-results";
+export * from "./evaluate-retrieval-status";
