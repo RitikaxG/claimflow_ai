@@ -82,7 +82,7 @@ export function buildRetrievalQueryPlan({
     if(mentionsTheft){
         addQuery(plan,{
             intent : "evidence",
-            query : "theft claim FIR missing police report required evidence approval police station vechicle registration",
+            query : "theft claim FIR police report required evidence approval police station vehicle registration"",
             topK : 3,
         });
 

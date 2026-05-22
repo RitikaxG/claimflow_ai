@@ -85,6 +85,7 @@ function buildCoverageAnswerPrompt(input: GenerateCoverageAnswerInput) {
     - Use PARTIALLY_COVERED when coverage exists but limits, missing add-ons, or partial evidence affect the decision.
     - Use NEEDS_REVIEW when the retrieved clauses are insufficient, contradictory, or required claim evidence is missing.
     - Every cited quote must be copied from one of the retrieved policy clause texts.
+    - When claimJson and validationJson disagree, trust claimJson and the corrected validation fields. Do not infer missing evidence from stale extraction metadata.
 
     USER QUESTION:
     ${input.question}

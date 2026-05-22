@@ -102,83 +102,120 @@ function getLatestApprovedDecision(
     })
 }
 
-function buildClaimContext(input : {
-    run: {
-        id: string;
-        status: string;
-        schemaVersion: string;
-        model: string | null;
-        promptVersion: string | null;
-        extractedJson: unknown | null;
-        validationJson: unknown | null;
-        missingFieldsJson: unknown | null;
-        confidenceJson: unknown | null;
-        document: {
-            id: string;
-            filename: string;
-            sourceType: string;
-            mimeType: string;
-            contentHash: string | null;
-        };
-        reviewTask: {
-            status: ReviewTaskStatus;
-            decisions: Array<{
-                decision: ReviewDecisionType;
-                correctedJson: unknown | null;
-                correctedValidationJson: unknown | null;
-                reviewerName: string | null;
-                notes: string | null;
-                createdAt: Date
-            }> 
-        } | null;
-    }
+function getArrayFieldFromValidation(input: {
+  validationJson: unknown;
+  field: "missingFields" | "requiredEvidence" | "warnings" | "conflicts";
 }) {
-    const latestApprovedDecision = getLatestApprovedDecision(
-        input.run.reviewTask?.decisions ?? []
-    );
+  if (
+    typeof input.validationJson !== "object" ||
+    input.validationJson === null ||
+    Array.isArray(input.validationJson)
+  ) {
+    return [];
+  }
 
-    const claimJson = latestApprovedDecision?.correctedJson ?? input.run.extractedJson;
-    const validationJson = latestApprovedDecision?.correctedValidationJson ?? input.run.validationJson;
+  const value = (input.validationJson as Record<string, unknown>)[input.field];
 
-    return{
-        claimJson,
-        context: {
-            claimJson,
-            validationJson,
-            missingFieldsJson: input.run.missingFieldsJson,
-            confidenceJson: input.run.confidenceJson,
-            claimSource: latestApprovedDecision
-                ? "reviewDecision.correctedJson"
-                : "extractionRun.extractedJson",
-            run:{
-                id: input.run.id,
-                status: input.run.status,
-                schemaVersion: input.run.schemaVersion,
-                model: input.run.model,
-                promptVersion: input.run.promptVersion,
-            },
-            document: {
-                id: input.run.document.id,
-                filename: input.run.document.filename,
-                sourceType: input.run.document.sourceType,
-                mimeType: input.run.document.mimeType,
-                contentHash: input.run.document.contentHash,
-            },
-            review: input.run.reviewTask
-            ? {
-                status: input.run.reviewTask.status,
-                latestApprovedDecision: latestApprovedDecision
-                ? {
-                    decision: latestApprovedDecision.decision,
-                    reviewerName: latestApprovedDecision.reviewerName,
-                    notes: latestApprovedDecision.notes,
-                    createdAt : latestApprovedDecision.createdAt
+  return Array.isArray(value) ? value : [];
+}
+
+function buildClaimContext(input: {
+  run: {
+    id: string;
+    status: string;
+    schemaVersion: string;
+    model: string | null;
+    promptVersion: string | null;
+    extractedJson: unknown | null;
+    validationJson: unknown | null;
+    missingFieldsJson: unknown | null;
+    confidenceJson: unknown | null;
+    document: {
+      id: string;
+      filename: string;
+      sourceType: string;
+      mimeType: string;
+      contentHash: string | null;
+    };
+    reviewTask: {
+      status: ReviewTaskStatus;
+      decisions: Array<{
+        decision: ReviewDecisionType;
+        correctedJson: unknown | null;
+        correctedValidationJson: unknown | null;
+        reviewerName: string | null;
+        notes: string | null;
+        createdAt: Date;
+      }>;
+    } | null;
+  };
+}) {
+  const latestApprovedDecision = getLatestApprovedDecision(
+    input.run.reviewTask?.decisions ?? [],
+  );
+
+  const claimJson =
+    latestApprovedDecision?.correctedJson ?? input.run.extractedJson;
+
+  const validationJson =
+    latestApprovedDecision?.correctedValidationJson ?? input.run.validationJson;
+
+  const missingFieldsJson = latestApprovedDecision
+    ? getArrayFieldFromValidation({
+        validationJson,
+        field: "missingFields",
+      })
+    : input.run.missingFieldsJson;
+
+  const requiredEvidenceJson = getArrayFieldFromValidation({
+    validationJson,
+    field: "requiredEvidence",
+  });
+
+  return {
+    claimJson,
+    context: {
+      claimJson,
+      validationJson,
+
+      // IMPORTANT:
+      // For reviewed claims, do not use stale extractionRun.missingFieldsJson.
+      missingFieldsJson,
+      requiredEvidenceJson,
+
+      confidenceJson: input.run.confidenceJson,
+      claimSource: latestApprovedDecision
+        ? "reviewDecision.correctedJson"
+        : "extractionRun.extractedJson",
+      run: {
+        id: input.run.id,
+        status: input.run.status,
+        schemaVersion: input.run.schemaVersion,
+        model: input.run.model,
+        promptVersion: input.run.promptVersion,
+      },
+      document: {
+        id: input.run.document.id,
+        filename: input.run.document.filename,
+        sourceType: input.run.document.sourceType,
+        mimeType: input.run.document.mimeType,
+        contentHash: input.run.document.contentHash,
+      },
+      review: input.run.reviewTask
+        ? {
+            status: input.run.reviewTask.status,
+            latestApprovedDecision: latestApprovedDecision
+              ? {
+                  decision: latestApprovedDecision.decision,
+                  reviewerName: latestApprovedDecision.reviewerName,
+                  notes: latestApprovedDecision.notes,
+                  createdAt: latestApprovedDecision.createdAt,
                 }
-                : null
-            }
-            : null
-        } 
-    }
+              : null,
+          }
+        : null,
+    },
+  };
 }
 
 async function saveCoverageQuestion(input: {
@@ -360,6 +397,15 @@ export async function POST(request: Request, { params } : Params ){
             forcedNeedsReview: citationValidation.forcedNeedsReview,
             model: generated.model,
             promptVersion: generated.promptVersion,
+
+            debug: {
+                claimSource: claimContext.claimSource,
+                police: isPlainObject(claimJson)
+                ? (claimJson as Record<string, unknown>).police
+                : null,
+                missingFieldsJson: claimContext.missingFieldsJson,
+                requiredEvidenceJson: claimContext.requiredEvidenceJson,
+            },
         })
     } catch(error){
         console.error("Coverage answer API failed", error);
