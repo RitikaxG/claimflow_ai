@@ -3,13 +3,13 @@ import type { MergedRetrievedPolicyChunk, PolicyRetrievalResult } from "../retri
 
 export type CoverageCitationValidationResult = {
     answer : CoverageAnswer;
-    forceNeedsReview : boolean;
+    forcedNeedsReview : boolean;
     guardrailReasons : string[];
 };
 
 type ValidateCoverageCitationsInput = {
     answer : CoverageAnswer;
-    retrievedResult : PolicyRetrievalResult;
+    retrievalResult : PolicyRetrievalResult;
 };
 
 function normalizeText(value : string){
@@ -135,7 +135,7 @@ export function validateCoverageCitations(
     const guardrailReasons : string[] = [];
 
     const chunksById = new Map(
-        input.retrievedResult.matches.map((match) => [match.chunkId,match])
+        input.retrievalResult.matches.map((match) => [match.chunkId,match])
     );
 
     const validCitations : CitedCoverageClause[] = [];
@@ -156,7 +156,7 @@ export function validateCoverageCitations(
 
     let shouldForceNeedsReview = false;
 
-    if(input.retrievedResult.retrievalStatus === "INSUFFICIENT_EVIDENCE"){
+    if(input.retrievalResult.retrievalStatus === "INSUFFICIENT_EVIDENCE"){
         shouldForceNeedsReview = true;
         guardrailReasons.push(
             "Retrieval status was INSUFFICIENT_EVIDENCE, so a coverage decision cannot be trusted."
@@ -171,7 +171,7 @@ export function validateCoverageCitations(
     }
 
     if(parsedAnswer.decision === "COVERED"){
-        const hasAnyCoverageIntent = input.retrievedResult.matches.some(hasCoverageIntent);
+        const hasAnyCoverageIntent = input.retrievalResult.matches.some(hasCoverageIntent);
 
         if(!hasAnyCoverageIntent){
             shouldForceNeedsReview = true;
@@ -180,7 +180,7 @@ export function validateCoverageCitations(
             )
         }
 
-        if(isOnlyExclusionOrEvidenceGap(input.retrievedResult.matches)){
+        if(isOnlyExclusionOrEvidenceGap(input.retrievalResult.matches)){
             shouldForceNeedsReview = true;
             guardrailReasons.push(
                 "Model returned COVERED but retrieved evidence was only exclusion/evidence-gap oriented.",
@@ -195,7 +195,7 @@ export function validateCoverageCitations(
                 validCitations,
                 guardrailReasons,
             }),
-            forceNeedsReview : true,
+            forcedNeedsReview : true,
             guardrailReasons,
         }
     }
@@ -205,7 +205,7 @@ export function validateCoverageCitations(
             ...parsedAnswer,
             citedClauses : validCitations,
         }),
-        forceNeedsReview : false,
+        forcedNeedsReview : false,
         guardrailReasons,
     }
 }
