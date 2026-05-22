@@ -1,8 +1,9 @@
 import { readFile } from "node:fs/promises";
-import { getGeminiClient, GEMINI_MODEL } from "./gemini-client";
+import { getGeminiClient, GEMINI_MODEL } from "../client/gemini-client";
 import { CLAIM_EXTRACTION_SYSTEM_PROMPT, CLAIM_EXTRACTION_PROMPT_VERSION } from "./prompt";
 import { ClaimExtractionSchema, type ClaimExtraction } from "@repo/shared/schemas";
-import { CLAIM_EXTRACTION_RESPONSE_SCHEMA } from "./claim-response-schema";
+import { CLAIM_EXTRACTION_RESPONSE_SCHEMA } from "./response-schema";
+import { toRawModelOutput } from "../utils/raw-model-output";
 
 export type ClaimExtractionResult = {
     model : string,
@@ -36,17 +37,6 @@ function toClaimExtractionResult(params : {
     };
 }
 
-function toRawModelOutput(response : {
-    text? : string,
-    candidates? : unknown,
-    usageMetadata? : unknown,
-}){
-    return {
-        text : response.text ?? null,
-        candidates : response.candidates ?? null,
-        usageMetadata : response.usageMetadata ?? null,
-    };
-}
 
 export async function extractClaimFromPdf(
     filePath : string

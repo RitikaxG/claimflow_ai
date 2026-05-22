@@ -1,6 +1,7 @@
 import { CoverageAnswerSchema, type CoverageAnswer } from "@repo/shared/schemas";
-import { getGeminiClient, GEMINI_MODEL } from "./gemini-client";
-import { COVERAGE_ANSWER_RESPONSE_SCHEMA } from "./coverage-answer-response-schema";
+import { getGeminiClient, GEMINI_MODEL } from "../client/gemini-client";
+import { COVERAGE_ANSWER_RESPONSE_SCHEMA } from "./response-schema";
+import { toRawModelOutput } from "../utils/raw-model-output";
 
 export const COVERAGE_ANSWER_PROMPT_VERSION = "coverage_answer_v1";
 
@@ -37,18 +38,6 @@ export type GenerateCoverageAnswerResult = {
 function safeJson(value : unknown) : string {
     return JSON.stringify(value,null,2);
 };
-
-function toRawModelOutput(response : {
-    text? : string;
-    candidates? : unknown;
-    usageMetadata? : unknown;
-}){
-    return {
-        text : response.text ?? null,
-        candidates : response.candidates ?? null,
-        usageMetadata : response.usageMetadata ?? null,
-    }
-}
 
 function formatRetrievedClauses(matches : CoverageRetrievedChunk[]){
     return matches.map((match,index) => {

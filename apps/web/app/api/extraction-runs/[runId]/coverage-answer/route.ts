@@ -61,7 +61,7 @@ function validateRequestBody(body : unknown): {
     };
 }
 
-function buildInsufficientEvidencAnswer(reason : string) : CoverageAnswer {
+function buildInsufficientEvidenceAnswer(reason : string) : CoverageAnswer {
     return {
         decision : "NEEDS_REVIEW",
         answer : 
@@ -318,11 +318,11 @@ export async function POST(request: Request, { params } : Params ){
         const retrievalResult = await retrievePolicyEvidence({
             question,
             claimContext,
-            topKFinal: 5,
+            topKFinal: 8,
         });
 
         if(retrievalResult.retrievalStatus === "INSUFFICIENT_EVIDENCE"){
-            const finalAnswer = buildInsufficientEvidencAnswer(retrievalResult.reason);
+            const finalAnswer = buildInsufficientEvidenceAnswer(retrievalResult.reason);
         
 
             const guardrailReasons = [
@@ -397,15 +397,6 @@ export async function POST(request: Request, { params } : Params ){
             forcedNeedsReview: citationValidation.forcedNeedsReview,
             model: generated.model,
             promptVersion: generated.promptVersion,
-
-            debug: {
-                claimSource: claimContext.claimSource,
-                police: isPlainObject(claimJson)
-                ? (claimJson as Record<string, unknown>).police
-                : null,
-                missingFieldsJson: claimContext.missingFieldsJson,
-                requiredEvidenceJson: claimContext.requiredEvidenceJson,
-            },
         })
     } catch(error){
         console.error("Coverage answer API failed", error);
