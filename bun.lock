@@ -106,6 +106,7 @@
       "dependencies": {
         "@repo/ai": "workspace:*",
         "@repo/db": "workspace:*",
+        "@repo/shared": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "latest",

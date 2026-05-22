@@ -13,3 +13,5 @@ export * from "./retrieval/build-retrieval-query-plan";
 export * from "./retrieval/merge-retrieval-results";
 export * from "./retrieval/evaluate-retrieval-status";
 export * from "./retrieval/retrieve-policy-evidence";
+
+export * from "./answer/validate-coverage-citations";
