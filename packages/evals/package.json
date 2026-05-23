@@ -5,6 +5,7 @@
   "scripts": {
     "export:week1": "bun --env-file ../db/.env export-week1-actuals.ts",
     "eval:week2:review": "bun --env-file ../db/.env evaluate-week2-review-workflow.ts",
+    "eval:week3:rag": "bun --env-file ../db/.env evaluate-week3-rag.ts",
     "eval:week1": "bun evaluate-week1.ts",
     "check-types": "tsc --noEmit"
   },

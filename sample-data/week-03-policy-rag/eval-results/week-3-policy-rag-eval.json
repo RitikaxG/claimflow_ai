@@ -1,0 +1,360 @@
+{
+  "generatedAt": "2026-05-23T09:41:44.141Z",
+  "summary": {
+    "total": 12,
+    "passed": 7,
+    "failed": 5,
+    "retrievalHitRate": 0.8333333333333334,
+    "decisionMatchRate": 0.75,
+    "citationPresentRate": 0.8333333333333334,
+    "citationSupportRate": 0.8333333333333334,
+    "unsupportedRefusalRate": 1,
+    "falseApprovalRate": 0
+  },
+  "cases": [
+    {
+      "questionId": "W3-COV-001",
+      "packetId": "w3-001-theft-missing-fir-policy-question",
+      "question": "Is this theft claim ready for approval if the FIR number is missing?",
+      "expectedDecision": "NEEDS_REVIEW",
+      "actualDecision": "NEEDS_REVIEW",
+      "expectedRetrievedClauses": [
+        "COV-TH-001",
+        "EV-TH-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TH-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EV-TP-001",
+        "LIMIT-RP-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8368881137638059,
+      "citationCount": 2,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": true,
+      "blockers": []
+    },
+    {
+      "questionId": "W3-COV-002",
+      "packetId": "w3-002-third-party-police-report-question",
+      "question": "Can this third-party claim be approved without police report evidence?",
+      "expectedDecision": "NEEDS_REVIEW",
+      "actualDecision": "NEEDS_REVIEW",
+      "expectedRetrievedClauses": [
+        "COV-TP-001",
+        "EV-TP-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TH-001",
+        "COV-TP-001",
+        "EV-FLD-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EV-TP-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8368881137638059,
+      "citationCount": 2,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": true,
+      "blockers": []
+    },
+    {
+      "questionId": "W3-COV-003",
+      "packetId": "w3-003-repair-estimate-coverage-limit",
+      "question": "Can this high repair estimate be approved directly?",
+      "expectedDecision": "NEEDS_REVIEW",
+      "actualDecision": "NOT_COVERED",
+      "expectedRetrievedClauses": [
+        "LIMIT-RP-001",
+        "EV-OD-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TH-001",
+        "COV-TP-001",
+        "EV-FLD-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EV-TP-001",
+        "LIMIT-RP-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8373044244362561,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": false,
+      "blockers": [
+        "Decision mismatch. Expected NEEDS_REVIEW, got NOT_COVERED."
+      ]
+    },
+    {
+      "questionId": "W3-COV-004",
+      "packetId": "w3-004-excluded-commercial-use",
+      "question": "Does the policy cover damage if the private vehicle was used for commercial delivery?",
+      "expectedDecision": "NOT_COVERED",
+      "actualDecision": "NOT_COVERED",
+      "expectedRetrievedClauses": [
+        "EX-COM-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TH-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EX-ALC-001",
+        "EX-COM-001",
+        "EX-LIC-001",
+        "EX-WEAR-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8407780433167384,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": true,
+      "blockers": []
+    },
+    {
+      "questionId": "W3-COV-005",
+      "packetId": "w3-005-ambiguous-flood-damage",
+      "question": "Is this flood damage claim covered?",
+      "expectedDecision": "NEEDS_REVIEW",
+      "actualDecision": "NEEDS_REVIEW",
+      "expectedRetrievedClauses": [
+        "COV-OD-001",
+        "EV-FLD-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TH-001",
+        "EV-FLD-001",
+        "EV-TH-001",
+        "EX-ALC-001",
+        "EX-COM-001",
+        "EX-LIC-001",
+        "EX-WEAR-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8368881137638059,
+      "citationCount": 2,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": false,
+      "blockers": [
+        "Answer did not mention required missing evidence terms: [\"inspection evidence\"]."
+      ]
+    },
+    {
+      "questionId": "W3-COV-006",
+      "packetId": null,
+      "question": "Is accidental own damage covered under this policy?",
+      "expectedDecision": "COVERED",
+      "actualDecision": "COVERED",
+      "expectedRetrievedClauses": [
+        "COV-OD-001",
+        "EV-OD-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TP-001",
+        "EV-FLD-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EX-WEAR-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8373044244362561,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": true,
+      "blockers": []
+    },
+    {
+      "questionId": "W3-COV-007",
+      "packetId": null,
+      "question": "Is theft covered when police evidence is submitted?",
+      "expectedDecision": "COVERED",
+      "actualDecision": "PARTIALLY_COVERED",
+      "expectedRetrievedClauses": [
+        "COV-TH-001",
+        "EV-TH-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TH-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EV-TP-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8368881137638059,
+      "citationCount": 2,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": false,
+      "blockers": [
+        "Decision mismatch. Expected COVERED, got PARTIALLY_COVERED."
+      ]
+    },
+    {
+      "questionId": "W3-COV-008",
+      "packetId": null,
+      "question": "Is the claim covered if the driver had no valid license?",
+      "expectedDecision": "NOT_COVERED",
+      "actualDecision": "NOT_COVERED",
+      "expectedRetrievedClauses": [
+        "EX-LIC-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "EX-ALC-001",
+        "EX-COM-001",
+        "EX-LIC-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8197527420373769,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": true,
+      "blockers": []
+    },
+    {
+      "questionId": "W3-COV-009",
+      "packetId": null,
+      "question": "Is the claim covered if the driver was intoxicated?",
+      "expectedDecision": "NOT_COVERED",
+      "actualDecision": "NOT_COVERED",
+      "expectedRetrievedClauses": [
+        "EX-ALC-001"
+      ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "EX-ALC-001",
+        "EX-COM-001",
+        "EX-LIC-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8225997931540042,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
+      "falseApproval": false,
+      "passed": true,
+      "blockers": []
+    },
+    {
+      "questionId": "W3-COV-010",
+      "packetId": null,
+      "question": "Does the policy cover normal wear and tear?",
+      "expectedDecision": "NOT_COVERED",
+      "actualDecision": "NEEDS_REVIEW",
+      "expectedRetrievedClauses": [
+        "EX-WEAR-001"
+      ],
+      "retrievedClauseIds": [],
+      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
+      "retrievalReason": "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 17.984925417s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-flash\",\"location\":\"global\"},\"quotaValue\":\"20\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"17s\"}]}}",
+      "topSimilarity": null,
+      "citationCount": 0,
+      "citationSupportPassed": false,
+      "forcedNeedsReview": true,
+      "guardrailReasons": [
+        "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 17.984925417s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-flash\",\"location\":\"global\"},\"quotaValue\":\"20\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"17s\"}]}}"
+      ],
+      "falseApproval": false,
+      "passed": false,
+      "blockers": [
+        "Eval execution failed: {\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 17.984925417s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-flash\",\"location\":\"global\"},\"quotaValue\":\"20\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"17s\"}]}}"
+      ]
+    },
+    {
+      "questionId": "W3-COV-011",
+      "packetId": null,
+      "question": "Does this auto policy cover mobile phone screen damage?",
+      "expectedDecision": "NEEDS_REVIEW",
+      "actualDecision": "NEEDS_REVIEW",
+      "expectedRetrievedClauses": [],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "EX-ALC-001",
+        "EX-COM-001",
+        "EX-WEAR-001"
+      ],
+      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
+      "retrievalReason": "Only a general retrieval query was generated and top similarity 0.7054 is below stricter general-only threshold 0.8.",
+      "topSimilarity": 0.705410221057841,
+      "citationCount": 0,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": true,
+      "guardrailReasons": [
+        "Retrieval returned INSUFFICIENT_EVIDENCE, so generation was skipped.",
+        "Only a general retrieval query was generated and top similarity 0.7054 is below stricter general-only threshold 0.8."
+      ],
+      "falseApproval": false,
+      "passed": true,
+      "blockers": []
+    },
+    {
+      "questionId": "W3-COV-012",
+      "packetId": null,
+      "question": "Can the claim be approved using only a repair estimate?",
+      "expectedDecision": "NEEDS_REVIEW",
+      "actualDecision": "NEEDS_REVIEW",
+      "expectedRetrievedClauses": [
+        "LIMIT-RP-001",
+        "EV-OD-001"
+      ],
+      "retrievedClauseIds": [],
+      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
+      "retrievalReason": "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 16.144663063s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"20\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"16s\"}]}}",
+      "topSimilarity": null,
+      "citationCount": 0,
+      "citationSupportPassed": false,
+      "forcedNeedsReview": true,
+      "guardrailReasons": [
+        "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 16.144663063s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"20\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"16s\"}]}}"
+      ],
+      "falseApproval": false,
+      "passed": false,
+      "blockers": [
+        "Eval execution failed: {\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 16.144663063s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"20\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"16s\"}]}}"
+      ]
+    }
+  ]
+}
