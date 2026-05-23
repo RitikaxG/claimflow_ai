@@ -303,7 +303,7 @@ function buildReusableCoverageResponse(
     citedClauses: coverageQuestion.answerJson.citedClauses,
     missingEvidence: coverageQuestion.answerJson.missingEvidence,
     confidence: coverageQuestion.answerJson.confidence,
-    retrievalStatus: coverageQuestion.retrievalStatus,
+    retrievalStatus: coverageQuestion.retrievalStatus ?? "INSUFFICIENT_EVIDENCE",
     retrievalReason:
       typeof retrievalJson.reason === "string" ? retrievalJson.reason : "",
     queryPlan: Array.isArray(retrievalJson.queryPlan)
