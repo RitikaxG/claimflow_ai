@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@repo/db": "workspace:*",
-    "@repo/shared": "workspace:*"
+    "@repo/shared": "workspace:*",
+    "@repo/ai":"workspace:*",
+    "@repo/rag":"workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
