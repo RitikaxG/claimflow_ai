@@ -33,6 +33,47 @@ function isPlainObject(value : unknown) : value is Record<string,unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
+function normalizeCoverageQuestion(question: string) {
+  return question
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isCoverageAnswerJson(value: unknown): value is {
+  decision: string;
+  answer: string;
+  citedClauses: unknown[];
+  missingEvidence: unknown[];
+  confidence: number;
+  generation?: unknown;
+} {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return (
+    typeof record.decision === "string" &&
+    typeof record.answer === "string" &&
+    Array.isArray(record.citedClauses) &&
+    Array.isArray(record.missingEvidence) &&
+    typeof record.confidence === "number"
+  );
+}
+
+function isRetrievalJson(value: unknown): value is {
+  reason?: unknown;
+  queryPlan?: unknown;
+  matches?: unknown;
+  guardrailReasons?: unknown;
+  forcedNeedsReview?: unknown;
+} {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function validateRequestBody(body : unknown): {
     question : string
 }{
@@ -218,6 +259,83 @@ function buildClaimContext(input: {
   };
 }
 
+async function findReusableCoverageQuestion(input: {
+  runId: string;
+  normalizedQuestion: string;
+}) {
+  const existingQuestions = await prisma.coverageQuestion.findMany({
+    where: {
+      runId: input.runId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 20,
+  });
+
+  return (
+    existingQuestions.find((item) => {
+      return normalizeCoverageQuestion(item.question) === input.normalizedQuestion;
+    }) ?? null
+  );
+}
+
+function buildReusableCoverageResponse(
+  coverageQuestion: Awaited<ReturnType<typeof findReusableCoverageQuestion>>,
+) {
+  if (!coverageQuestion) {
+    return null;
+  }
+
+  if (!isCoverageAnswerJson(coverageQuestion.answerJson)) {
+    return null;
+  }
+
+  const retrievalJson = isRetrievalJson(coverageQuestion.retrievalJson)
+    ? coverageQuestion.retrievalJson
+    : {};
+
+  return {
+    coverageQuestionId: coverageQuestion.id,
+    reused: true,
+    decision: coverageQuestion.answerJson.decision,
+    answer: coverageQuestion.answerJson.answer,
+    citedClauses: coverageQuestion.answerJson.citedClauses,
+    missingEvidence: coverageQuestion.answerJson.missingEvidence,
+    confidence: coverageQuestion.answerJson.confidence,
+    retrievalStatus: coverageQuestion.retrievalStatus,
+    retrievalReason:
+      typeof retrievalJson.reason === "string" ? retrievalJson.reason : "",
+    queryPlan: Array.isArray(retrievalJson.queryPlan)
+      ? retrievalJson.queryPlan
+      : [],
+    matches: Array.isArray(retrievalJson.matches) ? retrievalJson.matches : [],
+    guardrailReasons: Array.isArray(retrievalJson.guardrailReasons)
+      ? retrievalJson.guardrailReasons
+      : [],
+    forcedNeedsReview:
+      typeof retrievalJson.forcedNeedsReview === "boolean"
+        ? retrievalJson.forcedNeedsReview
+        : false,
+    model:
+      typeof coverageQuestion.answerJson.generation === "object" &&
+      coverageQuestion.answerJson.generation !== null &&
+      "model" in coverageQuestion.answerJson.generation
+        ? (coverageQuestion.answerJson.generation as { model?: string }).model
+        : undefined,
+    promptVersion:
+      typeof coverageQuestion.answerJson.generation === "object" &&
+      coverageQuestion.answerJson.generation !== null &&
+      "promptVersion" in coverageQuestion.answerJson.generation
+        ? (
+            coverageQuestion.answerJson.generation as {
+              promptVersion?: string;
+            }
+          ).promptVersion
+        : undefined,
+  };
+}
+
 async function saveCoverageQuestion(input: {
     runId: string;
     question: string;
@@ -267,6 +385,7 @@ export async function POST(request: Request, { params } : Params ){
     try{
         const body = await request.json();
         const { question } = validateRequestBody(body);
+        const normalizedQuestion = normalizeCoverageQuestion(question);
 
         const run = await prisma.extractionRun.findUnique({
             where : {
@@ -315,10 +434,21 @@ export async function POST(request: Request, { params } : Params ){
             { status : 400 })
         }
 
+        const reusableCoverageQuestion = await findReusableCoverageQuestion({
+            runId: run.id,
+            normalizedQuestion,
+        });
+
+        const reusableResponse = buildReusableCoverageResponse(reusableCoverageQuestion);
+
+        if (reusableResponse) {
+            return NextResponse.json(reusableResponse);
+        }
+
         const retrievalResult = await retrievePolicyEvidence({
             question,
             claimContext,
-            topKFinal: 8,
+            topKFinal: 5,
         });
 
         if(retrievalResult.retrievalStatus === "INSUFFICIENT_EVIDENCE"){

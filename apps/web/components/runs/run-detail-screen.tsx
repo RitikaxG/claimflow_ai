@@ -13,6 +13,7 @@ import { MissingFieldsCard } from "./missing-fields-card";
 import { ConflictsCard } from "./conflicts-card";
 import { NeedsReviewCallout } from "./needs-review-callout";
 import { SourceDocumentCard } from "./source-document-card";
+import { RunCoverageCtaCard } from "./run-coverage-cta-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -65,6 +66,8 @@ export function RunDetailScreen() {
 
       <ConflictsCard validationJson={selectedRun.validationJson} />
 
+      <RunCoverageCtaCard runId={selectedRun.id} status={selectedRun.status} />
+      
       <RunTimeline events={selectedRun.events} />
     </div>
   );
