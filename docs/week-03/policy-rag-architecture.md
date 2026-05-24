@@ -1,22 +1,61 @@
 # Week 3 Architecture — Policy RAG + Citations
 
-## Purpose
+## What Week 3 adds
 
-Week 3 adds a policy-grounded decision-support layer to ClaimFlow AI.
+Before Week 3, ClaimFlow AI could extract a claim, validate required fields, and route risky cases to human review.
 
-Before Week 3, the system could extract a claim, validate required fields, and route risky cases to human review.
-
-Week 3 answers a new question:
+Week 3 adds a policy-grounded decision-support layer:
 
 ```txt
-Given this claim context, what does the policy say about coverage?
+reviewed or extracted claim context
++ coverage question
+→ policy retrieval query plan
+→ embedded query
+→ pgvector policy clause search
+→ retrieved policy evidence
+→ grounded answer generation
+→ citation verification
+→ CoverageQuestion stored
 ```
 
 The system should not answer from model memory. It should retrieve policy evidence, generate a grounded answer, verify citations, and refuse when evidence is weak.
 
+This is the central Week 3 RAG system doc. The proof screenshots and product demo evidence are kept here instead of being repeated across the sample-data, ship-log, and bug-fix docs.
+
+Demo: https://x.com/RitikaxG/status/2058472008296583510?s=20
+
 ---
 
-## High-level flow
+## 1. Dataset preparation and DB schema updation
+
+Week 3 starts with a controlled policy dataset:
+
+[Week 03 — Policy RAG + Citations Dataset](https://github.com/RitikaxG/claimflow_ai/blob/main/sample-data/week-03-policy-rag/README.md)
+
+The database was extended so RAG evidence is stored as first-class workflow state, not temporary model context.
+
+```txt
+PolicyDocument = one source policy file
+PolicyChunk = one retrievable policy clause
+CoverageQuestion = one user question asked against an extraction run
+```
+
+The existing claim workflow stays connected:
+
+```txt
+Document
+→ ExtractionRun
+→ CoverageQuestion
+→ retrieved policy clauses
+→ grounded answer
+→ final decision
+```
+
+![Week 3 DB design schema](./images/db-schema.png)
+
+---
+
+## 2. High-level flow
 
 ```txt
 policy markdown documents
@@ -40,7 +79,7 @@ The RAG system is a separate decision layer. It does not replace extraction, val
 
 ---
 
-## Source-of-truth policy corpus
+## 3. Source-of-truth policy corpus
 
 Week 3 uses synthetic auto-insurance policy markdown as the deterministic source of truth.
 
@@ -74,7 +113,34 @@ Stable clause IDs are important because ClaimFlow is an audit-heavy workflow. A 
 
 ---
 
-## Policy parsing
+## 4. Policy loading
+
+Policy markdown is loaded into Postgres with an idempotent loader.
+
+```bash
+bun run rag:load-policies
+```
+
+Loader behavior:
+
+```txt
+read policy markdown files
+→ parse policy metadata + clauses
+→ compute content hash
+→ upsert PolicyDocument by sourcePath
+→ skip unchanged documents
+→ rebuild chunks when content changes or force reload is enabled
+```
+
+![Policies loaded](./images/load-policies.png)
+
+Policy documents and policy chunks are visible in Prisma Studio after loading.
+
+![Policy chunks table populated](./images/policy-chunks-table-populated.png)
+
+---
+
+## 5. Policy parsing
 
 Each policy markdown file contains:
 
@@ -119,7 +185,7 @@ text: full clause text including heading
 
 ---
 
-## Chunking strategy
+## 6. Chunking strategy
 
 Week 3 uses clause-based chunking.
 
@@ -141,7 +207,7 @@ This also makes evals easier because expected retrieval can be defined as requir
 
 ---
 
-## Embedding strategy
+## 7. Embedding strategy
 
 The system embeds policy chunks and user queries differently.
 
@@ -167,9 +233,17 @@ The user question is formatted as a question-answering query.
 
 The embeddings are 768-dimensional and stored in Postgres using pgvector.
 
+```bash
+bun run rag:embed-policies
+```
+
+![Embeddings created for all policy chunks](./images/embed-policies.png)
+
+![Embeddings stored in pgvector](./images/embeddings-stored-in-pg.png)
+
 ---
 
-## Vector storage and search
+## 8. Vector storage and search
 
 Policy chunks are stored as database rows with their embeddings.
 
@@ -188,11 +262,19 @@ similarity score
 source query intent
 ```
 
-The similarity score is used for retrieval debugging and thresholding.
+The first vector smoke test verifies that a natural-language question retrieves relevant policy clauses:
+
+```bash
+bun --filter @repo/rag smoke:vector-search "Is theft claim ready for approval if FIR number is missing?"
+```
+
+![Vector search smoke test](./images/policy-retrieved.png)
+
+The early result proved vector search was working, while also showing that plain vector search alone is not enough for final answer quality.
 
 ---
 
-## Claim-aware query planning
+## 9. Claim-aware query planning
 
 The system does not embed only the raw user question.
 
@@ -242,7 +324,7 @@ Is a repair estimate above the approval threshold?
 
 ---
 
-## Retrieval intents
+## 10. Retrieval intents
 
 The retrieval planner uses intent labels to make retrieval explainable.
 
@@ -262,7 +344,7 @@ They help the system search for the right type of policy evidence.
 
 ---
 
-## Multi-query retrieval
+## 11. Multi-query retrieval
 
 Each planned query is embedded and searched separately.
 
@@ -278,9 +360,17 @@ The raw retrieval results may contain duplicates because the same clause can be 
 
 For example, a theft evidence clause may appear for both the general query and the evidence query.
 
+The policy retrieval smoke test runs the higher-level retrieval stack:
+
+```bash
+bun --env-file packages/db/.env packages/rag/smoke-test-policy-retrieval.ts "Is this theft claim ready for approval if FIR number is missing"
+```
+
+![Policy retrieval smoke test output](./images/policy-retrieved.png)
+
 ---
 
-## Retrieval merge and ranking
+## 12. Retrieval merge and ranking
 
 After retrieval, duplicate chunks are merged.
 
@@ -307,7 +397,7 @@ That makes failures easier to debug.
 
 ---
 
-## Retrieval thresholding
+## 13. Retrieval thresholding
 
 Before generation, the system checks whether retrieval is strong enough.
 
@@ -334,7 +424,41 @@ This prevents the model from filling gaps with general insurance knowledge.
 
 ---
 
-## Reviewed claim context precedence
+## 14. Retrieval smoke case suite
+
+The retrieval case suite checks supported and unsupported scenarios.
+
+From `packages/rag`:
+
+```bash
+bun --env-file ../db/.env scripts/smoke-test-retrieval-cases.ts
+```
+
+The runner checks cases such as:
+
+```txt
+theft missing FIR
+third-party documents
+commercial use exclusion
+invalid license exclusion
+repair estimate approval limit
+flood evidence
+unsupported racing-performance question
+```
+
+The important edge behavior is:
+
+```txt
+unsupported questions should return INSUFFICIENT_EVIDENCE
+```
+
+![Smoke retrieval cases 1](./images/smoke-test-retrievel-cases-1.png)
+
+![Smoke retrieval cases 2](./images/smoke-test-retrieval-cases-2.png)
+
+---
+
+## 15. Reviewed claim context precedence
 
 Coverage answering should use the best available claim context.
 
@@ -361,7 +485,7 @@ This keeps Week 3 connected to Week 2's human-in-the-loop workflow.
 
 ---
 
-## Grounded answer generation
+## 16. Grounded answer generation
 
 After retrieval succeeds, the model receives only:
 
@@ -396,7 +520,7 @@ The generated answer is still treated as untrusted until verified.
 
 ---
 
-## Citation verification
+## 17. Citation verification
 
 The system validates every citation after generation.
 
@@ -422,7 +546,7 @@ A `COVERED` answer requires coverage-oriented evidence. Evidence-only or exclusi
 
 ---
 
-## Persistence model
+## 18. Persistence model
 
 Each coverage question is saved as a traceable decision record.
 
@@ -450,7 +574,31 @@ future governance and observability work
 
 ---
 
-## Retrieval strategies used in Week 3
+## 19. Product surface added in Week 3
+
+Week 3 adds a coverage entry point on the extraction run page.
+
+![Coverage section added to run page](./images/coverage-screen-on-run.png)
+
+The user opens the coverage page and asks a claim-specific coverage question.
+
+![Coverage question page](./images/coverage-page-1.png)
+
+The system runs retrieval, generates a policy-grounded answer, verifies citations, persists the result, and can reuse the saved answer for the same normalized question.
+
+![Coverage decision result](./images/coverage-page-2.png)
+
+The UI shows exact policy clauses cited by the answer.
+
+![Policy evidence used](./images/coverage-page-3.png)
+
+The retrieval trace exposes the retrieved chunks, similarity scores, retrieval intents, and citation status used for debugging.
+
+![Supporting retrieval trace](./images/coverage-page-4.png)
+
+---
+
+## 20. Retrieval strategies used in Week 3
 
 Week 3 uses a simple but real retrieval stack:
 
@@ -485,41 +633,7 @@ Those are later improvements. Week 3 focuses on a manual, inspectable RAG pipeli
 
 ---
 
-## Smoke test behavior
-
-The retrieval smoke test asks a theft/FIR question.
-
-Expected behavior:
-
-```txt
-retrieve theft evidence requirement
-retrieve theft coverage clause
-return ENOUGH_EVIDENCE
-```
-
-The edge-case retrieval runner checks cases such as:
-
-```txt
-theft missing FIR
-third-party documents
-commercial use exclusion
-invalid license exclusion
-repair estimate approval limit
-flood evidence
-unsupported racing-performance question
-```
-
-The important edge behavior is:
-
-```txt
-unsupported questions should return INSUFFICIENT_EVIDENCE
-```
-
-That is the safety behavior the RAG layer is designed to enforce.
-
----
-
-## Eval design
+## 21. Eval design
 
 The Week 3 eval checks both retrieval and answer behavior.
 

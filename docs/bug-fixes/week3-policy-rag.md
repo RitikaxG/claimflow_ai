@@ -2,6 +2,8 @@
 
 Week 3 introduced a new policy RAG subsystem. These are the main bugs and failure cases handled while moving from policy ingestion to grounded answer generation.
 
+Proof screenshots are centralized in `docs/week-03/policy-rag-architecture.md`. This bug-fix doc keeps only the failure, fix, and why-it-matters notes.
+
 ---
 
 ## 1. Postgres did not know the `vector` type
@@ -30,6 +32,8 @@ Postgres
 + policy_chunks.embedding vector(768)
 ```
 
+Final DB design after pgvector and Week 3 RAG tables:
+
 ### Why it matters
 
 RAG depends on vector storage and cosine similarity search. Without pgvector, the project would either fail at migration time or fall back to fake in-memory similarity.
@@ -55,6 +59,10 @@ same sourcePath + same contentHash → skip
 same sourcePath + changed contentHash → rebuild chunks
 force reload enabled → rebuild chunks
 ```
+
+Policy loader output after successful idempotent load:
+
+Policy document/chunk rows are visible in the database after loading.
 
 ### Why it matters
 
@@ -134,6 +142,10 @@ assert every value is finite
 serialize as [v1,v2,v3,...]
 ```
 
+Policy chunks embedded successfully:
+
+The embeddings are stored in Postgres beside each policy chunk.
+
 ### Why it matters
 
 This prevents invalid model output or formatting mistakes from corrupting the vector column.
@@ -166,6 +178,12 @@ query plan:
 general  → Is this claim covered?
 evidence → theft FIR police report required evidence
 coverage → theft stolen vehicle coverage reported to police
+```
+
+The first vector smoke test proved vector search worked, but also showed plain vector search alone was not enough for final retrieval quality:
+
+```bash
+bun --filter @repo/rag smoke:vector-search "Is theft claim ready for approval if FIR number is missing?"
 ```
 
 ### Why it matters
@@ -201,6 +219,12 @@ store all matched queries
 store bestIntent from strongest match
 ```
 
+The higher-level retrieval smoke test verifies query planning, dedupe, and match ranking:
+
+```bash
+bun --env-file packages/db/.env packages/rag/smoke-test-policy-retrieval.ts "Is this theft claim ready for approval if FIR number is missing"
+```
+
 ### Why it matters
 
 The answer prompt receives a clean evidence set while still preserving retrieval traceability.
@@ -230,6 +254,12 @@ Rule:
 ```txt
 only general query + top similarity below stricter threshold
 → INSUFFICIENT_EVIDENCE
+```
+
+The retrieval case suite verifies supported and unsupported cases:
+
+```bash
+bun --env-file ../db/.env scripts/smoke-test-retrieval-cases.ts
 ```
 
 ### Why it matters
@@ -315,6 +345,8 @@ Invalid citations are removed.
 
 If no valid citations remain, the answer is forced to `NEEDS_REVIEW`.
 
+The UI now shows both the cited evidence and the supporting retrieval trace:
+
 ### Why it matters
 
 Citations are evidence, not decoration. They must be mechanically checkable.
@@ -339,6 +371,8 @@ If not, force:
 NEEDS_REVIEW
 ```
 
+The coverage page shows the final decision, retrieval status, confidence, citations, and trace.
+
 ### Why it matters
 
 False approval is the most important failure mode to prevent.
@@ -357,13 +391,35 @@ This is costly and unstable during API-limit-constrained testing.
 
 Normalize the user question and reuse a previously stored coverage answer for the same run when possible.
 
+The coverage page exposes this behavior after saving an answer.
+
 ### Why it matters
 
 The system becomes more deterministic and avoids unnecessary API calls.
 
 ---
 
-## 14. Full answer-generation eval can be blocked by API limits
+## 14. Coverage UI needed to stay connected to the run context
+
+### Problem
+
+A generic coverage page would become a chatbot and lose the claim context.
+
+Week 3 needed the coverage question to be tied to a specific extraction run.
+
+### Fix
+
+The run detail page now includes a coverage section that opens a claim-specific coverage page.
+
+The coverage page uses the current extraction run, document metadata, schema version, extracted or corrected claim context, and retrieved policy clauses.
+
+### Why it matters
+
+RAG is part of the ClaimFlow workflow, not a separate generic policy chatbot.
+
+---
+
+## 15. Full answer-generation eval can be blocked by API limits
 
 ### Problem
 
