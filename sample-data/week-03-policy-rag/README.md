@@ -1,25 +1,25 @@
-# Week 03 — Policy RAG + Citations Failure Dataset
+# Week 03 — Policy RAG + Citations Dataset
 
 This dataset tests whether ClaimFlow AI can answer claim coverage questions using retrieved policy clauses with citations.
 
 Week 3 is not a generic chatbot. It is a policy-grounded decision-support layer:
 
 ```txt
-Claim context
+claim context
 + coverage question
 + retrieved policy clauses
 → cited coverage answer
-→ NEEDS_REVIEW / refusal when evidence is missing
+→ NEEDS_REVIEW / refusal when evidence is missing or retrieval is weak
 ```
 
 ## Dataset goal
 
 The dataset checks whether the system can:
 
-- retrieve the correct policy clause
-- cite the retrieved clause in the answer
-- avoid unsupported approval
-- return `NEEDS_REVIEW` when evidence is missing
+- retrieve the correct policy clauses
+- cite the retrieved clauses in the answer
+- avoid unsupported approvals
+- return `NEEDS_REVIEW` when required claim evidence is missing
 - refuse or mark insufficient evidence when no policy clause supports the question
 - produce eval evidence for retrieval, citation, and decision quality
 
@@ -69,24 +69,25 @@ sample-data/week-03-policy-rag/
     answers.expected.json
 
   eval-results/
-    .gitkeep
+    week-3-policy-rag-eval.md
+    week-3-policy-rag-eval.json
 ```
 
 ## How to read this dataset
 
 ```txt
-policies/      = source documents for RAG
+policies/      = source policy documents for RAG
 questions/     = eval questions
 packets/       = synthetic claim contexts
 expected/      = global eval rules
 eval-results/  = generated eval reports
 ```
 
-## `policies/`
+## Policy corpus
 
 The `policies/` folder is the RAG knowledge base.
 
-These files are ingested, chunked, embedded, and retrieved during Week 3.
+These files are ingested, parsed, chunked, embedded, and retrieved during Week 3.
 
 ### `auto-policy-synthetic-01.md`
 
@@ -116,7 +117,7 @@ EX-COM-001    Commercial use exclusion
 EX-WEAR-001   Wear and tear exclusion
 ```
 
-Used to test `NOT_COVERED` decisions.
+Used to test `NOT_COVERED` decisions and false-approval prevention.
 
 ### `auto-policy-synthetic-03-evidence.md`
 
@@ -137,7 +138,78 @@ Used to test `NEEDS_REVIEW` decisions when evidence is incomplete.
 
 Placeholder for public policy PDFs or links.
 
-Public policy documents are anchor/reference material only for now. They are not the deterministic source of truth for the first eval.
+Public policy documents are anchor/reference material only for now. They are not the deterministic source of truth for the first RAG eval and should not be ingested as eval policy chunks yet.
+
+## Chunking contract
+
+Week 3 uses clause-based chunking.
+
+```txt
+one policy clause = one retrievable chunk
+```
+
+Each retrieved chunk should preserve:
+
+```txt
+clauseId
+sectionTitle
+policyTitle
+full clause text
+tokenCount
+```
+
+This makes answer citations stable and auditable.
+
+## Embedding + retrieval contract
+
+Policy chunks are embedded as policy text.
+
+Questions are embedded as question-answering queries.
+
+Expected retrieval flow:
+
+```txt
+coverage question
++ claim context
+→ focused query plan
+→ vector search
+→ merged policy chunks
+→ retrieval status
+```
+
+Retrieval can return:
+
+```txt
+ENOUGH_EVIDENCE
+INSUFFICIENT_EVIDENCE
+```
+
+The system should not generate a coverage answer when retrieval is insufficient.
+
+## Retrieval strategies tested
+
+The dataset is designed around these retrieval strategies:
+
+```txt
+clause-based chunking
+claim-aware query expansion
+multi-query retrieval
+intent-labeled retrieval
+vector similarity ranking
+duplicate chunk merging
+similarity thresholds
+general-only stricter threshold
+```
+
+Supported retrieval intents:
+
+```txt
+general
+coverage
+evidence
+exclusion
+limit
+```
 
 ## `questions/coverage-questions.json`
 
@@ -164,7 +236,7 @@ Important fields:
 - `packetId`: claim context to use, if any
 - `question`: user-facing coverage question
 - `expectedRetrievedClauses`: clauses retrieval should find
-- `expectedAnswerType`: expected decision
+- `expectedAnswerType`: expected final decision
 - `expectedCitationRequired`: whether citations are required
 - `expectedRefusal`: whether insufficient evidence/refusal is expected
 - `falseApprovalAllowed`: should be `false` for safety-critical cases
@@ -298,14 +370,15 @@ Defines retrieval success.
 Main rule:
 
 ```txt
-A question passes retrieval if all expectedRetrievedClauses appear in topK retrieved chunks.
+A question passes retrieval if all expectedRetrievedClauses appear in the retrieved chunks.
 ```
 
-Default settings:
+Default expectations:
 
 ```txt
-topK = 5
-minSimilarity = 0.72
+topK = 5 or 8 depending on runner
+required clause IDs must appear in retrievedClauseIds
+unsupported questions should not force a confident answer
 ```
 
 ### `answers.expected.json`
@@ -317,6 +390,7 @@ Main rules:
 ```txt
 Every non-refusal answer must include at least one citation.
 Each citation must refer to a retrieved chunk.
+Each cited quote must exist in the retrieved chunk text.
 A COVERED answer is invalid if required evidence is missing.
 A NOT_COVERED answer must cite an exclusion clause.
 Unsupported policy questions must return NEEDS_REVIEW or refusal.
@@ -327,21 +401,28 @@ false_approval_rate must be 0.
 
 Stores generated reports.
 
-Expected output later:
+Expected output:
 
 ```txt
 week-3-policy-rag-eval.md
 week-3-policy-rag-eval.json
 ```
 
+Current note:
+
+```txt
+Full answer-generation eval should be re-run after Gemini API quota refresh.
+Do not mark Week 3 eval as final until the report is regenerated from a successful run.
+```
+
 ## Eval metrics
 
 ```txt
 retrieval_hit_rate
+coverage_decision_match_rate
 citation_present_rate
 citation_support_rate
-unsupported_answer_rate
-coverage_decision_match_rate
+unsupported_refusal_rate
 false_approval_rate
 ```
 
@@ -349,6 +430,27 @@ Most important metric:
 
 ```txt
 false_approval_rate = 0
+```
+
+## How to run Week 3 setup + eval
+
+From the repo root:
+
+```bash
+bun run rag:load-policies
+bun run rag:embed-policies
+bun run rag:smoke:retrieval-cases
+bun run eval:week3:rag
+```
+
+Recommended order:
+
+```txt
+1. Load policies
+2. Embed policy chunks
+3. Run retrieval smoke cases
+4. Run full Week 3 RAG eval after API quota is available
+5. Commit eval-results markdown + JSON reports
 ```
 
 ## What this dataset is not

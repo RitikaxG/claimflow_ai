@@ -10,6 +10,7 @@ The project should not only ship UI demos. Each week should also leave behind a 
 |---|---|---|---|
 | Week 1 | Extraction + validation eval | `sample-data/auto-insurance/v1` | Gemini output can be compared against gold extraction JSON, and deterministic validation produces expected `COMPLETED` / `NEEDS_REVIEW` behavior |
 | Week 2 | Review workflow eval | `sample-data/week-02-review-failures` | Bad or incomplete AI output is routed into human review instead of silently completing or breaking the app |
+| Week 3 | Policy RAG + citations eval | `sample-data/week-03-policy-rag` | Coverage questions retrieve required policy clauses, cite only retrieved evidence, refuse weak evidence, and avoid false approvals |
 
 ## Eval artifacts
 
@@ -17,6 +18,7 @@ The project should not only ship UI demos. Each week should also leave behind a 
 |---|---|---|
 | Week 1 | `sample-data/auto-insurance/v1/eval-results/week-1-eval.md` | `sample-data/auto-insurance/v1/eval-results/week-1-eval.json` |
 | Week 2 | `sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.md` | `sample-data/week-02-review-failures/eval-results/week-2-review-workflow-eval.json` |
+| Week 3 | `sample-data/week-03-policy-rag/eval-results/week-3-policy-rag-eval.md` | `sample-data/week-03-policy-rag/eval-results/week-3-policy-rag-eval.json` |
 
 Markdown reports are for human review and documentation.
 
@@ -30,7 +32,17 @@ From the repo root:
 bun run eval:week1:export
 bun run eval:week1
 bun run eval:week2:review
+bun run rag:load-policies
+bun run rag:embed-policies
+bun run rag:smoke:retrieval-cases
+bun run eval:week3:rag
 ```
+
+Week 1 checks extraction and validation behavior.
+
+Week 2 checks whether bad, incomplete, low-confidence, duplicate, failed, or human-decision packets move through the correct workflow states.
+
+Week 3 checks whether coverage answers are grounded in retrieved policy clauses and safely refuse unsupported answers.
 
 ## Week 1 eval: extraction + validation
 
@@ -80,7 +92,6 @@ bad / incomplete / duplicate / failed / review-decision packet
 → assert database state
 ```
 
-
 ![Week 2 Eval Result](../sample-data/images/eval-results-week2.png)
 
 Current result:
@@ -103,6 +114,56 @@ What it measures:
 - duplicate upload behavior
 - extraction failure behavior
 
+## Week 3 eval: policy RAG + citations
+
+Goal:
+
+```txt
+claim context
++ coverage question
+→ query planning
+→ policy clause retrieval
+→ grounded answer generation
+→ citation verification
+→ compare against expected retrieval and decision behavior
+```
+
+Current status:
+
+- Retrieval smoke tests are implemented.
+- The full answer-generation eval should be re-run after Gemini API quota refresh.
+- Until the final rerun is complete, treat Week 3 eval status as pending final confirmation.
+
+What it measures:
+
+- required policy clauses retrieved
+- expected decision matched
+- citations present when required
+- citations point only to retrieved chunks
+- cited quotes exist in retrieved policy text
+- unsupported questions return `NEEDS_REVIEW` / insufficient evidence
+- missing evidence is mentioned when required
+- false approval rate stays at `0%`
+
+Important Week 3 metrics:
+
+```txt
+retrieval_hit_rate
+coverage_decision_match_rate
+citation_present_rate
+citation_support_rate
+unsupported_refusal_rate
+false_approval_rate
+```
+
+Most important safety metric:
+
+```txt
+false_approval_rate = 0
+```
+
+A false approval means the system returned `COVERED` when the expected safe answer was not `COVERED`.
+
 ## Why evals matter for this project
 
 ClaimFlow AI is a workflow reliability project, not just a prompt demo.
@@ -116,16 +177,15 @@ Did the model extract JSON?
 The stronger question is:
 
 ```txt
-When the model is wrong, incomplete, uncertain, or blocked, does the system move safely into the right product state?
+When the model is wrong, incomplete, uncertain, unsupported, or blocked, does the system move safely into the right product state?
 ```
 
-That is why the evals include workflow assertions, not only model-output assertions.
+That is why the evals include workflow assertions, retrieval assertions, citation assertions, and final-state assertions.
 
 ## How evals should grow in future weeks
 
 | Future week | Eval direction |
 |---|---|
-| Week 3 — RAG | Answer correctness, citation presence, citation support, refusal when policy evidence is missing |
 | Week 4 — agentic workflow | Tool-selection correctness, guardrail behavior, invalid-action blocking, final-state correctness |
 | Week 5 — memory | Whether past human corrections are reused safely without overwriting source-of-truth evidence |
 | Week 6 — gateway + observability | Eval dashboard, latency/cost/error metrics, prompt/model version tracking |
@@ -150,12 +210,12 @@ Every eval should answer four questions:
 
 ## Current status
 
-Week 1 and Week 2 now both have committed eval reports.
+Week 1 and Week 2 have committed eval reports.
 
-That means the project can move into Week 3 RAG with a stronger foundation:
+Week 3 has the RAG eval script and report paths ready. The final full answer-generation eval should be re-run after API quota refresh.
 
 ```txt
 Week 1: Can extract and validate claim data.
 Week 2: Can route unsafe AI output into human review.
-Week 3: Can answer policy-grounded questions with citations.
+Week 3: Can retrieve policy evidence and generate cited coverage answers, with final eval rerun pending.
 ```
