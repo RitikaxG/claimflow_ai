@@ -57,6 +57,12 @@ Document
 
 ## 2. High-level flow
 
+The diagram below shows the raw RAG workflow for claims: how claim context, policy chunks, retrieval checks, grounded answer generation, citation verification, and persistence connect in one runtime path.
+
+![ClaimFlow AI — RAG workflow for claims](./images/rag-workflow.png)
+
+The same flow in text form:
+
 ```txt
 policy markdown documents
 → metadata parsing
