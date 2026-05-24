@@ -1,136 +1,243 @@
 # ClaimFlow AI Sample Data
 
-This folder contains the synthetic and public sample data used to test ClaimFlow AI across the 8-week build.
+This folder is the dataset + evaluation workspace for ClaimFlow AI.
 
-The sample-data folder should now be treated as a growing evaluation workspace, not as a Week 1-only dataset. Each week can add its own dataset, gold expectations, actual outputs, and eval results.
+Each week adds a small, controlled dataset that tests one new system capability:
 
-## Current datasets
+```txt
+Week 1 → extraction + validation failures
+Week 2 → human review workflow failures
+Week 3 → policy RAG + citation failures
+Future weeks → agent, memory, gateway, repo assistant, tuning-decision failures
+```
 
-| Week | Dataset | Purpose | Eval results |
-|---|---|---|---|
-| Week 1 | [`auto-insurance/v1`](./auto-insurance/v1) | Auto insurance document extraction + deterministic validation | [`auto-insurance/v1/eval-results`](./auto-insurance/v1/eval-results) |
-| Week 2 | [`week-02-review-failures`](./week-02-review-failures) | Human-review routing, failure handling, review decisions, and workflow-state correctness | [`week-02-review-failures/eval-results`](./week-02-review-failures/eval-results) |
-| Week 3 | [`week-03-policy-rag`](./week-03-policy-rag) | Policy clause retrieval, grounded coverage answers, citations, insufficient-evidence refusal, and false-approval prevention | [`week-03-policy-rag/eval-results`](./week-03-policy-rag/eval-results) |
+The goal is not to collect random sample files.
 
-## Folder contract
+The goal is to grow a repeatable failure dataset that proves ClaimFlow AI behaves safely when model output is incomplete, uncertain, unsupported, or wrong.
 
-Each dataset should own its own README and, when relevant, these folders:
+---
+
+## Dataset lookup
+
+| Week | Dataset | Failure surface added | What it proves | Eval command | Eval reports |
+| --- | --- | --- | --- | --- | --- |
+| Week 1 | [`auto-insurance/v1`](./auto-insurance/v1) | Missing fields, extraction mismatch, invalid or partial claim data, required evidence gaps | Claim documents can be extracted into structured JSON and validated deterministically | `bun run eval:week1:export` + `bun run eval:week1` | [`week-1-eval.md`](./auto-insurance/v1/eval-results/week-1-eval.md), [`week-1-eval.json`](./auto-insurance/v1/eval-results/week-1-eval.json) |
+| Week 2 | [`week-02-review-failures`](./week-02-review-failures) | Low-confidence extraction, duplicate uploads, unreadable files, missing evidence, bad workflow states, reviewer decisions | Unsafe or incomplete AI output is routed into human review instead of silently completing | `bun run eval:week2:review` | [`week-2-review-workflow-eval.md`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.md), [`week-2-review-workflow-eval.json`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.json) |
+| Week 3 | [`week-03-policy-rag`](./week-03-policy-rag) | Wrong policy retrieval, missing citations, unsupported coverage answers, false approvals, weak retrieval evidence | Coverage answers are grounded in retrieved policy clauses and refuse or route to review when evidence is insufficient | `bun run rag:load-policies`, `bun run rag:embed-policies`, `bun run rag:smoke:retrieval-cases`, `bun run eval:week3:rag` | [`week-3-policy-rag-eval.md`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.md), [`week-3-policy-rag-eval.json`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.json) |
+
+---
+
+## How the failure dataset expands week by week
+
+ClaimFlow AI is built as a layered AI workflow.
+
+Each week adds a new failure class to test.
+
+```txt
+Week 1:
+Can the system extract and validate claim data?
+
+Week 2:
+When extraction or validation is unsafe, can the system route to human review?
+
+Week 3:
+When answering coverage questions, can the system retrieve policy evidence, cite it, and refuse unsupported answers?
+
+Week 4:
+When an agent chooses an action, can the system block unsafe or invalid tool calls?
+
+Week 5:
+When memory is introduced, can the system reuse past corrections safely without overwriting source-of-truth evidence?
+
+Week 6:
+When gateway + observability are introduced, can the system track prompt, model, version, cost, and error behavior?
+
+Week 7:
+When repo-assistant behavior is introduced, can the system retrieve repo context and avoid unsafe terminal actions?
+
+Week 8:
+When fine-tuning is considered, can the system decide based on evidence whether RAG, rules, memory, or tuning is the right next move?
+```
+
+---
+
+## Current evaluation layers
+
+| Layer | Dataset | Checks |
+| --- | --- | --- |
+| Extraction eval | `auto-insurance/v1` | schema validity, field match, missing fields, required evidence, final validation status |
+| Review workflow eval | `week-02-review-failures` | review task creation, review status transitions, review decisions, review events, duplicate/failure handling |
+| Policy RAG eval | `week-03-policy-rag` | required clause retrieval, decision correctness, citation presence, citation support, unsupported-answer refusal, false approval rate |
+
+---
+
+## Dataset folder contract
+
+Each weekly dataset should own its own README and evaluation outputs.
+
+Recommended structure:
 
 ```txt
 sample-data/
   <dataset-name>/
     README.md
+
     source-docs/ or policies/ or packets/
+      ...
+
+    expected/ or gold/
+      ...
+
     questions/
-    expected-extractions/ or expected/ or gold/
-    expected-validations/ or expected/ or gold/
-    actual-extractions/
-    actual-validations/
+      ...
+
     eval-results/
+      <eval-name>.md
+      <eval-name>.json
 ```
 
-Use this pattern so future weeks can add RAG, memory, gateway, agent, and fine-tuning decision datasets without mixing responsibilities.
+The root `sample-data/README.md` is only the lookup/index.
 
-## Evaluation artifacts
+Detailed explanations belong inside each dataset README.
 
-Eval outputs should be committed in two forms:
+---
+
+## Evaluation artifact contract
+
+Every eval should produce two report formats:
 
 ```txt
-eval-results/*.md    # human-readable report for docs/review
-eval-results/*.json  # machine-readable result for future dashboards/regression checks
+eval-results/*.md
+eval-results/*.json
 ```
 
-Current eval reports:
+Markdown reports are for human review.
 
-- Week 1: [`auto-insurance/v1/eval-results/week-1-eval.md`](./auto-insurance/v1/eval-results/week-1-eval.md)
-- Week 1 JSON: [`auto-insurance/v1/eval-results/week-1-eval.json`](./auto-insurance/v1/eval-results/week-1-eval.json)
-- Week 2: [`week-02-review-failures/eval-results/week-2-review-workflow-eval.md`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.md)
-- Week 2 JSON: [`week-02-review-failures/eval-results/week-2-review-workflow-eval.json`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.json)
-- Week 3: [`week-03-policy-rag/eval-results/week-3-policy-rag-eval.md`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.md)
-- Week 3 JSON: [`week-03-policy-rag/eval-results/week-3-policy-rag-eval.json`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.json)
+JSON reports are for future regression checks, dashboards, CI gates, and observability.
 
-## Current domain
+---
 
-Auto insurance claim intake.
-
-## Why synthetic data exists
-
-Synthetic data gives ClaimFlow AI stable, repeatable, safe examples without exposing real customer information.
-
-Synthetic data is especially useful for this project because every packet can define:
-
-```txt
-input document
-expected extraction
-expected validation
-expected workflow state
-expected review task behavior
-expected human decision behavior
-expected policy clauses
-expected coverage answer behavior
-expected refusal behavior
-```
-
-That makes failures easier to debug than with uncontrolled public documents.
-
-## Week 3 policy RAG dataset
-
-Week 3 adds a deterministic RAG dataset:
-
-```txt
-sample-data/week-03-policy-rag/
-```
-
-It contains:
-
-```txt
-policies/      synthetic policy markdown used as the RAG knowledge base
-questions/     coverage eval questions
-packets/       claim contexts that simulate extraction/review output
-expected/      retrieval and answer quality expectations
-eval-results/  generated eval reports
-```
-
-The Week 3 dataset is designed to test:
-
-```txt
-policy clause retrieval
-citation presence
-citation support
-coverage decision correctness
-unsupported answer refusal
-false approval prevention
-```
-
-## How to run current evals
+## Current eval commands
 
 From the repo root:
 
 ```bash
 bun run eval:week1:export
 bun run eval:week1
+
 bun run eval:week2:review
+
 bun run rag:load-policies
 bun run rag:embed-policies
 bun run rag:smoke:retrieval-cases
 bun run eval:week3:rag
 ```
 
-Week 1 checks extraction and validation behavior.
+---
 
-Week 2 checks whether bad, incomplete, low-confidence, duplicate, failed, or human-decision packets move through the correct workflow states.
+## What each week proved
 
-Week 3 checks whether policy coverage answers are grounded in retrieved clauses and safely refuse insufficient evidence.
+### Week 1 — Extraction + validation
 
-## Safety
+Proved:
+
+```txt
+raw claim document
+→ AI extraction
+→ structured JSON
+→ deterministic validation
+→ COMPLETED or NEEDS_REVIEW
+```
+
+Main safety property:
+
+```txt
+Incomplete claim data should not be treated as clean.
+```
+
+---
+
+### Week 2 — Human review workflow
+
+Proved:
+
+```txt
+bad / incomplete / low-confidence AI output
+→ ReviewTask
+→ reviewer action
+→ ReviewDecision
+→ ReviewEvent audit trail
+```
+
+Main safety property:
+
+```txt
+Unsafe AI output creates human work instead of silently passing.
+```
+
+---
+
+### Week 3 — Policy RAG + citations
+
+Proved:
+
+```txt
+claim context
++ coverage question
+→ policy retrieval
+→ grounded answer
+→ citation verification
+→ COVERED / NOT_COVERED / PARTIALLY_COVERED / NEEDS_REVIEW
+```
+
+Main safety property:
+
+```txt
+Coverage answers must be supported by retrieved policy clauses.
+Unsupported or weakly grounded answers must not become approvals.
+```
+
+---
+
+## Most important regression metrics
+
+Across weeks, the most important safety metrics are:
+
+```txt
+false_completion_rate = 0
+false_approval_rate = 0
+unsupported_answer_rate = 0
+citation_support_rate should stay high once RAG is introduced
+review_routing_accuracy should stay high after Week 2
+```
+
+For this project, a flashy demo is not enough.
+
+A feature is only considered shipped when it has:
+
+```txt
+dataset
+expected behavior
+repeatable eval
+human-readable report
+machine-readable report
+```
+
+---
+
+## Safety rules for sample data
 
 Do not commit:
 
-- private customer claim documents
-- real policy numbers
-- real phone numbers or emails
-- private insurance data
-- API keys
-- large raw datasets
+```txt
+private customer claim documents
+real policy numbers
+real phone numbers or emails
+private insurance data
+API keys
+large raw datasets
+```
 
-All committed synthetic packet IDs, claim IDs, emails, phone numbers, and policy documents should stay fake and stable for repeatable workflow testing.
+All committed claim IDs, policy numbers, names, emails, and phone numbers should stay fake and stable.
+
+Synthetic data is intentional because it makes failure cases repeatable and safe to debug.
