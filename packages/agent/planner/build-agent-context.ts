@@ -28,7 +28,7 @@ function getBooleanFromMetadata(value : unknown, key : string): boolean {
         return false;
     }
 
-    return value[key] === "true";
+    return value[key] === true;
 }
 
 function getDuplicateSignals(
@@ -80,7 +80,7 @@ export async function buildAgentContext(
             },
             events : {
                 orderBy : {
-                    createdAt : "desc"
+                    createdAt : "asc"
                 }
             },
             agentActionLogs : {

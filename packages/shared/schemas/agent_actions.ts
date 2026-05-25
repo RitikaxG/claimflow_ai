@@ -22,7 +22,7 @@ export const AgentActionStatusSchema = z.enum([
 
 export const GuardrailDecisionSchema = z.enum([
     "ALLOWED",
-    "BLCOKED"
+    "BLOCKED"
 ]);
 
 export const ClaimStateForAgentSchema = z.object({
@@ -46,7 +46,7 @@ export const ClaimStateForAgentSchema = z.object({
     duplicateSignals: z.array(z.string()),
     documentMismatchSignals: z.array(z.string()),
 
-    previousAgentActions: z.array(z.unknown().default([])),
+    previousAgentActions: z.array(z.unknown()).default([]),
 });
 
 export const ProposedAgentActionSchema = z.object({
