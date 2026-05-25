@@ -14,8 +14,15 @@ export const AgentActionTypeSchema = z.enum([
 ]);
 
 export const AgentActionStatusSchema = z.enum([
+    "PROPOSED",
+    "EXECUTED",
+    "BLOCKED",
+    "FAILED"
+]);
+
+export const GuardrailDecisionSchema = z.enum([
     "ALLOWED",
-    "BLOCKED"
+    "BLCOKED"
 ]);
 
 export const ClaimStateForAgentSchema = z.object({
@@ -48,4 +55,10 @@ export const ProposedAgentActionSchema = z.object({
     rationale: z.string().optional(),
     toolName : z.string().nullable().optional(),
     toolInputJson: z.unknown().nullable().optional(),
-})
+});
+
+export type AgentActionType = z.infer<typeof AgentActionTypeSchema>;
+export type AgentActionStatus = z.infer<typeof AgentActionStatusSchema>;
+export type GuardrailDecision = z.infer<typeof GuardrailDecisionSchema>;
+export type ClaimStateForAgent = z.infer<typeof ClaimStateForAgentSchema>;
+export type ProposedAgentAction = z.infer<typeof ProposedAgentActionSchema>;
