@@ -106,6 +106,135 @@ const MARKDOWN_REPORT_PATH = path.join(
   "week-3-policy-rag-eval.md",
 );
 
+function parseNonNegativeInt(value: string | undefined, fallback: number) {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return fallback;
+  }
+
+  return parsed;
+}
+
+function parsePositiveInt(value: string | undefined, fallback: number) {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+
+  return parsed;
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
+}
+
+function isRetryableModelError(error: unknown) {
+  const message = getErrorMessage(error).toLowerCase();
+
+  return (
+    message.includes("503") ||
+    message.includes("429") ||
+    message.includes("unavailable") ||
+    message.includes("resource_exhausted") ||
+    message.includes("high demand") ||
+    message.includes("rate limit") ||
+    message.includes("quota")
+  );
+}
+
+async function withModelRetry<T>(
+  label: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  const maxAttempts = parsePositiveInt(
+    process.env.WEEK3_RAG_EVAL_MODEL_RETRIES,
+    4,
+  );
+
+  const baseDelayMs = parsePositiveInt(
+    process.env.WEEK3_RAG_EVAL_RETRY_BASE_DELAY_MS,
+    5_000,
+  );
+
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      if (!isRetryableModelError(error) || attempt === maxAttempts) {
+        throw error;
+      }
+
+      const delayMs = baseDelayMs * attempt;
+
+      console.warn(
+        `Retryable model error during ${label}. Attempt ${attempt}/${maxAttempts}. Retrying in ${delayMs}ms. Error: ${getErrorMessage(
+          error,
+        )}`,
+      );
+
+      await sleep(delayMs);
+    }
+  }
+
+  throw lastError;
+}
+
+function getQuestionIdFilter() {
+  const raw = process.env.WEEK3_RAG_EVAL_CASE_IDS;
+
+  if (!raw) {
+    return null;
+  }
+
+  const ids = raw
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return ids.length > 0 ? new Set(ids) : null;
+}
+
+function selectQuestionsForRun(questions: EvalQuestion[]) {
+  const idFilter = getQuestionIdFilter();
+
+  if (idFilter) {
+    return questions.filter((question) => idFilter.has(question.questionId));
+  }
+
+  const startIndex = parseNonNegativeInt(
+    process.env.WEEK3_RAG_EVAL_START_INDEX,
+    0,
+  );
+
+  const limit = process.env.WEEK3_RAG_EVAL_LIMIT
+    ? parsePositiveInt(process.env.WEEK3_RAG_EVAL_LIMIT, questions.length)
+    : questions.length;
+
+  return questions.slice(startIndex, startIndex + limit);
+}
+
 function toPrettyJson(value: unknown) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
@@ -115,7 +244,13 @@ async function readJson<T>(filePath: string): Promise<T> {
 }
 
 async function readPacketClaimContext(packetId: string) {
-  const filePath = path.join(DATASET_ROOT, "packets", packetId, "claim-context.json");
+  const filePath = path.join(
+    DATASET_ROOT,
+    "packets",
+    packetId,
+    "claim-context.json",
+  );
+
   return readJson<unknown>(filePath);
 }
 
@@ -292,11 +427,15 @@ async function evaluateOneQuestion(question: EvalQuestion): Promise<CaseResult> 
       retrievalResult.reason,
     ];
   } else {
-    const generated = await generateCoverageAnswer({
-      question: expected.question,
-      claimContext,
-      retrievalResult,
-    });
+    const generated = await withModelRetry(
+      `coverage generation for ${expected.questionId}`,
+      () =>
+        generateCoverageAnswer({
+          question: expected.question,
+          claimContext,
+          retrievalResult,
+        }),
+    );
 
     const citationValidation = validateCoverageCitations({
       answer: generated.answer,
@@ -542,18 +681,22 @@ function buildMarkdownReport(report: EvalReport) {
     if (item.guardrailReasons.length > 0) {
       lines.push("Guardrail reasons:");
       lines.push("");
+
       for (const reason of item.guardrailReasons) {
         lines.push(`- ${reason}`);
       }
+
       lines.push("");
     }
 
     if (item.blockers.length > 0) {
       lines.push("Blockers:");
       lines.push("");
+
       for (const blocker of item.blockers) {
         lines.push(`- ${blocker}`);
       }
+
       lines.push("");
     }
   }
@@ -562,11 +705,35 @@ function buildMarkdownReport(report: EvalReport) {
 }
 
 async function main() {
-  const questions = await readJson<EvalQuestion[]>(QUESTIONS_PATH);
+  const allQuestions = await readJson<EvalQuestion[]>(QUESTIONS_PATH);
+  const questions = selectQuestionsForRun(allQuestions);
+
+  const delayBetweenCasesMs = parseNonNegativeInt(
+    process.env.WEEK3_RAG_EVAL_DELAY_MS,
+    2_500,
+  );
+
+  console.log(
+    `Loaded ${allQuestions.length} Week 3 RAG eval questions. Running ${questions.length}.`,
+  );
+
+  if (process.env.WEEK3_RAG_EVAL_CASE_IDS) {
+    console.log(`Case filter: ${process.env.WEEK3_RAG_EVAL_CASE_IDS}`);
+  } else {
+    console.log(
+      `Start index: ${parseNonNegativeInt(
+        process.env.WEEK3_RAG_EVAL_START_INDEX,
+        0,
+      )}, limit: ${process.env.WEEK3_RAG_EVAL_LIMIT ?? "all"}`,
+    );
+  }
+
+  console.log(`Delay between cases: ${delayBetweenCasesMs}ms`);
+  console.log("");
 
   const cases: CaseResult[] = [];
 
-  for (const question of questions) {
+  for (const [index, question] of questions.entries()) {
     console.log(`Evaluating ${question.questionId}: ${question.question}`);
 
     try {
@@ -577,8 +744,7 @@ async function main() {
         `${result.passed ? "PASS" : "FAIL"} ${question.questionId} → ${result.actualDecision}`,
       );
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unknown eval error";
+      const message = getErrorMessage(error);
 
       cases.push({
         questionId: question.questionId,
@@ -606,6 +772,10 @@ async function main() {
       });
 
       console.error(`FAIL ${question.questionId}: ${message}`);
+    }
+
+    if (delayBetweenCasesMs > 0 && index < questions.length - 1) {
+      await sleep(delayBetweenCasesMs);
     }
   }
 

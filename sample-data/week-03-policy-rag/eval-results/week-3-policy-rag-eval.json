@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-05-25T06:37:44.068Z",
+  "generatedAt": "2026-05-25T10:55:01.557Z",
   "summary": {
     "total": 12,
-    "passed": 5,
-    "failed": 7,
-    "retrievalHitRate": 0.6666666666666666,
-    "decisionMatchRate": 0.5833333333333334,
-    "citationPresentRate": 0.6666666666666666,
-    "citationSupportRate": 0.6666666666666666,
+    "passed": 10,
+    "failed": 2,
+    "retrievalHitRate": 1,
+    "decisionMatchRate": 0.9166666666666666,
+    "citationPresentRate": 1,
+    "citationSupportRate": 1,
     "unsupportedRefusalRate": 1,
     "falseApprovalRate": 0
   },
@@ -76,7 +76,7 @@
       "packetId": "w3-003-repair-estimate-coverage-limit",
       "question": "Can this high repair estimate be approved directly?",
       "expectedDecision": "NEEDS_REVIEW",
-      "actualDecision": "NOT_COVERED",
+      "actualDecision": "NEEDS_REVIEW",
       "expectedRetrievedClauses": [
         "LIMIT-RP-001",
         "EV-OD-001"
@@ -99,10 +99,8 @@
       "forcedNeedsReview": false,
       "guardrailReasons": [],
       "falseApproval": false,
-      "passed": false,
-      "blockers": [
-        "Decision mismatch. Expected NEEDS_REVIEW, got NOT_COVERED."
-      ]
+      "passed": true,
+      "blockers": []
     },
     {
       "questionId": "W3-COV-004",
@@ -201,7 +199,7 @@
       "packetId": null,
       "question": "Is theft covered when police evidence is submitted?",
       "expectedDecision": "COVERED",
-      "actualDecision": "PARTIALLY_COVERED",
+      "actualDecision": "COVERED",
       "expectedRetrievedClauses": [
         "COV-TH-001",
         "EV-TH-001"
@@ -221,85 +219,87 @@
       "forcedNeedsReview": false,
       "guardrailReasons": [],
       "falseApproval": false,
-      "passed": false,
-      "blockers": [
-        "Decision mismatch. Expected COVERED, got PARTIALLY_COVERED."
-      ]
+      "passed": true,
+      "blockers": []
     },
     {
       "questionId": "W3-COV-008",
       "packetId": null,
       "question": "Is the claim covered if the driver had no valid license?",
       "expectedDecision": "NOT_COVERED",
-      "actualDecision": "NEEDS_REVIEW",
+      "actualDecision": "NOT_COVERED",
       "expectedRetrievedClauses": [
         "EX-LIC-001"
       ],
-      "retrievedClauseIds": [],
-      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
-      "retrievalReason": "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 19.586814623s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"19s\"}]}}",
-      "topSimilarity": null,
-      "citationCount": 0,
-      "citationSupportPassed": false,
-      "forcedNeedsReview": true,
-      "guardrailReasons": [
-        "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 19.586814623s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"19s\"}]}}"
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "EX-ALC-001",
+        "EX-COM-001",
+        "EX-LIC-001"
       ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8197527420373769,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
       "falseApproval": false,
-      "passed": false,
-      "blockers": [
-        "Eval execution failed: {\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 19.586814623s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"19s\"}]}}"
-      ]
+      "passed": true,
+      "blockers": []
     },
     {
       "questionId": "W3-COV-009",
       "packetId": null,
       "question": "Is the claim covered if the driver was intoxicated?",
       "expectedDecision": "NOT_COVERED",
-      "actualDecision": "NEEDS_REVIEW",
+      "actualDecision": "NOT_COVERED",
       "expectedRetrievedClauses": [
         "EX-ALC-001"
       ],
-      "retrievedClauseIds": [],
-      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
-      "retrievalReason": "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 18.57054242s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"18s\"}]}}",
-      "topSimilarity": null,
-      "citationCount": 0,
-      "citationSupportPassed": false,
-      "forcedNeedsReview": true,
-      "guardrailReasons": [
-        "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 18.57054242s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"18s\"}]}}"
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "EX-ALC-001",
+        "EX-COM-001",
+        "EX-LIC-001"
       ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8225997931540042,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
       "falseApproval": false,
-      "passed": false,
-      "blockers": [
-        "Eval execution failed: {\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 18.57054242s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"18s\"}]}}"
-      ]
+      "passed": true,
+      "blockers": []
     },
     {
       "questionId": "W3-COV-010",
       "packetId": null,
       "question": "Does the policy cover normal wear and tear?",
       "expectedDecision": "NOT_COVERED",
-      "actualDecision": "NEEDS_REVIEW",
+      "actualDecision": "NOT_COVERED",
       "expectedRetrievedClauses": [
         "EX-WEAR-001"
       ],
-      "retrievedClauseIds": [],
-      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
-      "retrievalReason": "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 17.601538089s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-flash\",\"location\":\"global\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"17s\"}]}}",
-      "topSimilarity": null,
-      "citationCount": 0,
-      "citationSupportPassed": false,
-      "forcedNeedsReview": true,
-      "guardrailReasons": [
-        "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 17.601538089s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-flash\",\"location\":\"global\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"17s\"}]}}"
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "EX-COM-001",
+        "EX-LIC-001",
+        "EX-WEAR-001",
+        "LIMIT-RP-001"
       ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8062823280615253,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
       "falseApproval": false,
-      "passed": false,
-      "blockers": [
-        "Eval execution failed: {\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 17.601538089s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-flash\",\"location\":\"global\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"17s\"}]}}"
-      ]
+      "passed": true,
+      "blockers": []
     },
     {
       "questionId": "W3-COV-011",
@@ -333,25 +333,31 @@
       "packetId": null,
       "question": "Can the claim be approved using only a repair estimate?",
       "expectedDecision": "NEEDS_REVIEW",
-      "actualDecision": "NEEDS_REVIEW",
+      "actualDecision": "NOT_COVERED",
       "expectedRetrievedClauses": [
         "LIMIT-RP-001",
         "EV-OD-001"
       ],
-      "retrievedClauseIds": [],
-      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
-      "retrievalReason": "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 16.256637503s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"16s\"}]}}",
-      "topSimilarity": null,
-      "citationCount": 0,
-      "citationSupportPassed": false,
-      "forcedNeedsReview": true,
-      "guardrailReasons": [
-        "{\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 16.256637503s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"16s\"}]}}"
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TP-001",
+        "EV-FLD-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EV-TP-001",
+        "LIMIT-RP-001"
       ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8373044244362561,
+      "citationCount": 1,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": false,
+      "guardrailReasons": [],
       "falseApproval": false,
       "passed": false,
       "blockers": [
-        "Eval execution failed: {\"error\":{\"code\":429,\"message\":\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\\nPlease retry in 16.256637503s.\",\"status\":\"RESOURCE_EXHAUSTED\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash\"},\"quotaValue\":\"5\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"16s\"}]}}"
+        "Decision mismatch. Expected NEEDS_REVIEW, got NOT_COVERED."
       ]
     }
   ]

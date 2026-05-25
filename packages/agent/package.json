@@ -18,5 +18,8 @@
   },
   "exports" : {
     ".":"./index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
   }
 }
