@@ -494,6 +494,8 @@ export async function POST(request: Request, { params } : Params ){
         const citationValidation = validateCoverageCitations({
             answer : generated.answer,
             retrievalResult,
+            question,
+            claimContext,
         });
 
         const finalAnswer = citationValidation.answer;

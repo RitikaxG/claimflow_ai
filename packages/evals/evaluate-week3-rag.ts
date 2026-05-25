@@ -440,6 +440,8 @@ async function evaluateOneQuestion(question: EvalQuestion): Promise<CaseResult> 
     const citationValidation = validateCoverageCitations({
       answer: generated.answer,
       retrievalResult,
+      question : expected.question,
+      claimContext,
     });
 
     finalAnswer = citationValidation.answer;
