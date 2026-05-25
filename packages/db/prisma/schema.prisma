@@ -94,6 +94,31 @@ enum RetrievalStatus {
   INSUFFICIENT_EVIDENCE
 }
 
+enum AgentActionType {
+  RETRIEVE_POLICY_CLAUSES
+  CREATE_REVIEW_TASK
+  REQUEST_MISSING_DOCUMENT
+  MARK_NEEDS_MORE_EVIDENCE
+  DRAFT_FOLLOWUP_REQUEST
+  DRAFT_APPROVAL_NOTE
+  DRAFT_DENIAL_REASON
+  ESCALATE_TO_HUMAN
+  ASK_CLARIFICATION
+  NO_ACTION
+}
+
+enum AgentActionStatus {
+  PROPOSED
+  EXECUTED
+  BLOCKED
+  FAILED
+}
+
+enum GuardrailDecision {
+  ALLOWED
+  BLOCKED
+}
+
 model Document {
   id String @id @default(cuid())
 
@@ -145,6 +170,9 @@ model ExtractionRun {
   events ExtractionEvent[]
   reviewTask ReviewTask?
   coverageQuestions CoverageQuestion[]
+
+  agentActionLogs AgentActionLog[]
+  followupDrafts FollowupDraft[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -305,4 +333,47 @@ model CoverageQuestion {
   @@index([finalDecision])
   @@index([retrievalStatus])
   @@map("coverage_questions")
+}
+
+model AgentActionLog {
+  id String @id @default(cuid())
+
+  runId String
+  run ExtractionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  action AgentActionType
+  status AgentActionStatus
+
+  rationale String?
+  guardrailDecision GuardrailDecision
+  blockedReason String?
+
+  toolName String?
+  toolInputJson Json?
+  toolOutputJson Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([runId])
+  @@index([action])
+  @@index([status])
+  @@map("agent_action_logs")
+}
+
+model FollowupDraft {
+  id String @id @default(cuid())
+
+  runId String
+  run ExtractionRun @relation(fields: [runId],references: [id],onDelete: Cascade)
+
+  subject String
+  body String
+  requestedEvidence Json
+  status String @default("DRAFTED")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([runId])
+  @@map("followup_drafts")
 }
