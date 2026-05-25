@@ -1,0 +1,22 @@
+{
+  "name": "agent",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22.0.0",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@repo/db":"workspace:*",
+    "@repo/shared":"workspace:*",
+    "@repo/rag":"workspace:*"
+  },
+  "exports" : {
+    ".":"./index.ts"
+  }
+}
