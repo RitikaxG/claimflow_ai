@@ -69,10 +69,31 @@ function buildCoverageAnswerPrompt(input: GenerateCoverageAnswerInput) {
     If required evidence is missing, list it in missingEvidence.
 
     Decision rules:
-    - Use COVERED only when retrieved clauses clearly support coverage and required evidence is present.
-    - Use NOT_COVERED when retrieved exclusions clearly apply.
-    - Use PARTIALLY_COVERED when coverage exists but limits, missing add-ons, or partial evidence affect the decision.
-    - Use NEEDS_REVIEW when the retrieved clauses are insufficient, contradictory, or required claim evidence is missing.
+    - First classify the user question:
+        - If the question asks whether a loss type is covered under the policy in general, answer the policy coverage status.
+        - If the question asks whether a specific claim can be approved, answer claim readiness using required evidence and exclusions.
+
+    - Use COVERED for a general policy coverage question when a retrieved coverage clause clearly covers the loss type.
+    - Do not downgrade COVERED to PARTIALLY_COVERED only because the clause says coverage is subject to policy terms, deductible, exclusions, or required evidence.
+    - Required evidence should be listed in missingEvidence only when the claim context shows that the evidence is missing or the question asks about approval/readiness.
+
+    - Use NOT_COVERED only when retrieved exclusion clauses clearly apply to the question or claim context.
+
+    - Use PARTIALLY_COVERED only when retrieved clauses show that:
+        - only part of the claimed loss is covered,
+        - a specific policy limit applies to part of the claim,
+        - an add-on/endorsement is required but missing,
+        - or some claimed items are outside coverage.
+    - Do not use PARTIALLY_COVERED for a simple “is this loss type covered?” question when the retrieved coverage clause supports coverage.
+
+    - Use NEEDS_REVIEW when:
+        - retrieved clauses are insufficient or contradictory,
+        - the question asks whether a specific claim can be approved and required claim evidence is missing,
+        - the claim context shows missing required evidence,
+        - or a human/insurer review clause applies before final approval.
+
+    - A repair estimate alone is not a denial. If LIMIT-RP-001 says insurer review is required before final approval, return NEEDS_REVIEW, not NOT_COVERED.
+
     - Every cited quote must be copied from one of the retrieved policy clause texts.
     - When claimJson and validationJson disagree, trust claimJson and the corrected validation fields. Do not infer missing evidence from stale extraction metadata.
 
