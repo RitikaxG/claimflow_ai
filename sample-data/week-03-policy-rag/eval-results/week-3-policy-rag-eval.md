@@ -1,14 +1,14 @@
 # Week 3 Policy RAG Eval
 
-Generated at: 2026-05-25T10:55:01.557Z
+Generated at: 2026-05-25T11:14:08.644Z
 
 ## Summary
 
 | Metric | Value |
 | --- | --- |
 | Total cases | 12 |
-| Passed | 10 |
-| Failed | 2 |
+| Passed | 11 |
+| Failed | 1 |
 | Retrieval hit rate | 100.0% |
 | Decision match rate | 91.7% |
 | Citation present rate | 100.0% |
@@ -58,7 +58,7 @@ Retrieval status: `ENOUGH_EVIDENCE`
 
 Top similarity: 0.8369
 
-Citation count: 2
+Citation count: 1
 
 Forced NEEDS_REVIEW: no
 
@@ -80,7 +80,7 @@ Retrieval status: `ENOUGH_EVIDENCE`
 
 Top similarity: 0.8373
 
-Citation count: 1
+Citation count: 3
 
 Forced NEEDS_REVIEW: no
 
@@ -106,7 +106,7 @@ Citation count: 1
 
 Forced NEEDS_REVIEW: no
 
-### ❌ W3-COV-005
+### ✅ W3-COV-005
 
 Question: Is this flood damage claim covered?
 
@@ -128,11 +128,7 @@ Citation count: 2
 
 Forced NEEDS_REVIEW: no
 
-Blockers:
-
-- Answer did not mention required missing evidence terms: ["inspection evidence"].
-
-### ✅ W3-COV-006
+### ❌ W3-COV-006
 
 Question: Is accidental own damage covered under this policy?
 
@@ -140,7 +136,7 @@ Packet: none
 
 Expected decision: `COVERED`
 
-Actual decision: `COVERED`
+Actual decision: `PARTIALLY_COVERED`
 
 Expected clauses: ["COV-OD-001","EV-OD-001"]
 
@@ -150,9 +146,13 @@ Retrieval status: `ENOUGH_EVIDENCE`
 
 Top similarity: 0.8373
 
-Citation count: 1
+Citation count: 2
 
 Forced NEEDS_REVIEW: no
+
+Blockers:
+
+- Decision mismatch. Expected COVERED, got PARTIALLY_COVERED.
 
 ### ✅ W3-COV-007
 
@@ -269,7 +269,7 @@ Guardrail reasons:
 - Retrieval returned INSUFFICIENT_EVIDENCE, so generation was skipped.
 - Only a general retrieval query was generated and top similarity 0.7054 is below stricter general-only threshold 0.8.
 
-### ❌ W3-COV-012
+### ✅ W3-COV-012
 
 Question: Can the claim be approved using only a repair estimate?
 
@@ -277,7 +277,7 @@ Packet: none
 
 Expected decision: `NEEDS_REVIEW`
 
-Actual decision: `NOT_COVERED`
+Actual decision: `NEEDS_REVIEW`
 
 Expected clauses: ["LIMIT-RP-001","EV-OD-001"]
 
@@ -287,11 +287,11 @@ Retrieval status: `ENOUGH_EVIDENCE`
 
 Top similarity: 0.8373
 
-Citation count: 1
+Citation count: 3
 
-Forced NEEDS_REVIEW: no
+Forced NEEDS_REVIEW: yes
 
-Blockers:
+Guardrail reasons:
 
-- Decision mismatch. Expected NEEDS_REVIEW, got NOT_COVERED.
+- Repair estimate alone is not a coverage exclusion; LIMIT-RP-001 requires insurer review before final approval.
 

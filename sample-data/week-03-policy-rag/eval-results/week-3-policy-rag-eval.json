@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-05-25T10:55:01.557Z",
+  "generatedAt": "2026-05-25T11:14:08.644Z",
   "summary": {
     "total": 12,
-    "passed": 10,
-    "failed": 2,
+    "passed": 11,
+    "failed": 1,
     "retrievalHitRate": 1,
     "decisionMatchRate": 0.9166666666666666,
     "citationPresentRate": 1,
@@ -63,7 +63,7 @@
       "retrievalStatus": "ENOUGH_EVIDENCE",
       "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
       "topSimilarity": 0.8368881137638059,
-      "citationCount": 2,
+      "citationCount": 1,
       "citationSupportPassed": true,
       "forcedNeedsReview": false,
       "guardrailReasons": [],
@@ -94,7 +94,7 @@
       "retrievalStatus": "ENOUGH_EVIDENCE",
       "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
       "topSimilarity": 0.8373044244362561,
-      "citationCount": 1,
+      "citationCount": 3,
       "citationSupportPassed": true,
       "forcedNeedsReview": false,
       "guardrailReasons": [],
@@ -160,17 +160,15 @@
       "forcedNeedsReview": false,
       "guardrailReasons": [],
       "falseApproval": false,
-      "passed": false,
-      "blockers": [
-        "Answer did not mention required missing evidence terms: [\"inspection evidence\"]."
-      ]
+      "passed": true,
+      "blockers": []
     },
     {
       "questionId": "W3-COV-006",
       "packetId": null,
       "question": "Is accidental own damage covered under this policy?",
       "expectedDecision": "COVERED",
-      "actualDecision": "COVERED",
+      "actualDecision": "PARTIALLY_COVERED",
       "expectedRetrievedClauses": [
         "COV-OD-001",
         "EV-OD-001"
@@ -186,13 +184,15 @@
       "retrievalStatus": "ENOUGH_EVIDENCE",
       "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
       "topSimilarity": 0.8373044244362561,
-      "citationCount": 1,
+      "citationCount": 2,
       "citationSupportPassed": true,
       "forcedNeedsReview": false,
       "guardrailReasons": [],
       "falseApproval": false,
-      "passed": true,
-      "blockers": []
+      "passed": false,
+      "blockers": [
+        "Decision mismatch. Expected COVERED, got PARTIALLY_COVERED."
+      ]
     },
     {
       "questionId": "W3-COV-007",
@@ -333,7 +333,7 @@
       "packetId": null,
       "question": "Can the claim be approved using only a repair estimate?",
       "expectedDecision": "NEEDS_REVIEW",
-      "actualDecision": "NOT_COVERED",
+      "actualDecision": "NEEDS_REVIEW",
       "expectedRetrievedClauses": [
         "LIMIT-RP-001",
         "EV-OD-001"
@@ -350,15 +350,15 @@
       "retrievalStatus": "ENOUGH_EVIDENCE",
       "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
       "topSimilarity": 0.8373044244362561,
-      "citationCount": 1,
+      "citationCount": 3,
       "citationSupportPassed": true,
-      "forcedNeedsReview": false,
-      "guardrailReasons": [],
+      "forcedNeedsReview": true,
+      "guardrailReasons": [
+        "Repair estimate alone is not a coverage exclusion; LIMIT-RP-001 requires insurer review before final approval."
+      ],
       "falseApproval": false,
-      "passed": false,
-      "blockers": [
-        "Decision mismatch. Expected NEEDS_REVIEW, got NOT_COVERED."
-      ]
+      "passed": true,
+      "blockers": []
     }
   ]
 }
