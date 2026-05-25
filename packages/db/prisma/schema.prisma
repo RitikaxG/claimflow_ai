@@ -73,6 +73,14 @@ enum ExtractionEventType {
   RUN_COMPLETED
   RUN_NEEDS_REVIEW
   RUN_FAILED
+
+  AGENT_STEP_STARTED
+  AGENT_ACTION_PROPOSED
+  AGENT_ACTION_BLOCKED
+  AGENT_TOOL_EXECUTED
+  FOLLOWUP_DRAFT_CREATED
+  ADDITIONAL_EVIDENCE_RECEIVED
+  REVIEW_REOPENED
 }
 
 enum PolicySourceType {
@@ -345,7 +353,9 @@ model AgentActionLog {
   status AgentActionStatus
 
   rationale String?
-  guardrailDecision GuardrailDecision
+  // nullable intentionally. If an action is only PROPOSED, guardrails have not decided yet,
+  // so forcing ALLOWED or BLOCKED would make the log inaccurate.
+  guardrailDecision GuardrailDecision?
   blockedReason String?
 
   toolName String?
