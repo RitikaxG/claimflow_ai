@@ -49,7 +49,7 @@ export async function createOrReuseReviewTask(input : {
                 toolName : input.sourceToolName,
             });
 
-            const updatedTask = tx.reviewTask.update({
+            const updatedTask = await tx.reviewTask.update({
                 where : { id : run.reviewTask.id },
                 data : {
                     priority : input.priority,
@@ -63,7 +63,7 @@ export async function createOrReuseReviewTask(input : {
             }
         }
 
-        const createdTask = tx.reviewTask.create({
+        const createdTask = await tx.reviewTask.create({
             data : {
                 runId : input.runId,
                 status : "PENDING",
