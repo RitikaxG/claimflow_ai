@@ -16,13 +16,13 @@ function buildDenialReason(input : {
 }){
     const citationBlock = 
     input.citedClauseIds.length > 0
-    ? input.citedClauseIds.map((item) => `-${item}`).join("\n")
+    ? input.citedClauseIds.map((item) => `- ${item}`).join("\n")
     : "- No policy clause citations provided.";
 
     const missingEvidenceBlock = 
     input.missingEvidence.length > 0
-    ? input.missingEvidence.map((item) => `-${item}`).join("\n")
-    : "- No missing evidence isted.";
+    ? input.missingEvidence.map((item) => `- ${item}`).join("\n")
+    : "- No missing evidence listed.";
 
     return [
         "Draft denial reason",

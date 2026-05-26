@@ -13,7 +13,7 @@ const DraftFollowupRequestInputSchema = z.object({
 
 function buildSubject(claimNumber? : string | null){
     if(claimNumber && claimNumber.trim().length > 0){
-        return `Additional documents required or caim ${claimNumber.trim()}`;
+        return `Additional documents required for claim ${claimNumber.trim()}`;
     }
     return "Additional documents required for claim review";
 };

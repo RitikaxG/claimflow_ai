@@ -19,11 +19,11 @@ const RetrievedPolicyClausesInputSchema = z.object({
 });
 
 function truncateText(text : string, maxLength = 1200){
-    if(text.length < maxLength){
+    if(text.length <= maxLength){
         return text;
     }
 
-    return `${text.slice(0,maxLength).trim()}`;
+    return `${text.slice(0, maxLength).trim()}...`;
 };
 
 export const retrievePolicyClausesTool = tool(
@@ -41,13 +41,13 @@ export const retrievePolicyClausesTool = tool(
                 message : "Policy clauses retrieved for claim workflow routing",
                 data : {
                     question : retrievalResult.question,
-                    retrievalResult : retrievalResult.retrievalStatus,
+                    retrievalStatus : retrievalResult.retrievalStatus,
                     reason : retrievalResult.reason,
                     queryPlan : retrievalResult.queryPlan,
                     matches : retrievalResult.matches.map((match) => ({
                         chunkId : match.chunkId,
                         policyDocumentId : match.policyDocumentId,
-                        poliyTitle : match.policyTitle,
+                        policyTitle : match.policyTitle,
                         clauseId : match.clauseId,
                         sectionTitle : match.sectionTitle,
                         similarity : match.similarity,

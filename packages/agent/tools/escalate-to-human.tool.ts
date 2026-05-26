@@ -6,7 +6,7 @@ import { failedToolResult, getErrorMessage, okToolResult } from "./tool-result";
 const EscalateToHumanInputSchema = z.object({
     runId : z.string().min(1),
     reason : z.string().min(5).max(2000),
-    priority : z.enum(["NORMAL","HIGH"]).default("NORMAL"),
+    priority : z.enum(["NORMAL","HIGH"]).default("HIGH"),
 });
 
 export const escalateToHumanTool = tool(

@@ -53,7 +53,7 @@ export async function createOrReuseReviewTask(input : {
                 where : { id : run.reviewTask.id },
                 data : {
                     priority : input.priority,
-                    reasonJson : toPrismaJson(input.reason)
+                    reasonJson : toPrismaJson(reasonJson)
                 }
             });
 

@@ -33,7 +33,7 @@ function buildApprovalNote(input : {
         "Evidence considered:",
         evidenceBlock,
         "",
-        "Polciy clause cited:",
+        "Policy clause cited:",
         citationBlock,
         "",
         "Human approval is required before any final claim action."
