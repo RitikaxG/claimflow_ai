@@ -12,12 +12,16 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@repo/db":"workspace:*",
-    "@repo/shared":"workspace:*",
-    "@repo/rag":"workspace:*"
+    "@langchain/core": "^1.1.48",
+    "@langchain/google-genai": "^2.1.31",
+    "@repo/db": "workspace:*",
+    "@repo/rag": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "langchain": "^1.4.2",
+    "zod": "^4.4.3"
   },
-  "exports" : {
-    ".":"./index.ts"
+  "exports": {
+    ".": "./index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
