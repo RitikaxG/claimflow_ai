@@ -24,6 +24,7 @@
     ".": "./index.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "smoke:tools": "bun --env-file ../db/.env scripts/smoke-test-tools.ts"
   }
 }
