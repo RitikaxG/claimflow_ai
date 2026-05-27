@@ -1,5 +1,4 @@
-import type { AgentActionType } from "@repo/db";
-import { ProposedAgentActionSchema, type ProposedAgentAction } from "@repo/shared/schemas";
+import { ProposedAgentActionSchema, type ProposedAgentAction, type AgentActionType } from "@repo/shared/schemas";
 
 const TOOL_NAME_TO_ACTION = {
     retrieve_policy_clauses : "RETRIEVE_POLICY_CLAUSES",

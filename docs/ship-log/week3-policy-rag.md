@@ -501,12 +501,22 @@ sample-data/week-03-policy-rag/eval-results/week-3-policy-rag-eval.md
 sample-data/week-03-policy-rag/eval-results/week-3-policy-rag-eval.json
 ```
 
-Current status:
+## Current eval status
+
+Week 3 RAG eval has been regenerated successfully.
+
+Latest result:
 
 ```txt
-Retrieval smoke tests are implemented.
-Full answer-generation eval should be re-run after the Gemini API limit refreshes.
-```
+total_cases = 12
+passed = 12
+failed = 0
+retrieval_hit_rate = 100%
+coverage_decision_match_rate = 100%
+citation_present_rate = 100%
+citation_support_rate = 100%
+unsupported_refusal_rate = 100%
+false_approval_rate = 0%
 
 ---
 
@@ -549,4 +559,4 @@ synthetic policy corpus
 → eval framework
 ```
 
-Week 3 is almost complete. The remaining step is the final eval re-run after API quota refresh.
+Week 3 is complete.

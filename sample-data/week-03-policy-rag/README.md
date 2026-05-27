@@ -408,12 +408,22 @@ week-3-policy-rag-eval.md
 week-3-policy-rag-eval.json
 ```
 
-Current note:
+## Current eval status
+
+Week 3 RAG eval has been regenerated successfully.
+
+Latest result:
 
 ```txt
-Full answer-generation eval should be re-run after Gemini API quota refresh.
-Do not mark Week 3 eval as final until the report is regenerated from a successful run.
-```
+total_cases = 12
+passed = 12
+failed = 0
+retrieval_hit_rate = 100%
+coverage_decision_match_rate = 100%
+citation_present_rate = 100%
+citation_support_rate = 100%
+unsupported_refusal_rate = 100%
+false_approval_rate = 0%
 
 ## Eval metrics
 
