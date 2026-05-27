@@ -25,6 +25,7 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "smoke:tools": "bun --env-file ../db/.env scripts/smoke-test-tools.ts"
+    "smoke:tools": "bun --env-file ../db/.env scripts/smoke-test-tools.ts",
+    "smoke:agent-step": "bun --env-file ../db/.env scripts/smoke-test-agent-step.ts"
   }
 }
