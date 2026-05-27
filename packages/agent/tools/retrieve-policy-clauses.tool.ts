@@ -3,18 +3,17 @@ import { z } from "zod";
 import { retrievePolicyEvidence } from "@repo/rag";
 import { failedToolResult, getErrorMessage, okToolResult } from "./tool-result";
 
-const claimContextSchema = z.object({
+const ClaimContextSchema = z.object({
     claimNumber : z.string().nullable().optional(),
     policyNumber : z.string().nullable().optional(),
     lossType : z.string().nullable().optional(),
     damageDescription : z.string().nullable().optional(),
-})
-.passthrough();
+});
 
 const RetrievedPolicyClausesInputSchema = z.object({
     runId : z.string().min(1),
     question : z.string().min(5).max(1000),
-    claimContext : claimContextSchema.default({}),
+    claimContext : ClaimContextSchema.default({}),
     topKFinal : z.number().int().min(1).max(12).default(8)
 });
 
