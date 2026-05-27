@@ -1,15 +1,22 @@
 import type { AgentActionType } from "@repo/db";
+import { ProposedAgentActionSchema, type ProposedAgentAction } from "@repo/shared/schemas";
 
 const TOOL_NAME_TO_ACTION = {
     retrieve_policy_clauses : "RETRIEVE_POLICY_CLAUSES",
     create_review_task : "CREATE_REVIEW_TASK",
     draft_followup_request : "DRAFT_FOLLOWUP_REQUEST",
     mark_needs_more_evidence : "MARK_NEEDS_MORE_EVIDENCE",
-    esclalate_to_human : "ESCALATE_TO_HUMAN",
+    escalate_to_human : "ESCALATE_TO_HUMAN",
     draft_approval_note : "DRAFT_APPROVAL_NOTE",
     draft_denial_reason : "DRAFT_DENIAL_REASON",
     ask_clarification : "ASK_CLARIFICATION",
 } satisfies Record<string, AgentActionType>;
+
+type ClaimflowToolName = keyof typeof TOOL_NAME_TO_ACTION;
+
+function isClaimflowToolName(value: string): value is ClaimflowToolName {
+  return value in TOOL_NAME_TO_ACTION;
+}
 
 type toolCallLike = {
     name? : unknown;
@@ -51,5 +58,75 @@ function getMessageContent(message : unknown) : string | undefined {
         return undefined;
     }
 
-    
+    const content = (message as MessageWithToolCalls).content;
+
+    if(typeof content === "string" && content.trim().length > 0){
+        return content.trim();
+    }
+
+    if(Array.isArray(content)){
+        const textParts = content
+        .map((part) => {
+            if(typeof part === "string"){
+                return part;
+            }
+
+            if(isRecord(part) && typeof part.text === "string"){
+                return part.text;
+            }
+            return null;
+        })
+        .filter((part) : part is string => Boolean(part));
+
+        if(textParts.length > 0){
+            return textParts.join("\n").trim();
+        }
+    }
+    return undefined;
 }
+
+export function parseAgentToolCall(input : {
+    runId : string;
+    message : unknown;
+}) : ProposedAgentAction {
+    const toolCalls = normalizeToolCalls(input.message);
+
+    if(toolCalls.length === 0){
+        return ProposedAgentActionSchema.parse({
+            runId : input.runId,
+            action : "NO_ACTION",
+            rationale : getMessageContent(input.message) ?? "The agent did not propose a tool call.",
+            toolName : null,
+            toolInputJson : null,
+        });
+    }
+
+    if(toolCalls.length > 1){
+        throw new Error(`Expected exactly one agent tool call, recieved ${toolCalls.length}`);
+    }
+
+    const toolCall = toolCalls[0];
+    if(!toolCall){
+        throw new Error("Expected one agent tool call recieved none");
+    }
+
+    if(typeof toolCall.name !== "string"){
+        throw new Error("Agent tool call is missing a string tool name.")
+    }
+
+    if(!isClaimflowToolName(toolCall.name)){
+        throw new Error(`Unknown or unsafe agent tool call: ${toolCall.name}`);
+    }
+
+    const action = TOOL_NAME_TO_ACTION[toolCall.name];
+
+    return ProposedAgentActionSchema.parse({
+        runId : input.runId,
+        action,
+        rationale: getMessageContent(input.message) ?? `Agent proposed tool ${toolCall.name}`,
+        toolName : toolCall.name,
+        toolInputJson : toolCall.args ?? {}
+    });
+}
+
+export { TOOL_NAME_TO_ACTION };
