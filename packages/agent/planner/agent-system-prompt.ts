@@ -25,6 +25,8 @@ Never call these unsafe tools:
 - bypass_review
 
 Routing rules:
+- If reviewTaskStatus is APPROVED, EDITED_AND_APPROVED, or REJECTED, the review is already final. Call no_action.
+- MissingFields and requiredEvidence may still be present on final reviews as audit history. Do not treat them as a reason to create follow-ups after final review.
 - If requiredEvidence is non-empty, call draft_followup_request.
 - If missingFields is non-empty and evidence is not enough, call ask_clarification or create_review_task.
 - If latestRetrievalStatus is null and the claim seems ready for coverage reasoning, call retrieve_policy_clauses.

@@ -1,6 +1,16 @@
 import { prisma } from "@repo/db";
 import { ClaimStateForAgentSchema, type ClaimStateForAgent } from "@repo/shared/schemas";
 
+const FINAL_REVIEW_TASK_STATUSES = new Set([
+  "APPROVED",
+  "EDITED_AND_APPROVED",
+  "REJECTED",
+]);
+
+function isFinalReviewTaskStatus(status: string | null): boolean {
+  return status !== null && FINAL_REVIEW_TASK_STATUSES.has(status);
+}
+
 function isRecord(value : unknown): value is Record<string,unknown>{
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -64,6 +74,22 @@ function getRetryCount(
     return Math.max(0,extractionStartedEvents.length - 1);
 }
 
+function getLatestCorrectedValidationJson(
+  reviewTask: {
+    decisions?: Array<{
+      correctedValidationJson: unknown;
+    }>;
+  } | null,
+): unknown | null {
+  const latestDecision = reviewTask?.decisions?.[0];
+
+  if (!latestDecision) {
+    return null;
+  }
+
+  return latestDecision.correctedValidationJson ?? null;
+}
+
 export async function buildAgentContext(
     runId: string
 ) : Promise<ClaimStateForAgent> {
@@ -71,7 +97,16 @@ export async function buildAgentContext(
         where : { id : runId },
         include : {
             document : true,
-            reviewTask : true,
+            reviewTask : {
+                include : {
+                    decisions : {
+                        orderBy : {
+                            createdAt : "desc"
+                        },
+                        take : 1,
+                    }
+                }
+            },
             coverageQuestions : {
                 orderBy : {
                     createdAt : "desc"
@@ -97,20 +132,55 @@ export async function buildAgentContext(
     }
 
     const latestCoverageQuestion = run.coverageQuestions[0] ?? null;
+    
+    const latestCorrectedValidationJson = getLatestCorrectedValidationJson(
+  run.reviewTask,
+);
+
+/**
+ * Source priority:
+ * 1. correctedValidationJson from latest human review decision
+ * 2. original validationJson from machine validation
+ *
+ * Important:
+ * Do not erase missingFields / requiredEvidence just because review is final.
+ * A rejected claim can still have unresolved evidence.
+ * An edited-and-approved claim may have correctedValidationJson that resolves it.
+ */
+const effectiveValidationJson =
+  latestCorrectedValidationJson ?? run.validationJson;
+
     const missingFieldsFromValidation = getStringArrayFromRecord(
-        run.validationJson,
-        "missingFields",
+    effectiveValidationJson,
+    "missingFields",
     );
 
     const requiredEvidence = getStringArrayFromRecord(
-        run.validationJson,
-        "requiredEvidence",
+    effectiveValidationJson,
+    "requiredEvidence",
     );
 
-    const missingFields = 
-        missingFieldsFromValidation.length > 0
+    const missingFields =
+    missingFieldsFromValidation.length > 0
         ? missingFieldsFromValidation
+        : latestCorrectedValidationJson
+        ? []
         : getStringArray(run.missingFieldsJson);
+
+    const reviewTaskStatus = run.reviewTask?.status ?? null;
+    const isFinalReviewTask = isFinalReviewTaskStatus(reviewTaskStatus);
+
+    /**
+     * Important:
+     * validationJson.requiredEvidence is the original machine-validation result.
+     * If human review is already final, the current workflow truth must win.
+     *
+     * A final review task should not expose old missing evidence as active unresolved
+     * evidence to the agent, otherwise the agent may keep asking for evidence after
+     * the claim has already been edited/approved/rejected.
+     */
+    const activeMissingFields = isFinalReviewTask ? [] : missingFields;
+    const activeRequiredEvidence = isFinalReviewTask ? [] : requiredEvidence;
 
     const duplicateSignals = getDuplicateSignals(run.events);
     const retryCount = getRetryCount(run.events);

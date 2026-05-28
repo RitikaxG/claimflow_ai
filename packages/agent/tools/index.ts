@@ -5,6 +5,7 @@ export { draftDenialReasonTool } from "./draft-denial-reason.tool";
 export { draftFollowupRequestTool } from "./draft-followup-request.tool";
 export { escalateToHumanTool } from "./escalate-to-human.tool";
 export { markNeedsMoreEvidenceTool } from "./mark-needs-more-evidence.tool";
+export { noActionTool } from "./no-action.tool";
 export { retrievePolicyClausesTool } from "./retrieve-policy-clauses.tool";
 
 export { getErrorMessage, okToolResult, failedToolResult } from "./tool-result";
@@ -17,6 +18,7 @@ import { draftDenialReasonTool } from "./draft-denial-reason.tool";
 import { draftFollowupRequestTool } from "./draft-followup-request.tool";
 import { escalateToHumanTool } from "./escalate-to-human.tool";
 import { markNeedsMoreEvidenceTool } from "./mark-needs-more-evidence.tool";
+import { noActionTool } from "./no-action.tool";
 import { retrievePolicyClausesTool } from "./retrieve-policy-clauses.tool";
 
 export const claimflowTools = [
@@ -28,4 +30,5 @@ export const claimflowTools = [
   draftApprovalNoteTool,
   draftDenialReasonTool,
   askClarificationTool,
+  noActionTool,
 ] as const;

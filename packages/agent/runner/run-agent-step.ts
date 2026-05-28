@@ -109,7 +109,7 @@ export async function runAgentStep(runId : string){
                 runId,
                 action : proposedAction.action,
                 status : "BLOCKED",
-                rationals : proposedAction.rationale,
+                rationale : proposedAction.rationale,
                 guardrailDecision : "BLOCKED",
                 blockedReason : guardrail.reason,
                 toolName : proposedAction.toolName,
@@ -145,6 +145,7 @@ export async function runAgentStep(runId : string){
     const toolSucceeded = didToolSucceed(toolOutput);
 
     let deterministicPostActionOutput: unknown = null;
+    let deterministicPostActionSucceeded = true;
 
     if(proposedAction.action === "DRAFT_FOLLOWUP_REQUEST" && toolSucceeded){
         deterministicPostActionOutput = await markNeedsMoreEvidenceTool.invoke({
@@ -155,7 +156,11 @@ export async function runAgentStep(runId : string){
             }),
             note : "Deterministic post-action after follow-up draft creation.",
         });
+
+        deterministicPostActionSucceeded = didToolSucceed(deterministicPostActionOutput);
     }
+
+    const workflowSucceeded = toolSucceeded && deterministicPostActionSucceeded;
 
     const executedLog = await prisma.agentActionLog.create({
         data : {
@@ -177,13 +182,13 @@ export async function runAgentStep(runId : string){
         data : {
             runId,
             type : "AGENT_TOOL_EXECUTED",
-            message : toolSucceeded
+            message : workflowSucceeded
             ? `Agent tool executed: ${proposedAction.toolName}.`
             : `Agent tool failed after guardrail approval: ${proposedAction.toolName}.`,
             metadata : toPrismaJson({
                 agentActionLogId: executedLog.id,
                 action: proposedAction.action,
-                status: toolSucceeded ? "EXECUTED" : "FAILED",
+                status: workflowSucceeded ? "EXECUTED" : "FAILED",
                 toolName: proposedAction.toolName,
                 deterministicPostAction: 
                 proposedAction.action === "DRAFT_FOLLOWUP_REQUEST" && toolSucceeded
@@ -197,7 +202,7 @@ export async function runAgentStep(runId : string){
         runId,
         proposedAction,
         guardrail,
-        executed : toolSucceeded,
+        executed : workflowSucceeded,
         toolOutput,
         deterministicPostActionOutput,
     }

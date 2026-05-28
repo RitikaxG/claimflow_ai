@@ -9,6 +9,7 @@ const TOOL_NAME_TO_ACTION = {
     draft_approval_note : "DRAFT_APPROVAL_NOTE",
     draft_denial_reason : "DRAFT_DENIAL_REASON",
     ask_clarification : "ASK_CLARIFICATION",
+    no_action: "NO_ACTION",
 } satisfies Record<string, AgentActionType>;
 
 type ClaimflowToolName = keyof typeof TOOL_NAME_TO_ACTION;
@@ -113,17 +114,19 @@ export function parseAgentToolCall(input : {
         throw new Error("Agent tool call is missing a string tool name.")
     }
 
-    if(!isClaimflowToolName(toolCall.name)){
+    const normalizedToolName = toolCall.name.trim().toLowerCase();
+
+    if(!isClaimflowToolName(normalizedToolName)){
         throw new Error(`Unknown or unsafe agent tool call: ${toolCall.name}`);
     }
 
-    const action = TOOL_NAME_TO_ACTION[toolCall.name];
+    const action = TOOL_NAME_TO_ACTION[normalizedToolName];
 
     return ProposedAgentActionSchema.parse({
         runId : input.runId,
         action,
         rationale: getMessageContent(input.message) ?? `Agent proposed tool ${toolCall.name}`,
-        toolName : toolCall.name,
+        toolName : normalizedToolName,
         toolInputJson : toolCall.args ?? {}
     });
 }
