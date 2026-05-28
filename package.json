@@ -18,7 +18,8 @@
     "rag:smoke:retrieval-cases": "bun --filter @repo/rag smoke:retrieval-cases",
     "eval:week3:rag": "bun --filter @repo/evals eval:week3:rag",
     "agent:smoke:tools": "bun --filter @repo/agent smoke:tools",
-    "agent:smoke:step": "bun --filter @repo/agent smoke:agent-step"
+    "agent:smoke:step": "bun --filter @repo/agent smoke:agent-step",
+    "agent:smoke:real-step": "bun --filter @repo/agent smoke:real-agent-step"
   },
   "devDependencies": {
     "prettier": "^3.6.0",
