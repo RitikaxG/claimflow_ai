@@ -48,17 +48,7 @@ function buildBody(input : {
 export const draftFollowupRequestTool = tool(
     async ({ runId, missingEvidence, claimNumber, recipientLabel }) => {
         try {
-            const run = await prisma.extractionRun.findUnique({
-                where : { id : runId },
-                select : {
-                    id : true,
-                }
-            });
-
-            if(!run){
-                throw new Error(`Extraction run not found: ${runId}`);
-            }
-
+            
             const subject = buildSubject(claimNumber);
             const body = buildBody({
                 missingEvidence,
@@ -66,15 +56,41 @@ export const draftFollowupRequestTool = tool(
                 recipientLabel,
             });
 
-            const followupDraft = await prisma.followupDraft.create({
-                data : {
-                    runId,
-                    subject,
-                    body,
-                    requestedEvidence : toPrismaJson(missingEvidence),
-                    status : "DRAFTED",
+            const followupDraft = await prisma.$transaction(async (tx) => {
+                const run = await tx.extractionRun.findUnique({
+                    where : {id : runId },
+                    select : {id : true }
+                });
+
+                if (!run) {
+                    throw new Error(`Extraction run not found: ${runId}`);
                 }
-            });
+
+                const createdDraft = await tx.followupDraft.create({
+                    data : {
+                        runId,
+                        subject,
+                        body,
+                        requestedEvidence : toPrismaJson(missingEvidence),
+                        status : "DRAFTED",
+                    }
+                });
+
+                await tx.extractionEvent.create({
+                    data : {
+                        runId,
+                        type : "FOLLOWUP_DRAFT_CREATED",
+                        message: "Follow-up draft created by ClaimFlow agent.",
+                        metadata : toPrismaJson({
+                            followupDraftId: createdDraft.id,
+                            requestedEvidence: missingEvidence,
+                            sourceToolName: "draft_followup_request",
+                        }),
+                    },
+                });
+
+                return createdDraft;
+            })
 
             return okToolResult({
                 action : "DRAFT_FOLLOWUP_REQUEST",
