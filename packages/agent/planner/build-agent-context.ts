@@ -1,15 +1,6 @@
 import { prisma } from "@repo/db";
 import { ClaimStateForAgentSchema, type ClaimStateForAgent } from "@repo/shared/schemas";
 
-const FINAL_REVIEW_TASK_STATUSES = new Set([
-  "APPROVED",
-  "EDITED_AND_APPROVED",
-  "REJECTED",
-]);
-
-function isFinalReviewTaskStatus(status: string | null): boolean {
-  return status !== null && FINAL_REVIEW_TASK_STATUSES.has(status);
-}
 
 function isRecord(value : unknown): value is Record<string,unknown>{
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -167,20 +158,6 @@ const effectiveValidationJson =
         ? []
         : getStringArray(run.missingFieldsJson);
 
-    const reviewTaskStatus = run.reviewTask?.status ?? null;
-    const isFinalReviewTask = isFinalReviewTaskStatus(reviewTaskStatus);
-
-    /**
-     * Important:
-     * validationJson.requiredEvidence is the original machine-validation result.
-     * If human review is already final, the current workflow truth must win.
-     *
-     * A final review task should not expose old missing evidence as active unresolved
-     * evidence to the agent, otherwise the agent may keep asking for evidence after
-     * the claim has already been edited/approved/rejected.
-     */
-    const activeMissingFields = isFinalReviewTask ? [] : missingFields;
-    const activeRequiredEvidence = isFinalReviewTask ? [] : requiredEvidence;
 
     const duplicateSignals = getDuplicateSignals(run.events);
     const retryCount = getRetryCount(run.events);

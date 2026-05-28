@@ -166,7 +166,7 @@ export async function runAgentStep(runId : string){
         data : {
             runId,
             action : proposedAction.action,
-            status : toolSucceeded ? "EXECUTED" : "FAILED",
+            status : workflowSucceeded ? "EXECUTED" : "FAILED",
             rationale : proposedAction.rationale,
             guardrailDecision : "ALLOWED",
             toolName : proposedAction.toolName,
@@ -184,7 +184,7 @@ export async function runAgentStep(runId : string){
             type : "AGENT_TOOL_EXECUTED",
             message : workflowSucceeded
             ? `Agent tool executed: ${proposedAction.toolName}.`
-            : `Agent tool failed after guardrail approval: ${proposedAction.toolName}.`,
+            : `Agent workflow failed after guardrail approval: ${proposedAction.toolName}.`,
             metadata : toPrismaJson({
                 agentActionLogId: executedLog.id,
                 action: proposedAction.action,
