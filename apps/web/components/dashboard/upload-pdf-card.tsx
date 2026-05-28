@@ -12,11 +12,17 @@ export function UploadPdfCard() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const form = event.currentTarget;
+
     if (!file) return;
 
-    await uploadPdf(file);
-    setFile(null);
-    event.currentTarget.reset();
+    try {
+      await uploadPdf(file);
+      setFile(null);
+      form.reset();
+    } catch (error) {
+      console.error("PDF upload failed:", error);
+    }
   };
 
   return (

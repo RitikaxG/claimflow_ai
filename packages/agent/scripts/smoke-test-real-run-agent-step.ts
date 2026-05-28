@@ -37,6 +37,8 @@ if (!runId) {
   );
 }
 
+const expectedAction = process.env.EXPECTED_AGENT_ACTION;
+
 const result = await runAgentStep(runId);
 
 console.log("");
@@ -48,6 +50,7 @@ console.log(`Tool name: ${result.proposedAction.toolName ?? "none"}`);
 console.log(`Guardrail decision: ${result.guardrail.decision}`);
 console.log(`Guardrail rule: ${result.guardrail.ruleId}`);
 console.log(`Executed: ${result.executed ? "YES" : "NO"}`);
+console.log(`Expected action: ${expectedAction ?? "not set"}`);
 
 if (result.guardrail.decision === "BLOCKED") {
   console.log(`Blocked reason: ${result.guardrail.reason}`);
@@ -60,6 +63,15 @@ printSection(
   "Deterministic Post Action Output",
   result.deterministicPostActionOutput,
 );
+
+if (
+  expectedAction &&
+  result.proposedAction.action !== expectedAction
+) {
+  throw new Error(
+    `Expected agent action ${expectedAction}, got ${result.proposedAction.action}.`,
+  );
+}
 
 if (result.proposedAction.action === "DRAFT_FOLLOWUP_REQUEST") {
   if (!result.executed) {

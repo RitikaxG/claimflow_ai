@@ -12,6 +12,12 @@ function isRecord(value : unknown): value is Record<string,unknown> {
     return typeof value === "object" && !Array.isArray(value) && value !== null;
 };
 
+const FINAL_REVIEW_TASK_STATUSES = new Set([
+    "APPROVED",
+    "EDITED_AND_APPROVED",
+    "REJECTED",
+]);
+
 function getMissingEvidenceForPostAction(input : {
     context : ClaimStateForAgent,
     proposedAction: ProposedAgentAction,
@@ -51,6 +57,91 @@ function didToolSucceed(toolOutput : unknown): boolean {
     }
 }
 
+function getStringField(value : unknown, key : string): string | null {
+    if(!isRecord(value)){
+        return null;
+    }
+
+    const field = value[key];
+
+    if(typeof field !== "string"){
+        return null;
+    }
+
+    const trimmed = field.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+
+function formatList(values : string[]): string {
+    return values.join(", ");
+}
+
+/**
+ * Deterministic workflow routing for high-confidence, non-LLM cases.
+ *
+ * The LLM is still used for ambiguous workflow routing, but obvious state-machine
+ * cases should not depend on prompt-following:
+ * - final review task -> no_action
+ * - missing required evidence -> draft_followup_request
+ * - missing extracted fields -> ask_clarification
+ */
+function getDeterministicProposedAction(
+    context : ClaimStateForAgent,
+) : ProposedAgentAction | null {
+    if(
+        context.reviewTaskStatus !== null &&
+        FINAL_REVIEW_TASK_STATUSES.has(context.reviewTaskStatus)
+    ){
+        return {
+            runId : context.runId,
+            action : "NO_ACTION",
+            rationale : `Review task is already final with status ${context.reviewTaskStatus}.`,
+            toolName : "no_action",
+            toolInputJson : {
+                runId : context.runId,
+                reason : `Review task is already final with status ${context.reviewTaskStatus}. No agent mutation is needed.`,
+            },
+        };
+    }
+
+    if(context.requiredEvidence.length > 0){
+        const claimNumber = getStringField(context.extractedJson, "claimNumber");
+        const recipientLabel =
+            getStringField(context.extractedJson, "claimantName") ??
+            getStringField(context.extractedJson, "insuredName");
+
+        return {
+            runId : context.runId,
+            action : "DRAFT_FOLLOWUP_REQUEST",
+            rationale : `Required evidence is missing: ${formatList(context.requiredEvidence)}.`,
+            toolName : "draft_followup_request",
+            toolInputJson : {
+                runId : context.runId,
+                missingEvidence : context.requiredEvidence,
+                claimNumber,
+                recipientLabel,
+            },
+        };
+    }
+
+    if(context.missingFields.length > 0){
+        return {
+            runId : context.runId,
+            action : "ASK_CLARIFICATION",
+            rationale : `Required extracted fields are missing: ${formatList(context.missingFields)}.`,
+            toolName : "ask_clarification",
+            toolInputJson : {
+                runId : context.runId,
+                question : `Please provide the missing claim field(s): ${formatList(context.missingFields)}.`,
+                reason : `Validation found missing extracted field(s): ${formatList(context.missingFields)}.`,
+                missingFields : context.missingFields,
+            },
+        };
+    }
+
+    return null;
+}
+
 export async function runAgentStep(runId : string){
     await prisma.extractionEvent.create({
         data : {
@@ -62,17 +153,25 @@ export async function runAgentStep(runId : string){
 
     const context = await buildAgentContext(runId);
 
-    const agent = createClaimflowAgent();
+    const deterministicProposedAction = getDeterministicProposedAction(context);
 
-    const response = await agent.invoke([
-        ["system",CLAIMFLOW_AGENT_SYSTEM_PROMPT],
-        ["human",buildAgentUserMessage(context)]
-    ]);
+    let proposedAction: ProposedAgentAction;
 
-    const proposedAction = parseAgentToolCall({
-        runId,
-        message : response,
-    });
+    if(deterministicProposedAction){
+        proposedAction = deterministicProposedAction;
+    } else {
+        const agent = createClaimflowAgent();
+
+        const response = await agent.invoke([
+            ["system", CLAIMFLOW_AGENT_SYSTEM_PROMPT],
+            ["human", buildAgentUserMessage(context)]
+        ]);
+
+        proposedAction = parseAgentToolCall({
+            runId,
+            message : response,
+        });
+    }
 
     const proposedLog = await prisma.agentActionLog.create({
         data : {
