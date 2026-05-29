@@ -23,7 +23,12 @@ export async function GET(_request : Request, { params } : Params){
                         orderBy : {
                             createdAt : "asc",
                         }
-                    }
+                    },
+                    followupDrafts : {
+                        orderBy : {
+                            createdAt : "desc"
+                        }
+                    },
                 }
             },
             decisions : {

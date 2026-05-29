@@ -200,6 +200,11 @@ type EditAndApproveInput = {
     notes? : string,
 }
 
+type AdditionalEvidenceInput = {
+    evidenceType : string,
+    note? : string,
+}
+
 type DashboardStore = {
     runs : ExtractionRunRecord[],
 
@@ -220,6 +225,9 @@ type DashboardStore = {
     isExtractingRun : boolean,
     isValidatingRun : boolean,
     isRunningAgentStep : boolean,
+    isSubmittingAdditionalEvidence : boolean,
+    isReopeningReviewTask : boolean,
+    
 
     deletingDocumentId : string | null,
 
@@ -247,6 +255,8 @@ type DashboardStore = {
     extractRun : (runId : string) => Promise<void>;
     validateRun : (runId : string) => Promise<void>;
     runAgentStep : (runId : string) => Promise<void>;
+    submitAdditionalEvidence : (runId : string, input : AdditionalEvidenceInput) => Promise<void>;
+    reopenReviewTask : (taskId : string) => Promise<void>;
     deleteDocument : (documentId : string, deletedReason? : string) => Promise<void>;
 };
 
@@ -286,6 +296,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     isExtractingRun : false,
     isValidatingRun : false,
     isRunningAgentStep : false,
+    isSubmittingAdditionalEvidence : false,
+    isReopeningReviewTask : false,
 
     deletingDocumentId : null,
 
@@ -695,5 +707,56 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             await get().fetchRun(runId);
         }
-    }
+    },
+    submitAdditionalEvidence : async(runId : string, input : AdditionalEvidenceInput) => {
+        set({
+            isSubmittingAdditionalEvidence : true,
+            error : null,
+            successMessage : null,
+        });
+
+        try{
+            await axios.post(
+                `/api/extraction-runs/${runId}/additional-evidence`,
+                input,
+            );
+
+            set({
+                isSubmittingAdditionalEvidence : false,
+                successMessage : "Additional evidence recorded.",
+            });
+
+            await get().fetchRun(runId);
+        }catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to record additional evidence."),
+                isSubmittingAdditionalEvidence : false,
+            });
+        }
+    },
+
+    reopenReviewTask : async(taskId : string) => {
+        set({
+            isReopeningReviewTask : true,
+            error : null,
+            successMessage : null,
+        });
+
+        try{
+            await axios.post(`/api/review-tasks/${taskId}/reopen`);
+
+            set({
+                isReopeningReviewTask : false,
+                successMessage : "Review reopened.",
+            });
+
+            await get().fetchReviewTask(taskId);
+            await get().fetchReviewTasks();
+        }catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to reopen review task."),
+                isReopeningReviewTask : false,
+            });
+        }
+    },
 }));

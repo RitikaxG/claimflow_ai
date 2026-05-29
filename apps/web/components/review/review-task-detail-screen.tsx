@@ -9,6 +9,7 @@ import {
 import { ReviewTaskStatusBadge } from "./review-task-status-badge";
 import { RunStatusBadge } from "../dashboard/run-status-badge";
 import { HumanCorrectionForm } from "./human-correction-form";
+import { AdditionalEvidencePanel } from "./additional-evidence-panel";
 
 type ReviewTaskDetailScreenProps = {
   taskId: string;
@@ -52,8 +53,7 @@ function isTerminalReviewStatus(status: ReviewTaskRecord["status"]) {
   return (
     status === "APPROVED" ||
     status === "EDITED_AND_APPROVED" ||
-    status === "REJECTED" ||
-    status === "NEEDS_MORE_INFO"
+    status === "REJECTED" 
   );
 }
 
@@ -519,6 +519,19 @@ function DecisionActionsPanel({
           </div>
         ) : null}
 
+        {task.status === "NEEDS_MORE_INFO" ? (
+          <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
+            <p className="text-sm font-medium text-amber-900">
+              Waiting for requested evidence.
+            </p>
+
+            <p className="mt-1 text-sm text-amber-800">
+              Record the received evidence from the panel on the left to reopen this
+              review.
+            </p>
+          </div>
+        ) : null}
+
         {isTerminalReviewStatus(task.status) ? (
           <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
             <p className="text-sm font-medium text-gray-950">
@@ -592,7 +605,11 @@ function ReviewWorkspace({ task }: { task: ReviewTaskRecord }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+      {task.status === "NEEDS_MORE_INFO" ? (
+        <AdditionalEvidencePanel task={task} />
+      ) : null}
+
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-6">
           {task.status === "IN_REVIEW" ? (
             <HumanCorrectionForm

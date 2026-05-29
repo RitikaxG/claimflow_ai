@@ -81,6 +81,57 @@ function getLatestCorrectedValidationJson(
   return latestDecision.correctedValidationJson ?? null;
 }
 
+function normalizeEvidenceLabel(value : string): string {
+    const normalized = value.toLowerCase().replace(/[^a-z0-9]/g,"");
+
+    const aliases : Record<string,string> = {
+        fir : "fir",
+        firnumber : "fir",
+        policereport : "policereport",
+        policefir : "fir",
+        invoice : "invoice",
+        photoevidence : "photoevidence",
+    };
+
+    return aliases[normalized] ?? normalized;
+}
+
+function getReceivedEvidenceFromEvents(
+    events : Array<{
+        type : string,
+        metadata : unknown,
+    }>,
+): string[] {
+    return events
+        .filter((event) => event.type === "ADDITIONAL_EVIDENCE_RECEIVED")
+        .map((event) => {
+            if(!isRecord(event.metadata)){
+                return null;
+            }
+
+            const evidenceType = event.metadata.evidenceType;
+
+            return typeof evidenceType === "string" && evidenceType.trim().length > 0
+                ? evidenceType
+                : null;
+        })
+        .filter((item) : item is string => item !== null);
+}
+
+function removeReceivedEvidence(input : {
+    requiredEvidence : string[],
+    receivedEvidence : string[],
+}) {
+    const receivedKeys = new Set(
+        input.receivedEvidence.map((item) => normalizeEvidenceLabel(item)),
+    );
+
+    return input.requiredEvidence.filter((item) => {
+        const requiredKey = normalizeEvidenceLabel(item);
+        return !receivedKeys.has(requiredKey);
+    });
+}
+
 export async function buildAgentContext(
     runId: string
 ) : Promise<ClaimStateForAgent> {
@@ -125,8 +176,8 @@ export async function buildAgentContext(
     const latestCoverageQuestion = run.coverageQuestions[0] ?? null;
     
     const latestCorrectedValidationJson = getLatestCorrectedValidationJson(
-  run.reviewTask,
-);
+        run.reviewTask,
+    );
 
 /**
  * Source priority:
@@ -138,18 +189,25 @@ export async function buildAgentContext(
  * A rejected claim can still have unresolved evidence.
  * An edited-and-approved claim may have correctedValidationJson that resolves it.
  */
-const effectiveValidationJson =
-  latestCorrectedValidationJson ?? run.validationJson;
+    const effectiveValidationJson =
+        latestCorrectedValidationJson ?? run.validationJson;
 
     const missingFieldsFromValidation = getStringArrayFromRecord(
-    effectiveValidationJson,
-    "missingFields",
+        effectiveValidationJson,
+        "missingFields",
     );
 
-    const requiredEvidence = getStringArrayFromRecord(
-    effectiveValidationJson,
-    "requiredEvidence",
+    const requiredEvidenceFromValidation = getStringArrayFromRecord(
+        effectiveValidationJson,
+        "requiredEvidence",
     );
+
+    const receivedEvidenceFromEvents = getReceivedEvidenceFromEvents(run.events);
+
+    const requiredEvidence = removeReceivedEvidence({
+        requiredEvidence : requiredEvidenceFromValidation,
+        receivedEvidence : receivedEvidenceFromEvents,
+    });
 
     const missingFields =
     missingFieldsFromValidation.length > 0
