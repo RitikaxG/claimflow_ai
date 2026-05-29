@@ -9,8 +9,52 @@ type Params = {
     }>;
 };
 
+type EvidenceItemInput = {
+    label : string,
+    note? : string,
+};
+
 function isRecord(value : unknown): value is Record<string,unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseEvidenceItems(value : unknown): EvidenceItemInput[] {
+    if(!Array.isArray(value)){
+        return [];
+    }
+
+    return value
+        .map((item) : EvidenceItemInput | null => {
+            if(!isRecord(item)){
+                return null;
+            }
+
+            const label =
+                typeof item.label === "string"
+                    ? item.label.trim()
+                    : "";
+
+            const note =
+                typeof item.note === "string"
+                    ? item.note.trim()
+                    : "";
+
+            if(!label){
+                return null;
+            }
+
+            if(note){
+                return {
+                    label,
+                    note,
+                };
+            }
+
+            return {
+                label,
+            };
+        })
+        .filter((item) : item is EvidenceItemInput => item !== null);
 }
 
 export async function POST(request : Request, { params } : Params) {
@@ -24,19 +68,11 @@ export async function POST(request : Request, { params } : Params) {
         );
     }
 
-    const evidenceType =
-        typeof body.evidenceType === "string"
-            ? body.evidenceType.trim()
-            : "";
+    const evidenceItems = parseEvidenceItems(body.evidenceItems);
 
-    const note =
-        typeof body.note === "string"
-            ? body.note.trim()
-            : "";
-
-    if(!evidenceType){
+    if(evidenceItems.length === 0){
         return NextResponse.json(
-            { error : "evidenceType is required." },
+            { error : "At least one evidence item is required." },
             { status : 400 },
         );
     }
@@ -61,10 +97,11 @@ export async function POST(request : Request, { params } : Params) {
         data : {
             runId,
             type : "ADDITIONAL_EVIDENCE_RECEIVED",
-            message : `Additional evidence received: ${evidenceType}`,
+            message : `Additional evidence received: ${evidenceItems
+                .map((item) => item.label)
+                .join(", ")}`,
             metadata : {
-                evidenceType,
-                note : note || null,
+                evidenceItems,
             },
         },
     });

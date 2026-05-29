@@ -82,18 +82,7 @@ function getLatestCorrectedValidationJson(
 }
 
 function normalizeEvidenceLabel(value : string): string {
-    const normalized = value.toLowerCase().replace(/[^a-z0-9]/g,"");
-
-    const aliases : Record<string,string> = {
-        fir : "fir",
-        firnumber : "fir",
-        policereport : "policereport",
-        policefir : "fir",
-        invoice : "invoice",
-        photoevidence : "photoevidence",
-    };
-
-    return aliases[normalized] ?? normalized;
+    return value.toLowerCase().replace(/[^a-z0-9]/g,"");
 }
 
 function getReceivedEvidenceFromEvents(
@@ -104,18 +93,31 @@ function getReceivedEvidenceFromEvents(
 ): string[] {
     return events
         .filter((event) => event.type === "ADDITIONAL_EVIDENCE_RECEIVED")
-        .map((event) => {
+        .flatMap((event) => {
             if(!isRecord(event.metadata)){
-                return null;
+                return [];
             }
 
-            const evidenceType = event.metadata.evidenceType;
+            const evidenceItems = event.metadata.evidenceItems;
 
-            return typeof evidenceType === "string" && evidenceType.trim().length > 0
-                ? evidenceType
-                : null;
-        })
-        .filter((item) : item is string => item !== null);
+            if(!Array.isArray(evidenceItems)){
+                return [];
+            }
+
+            return evidenceItems
+                .map((item) => {
+                    if(!isRecord(item)){
+                        return null;
+                    }
+
+                    const label = item.label;
+
+                    return typeof label === "string" && label.trim().length > 0
+                        ? label
+                        : null;
+                })
+                .filter((item) : item is string => item !== null);
+        });
 }
 
 function removeReceivedEvidence(input : {

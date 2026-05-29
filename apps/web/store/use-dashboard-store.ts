@@ -201,8 +201,10 @@ type EditAndApproveInput = {
 }
 
 type AdditionalEvidenceInput = {
-    evidenceType : string,
-    note? : string,
+    evidenceItems : {
+        label : string,
+        note? : string,
+    }[],
 }
 
 type DashboardStore = {
