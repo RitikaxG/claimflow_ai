@@ -268,10 +268,11 @@ export function CoverageAssistantCard({
         <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
             <h3 className="text-base font-semibold text-gray-900">
-                Coverage Decision
+                Coverage Assessment
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-                Final policy-grounded decision generated from retrieved clauses.
+                Policy-grounded assessment generated from retrieved clauses. Final approval or
+                rejection remains with human review.
             </p>
             </div>
 

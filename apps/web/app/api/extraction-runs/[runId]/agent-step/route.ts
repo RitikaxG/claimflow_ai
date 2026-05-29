@@ -14,8 +14,16 @@ export async function POST(_request : Request, { params } : Params ){
     const { runId } = await params;
 
     const existingRun = await prisma.extractionRun.findUnique({
-        where : { id : runId },
-        select : { id : true },
+        where: { id: runId },
+        select: {
+            id: true,
+            status: true,
+            document: {
+            select: {
+                deletedAt: true,
+            },
+            },
+        },
     });
 
     if(!existingRun){
@@ -23,6 +31,22 @@ export async function POST(_request : Request, { params } : Params ){
             { error : "Run not found." },
             { status : 404 },
         )
+    }
+
+    if (existingRun.document.deletedAt) {
+        return NextResponse.json(
+            { error: "This document has been deleted. Agent step cannot run." },
+            { status: 400 },
+        );
+    }
+
+    if (existingRun.status !== "COMPLETED" && existingRun.status !== "NEEDS_REVIEW") {
+        return NextResponse.json(
+            {
+            error: `Agent step can only run after validation. Current run status: ${existingRun.status}`,
+            },
+            { status: 400 },
+        );
     }
 
     try{

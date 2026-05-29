@@ -80,6 +80,7 @@ enum ExtractionEventType {
   AGENT_TOOL_EXECUTED
   FOLLOWUP_DRAFT_CREATED
   ADDITIONAL_EVIDENCE_RECEIVED
+  ADDITIONAL_INFORMATION_RECEIVED
   REVIEW_REOPENED
 }
 
@@ -107,7 +108,9 @@ enum AgentActionType {
   CREATE_REVIEW_TASK
   REQUEST_MISSING_DOCUMENT
   MARK_NEEDS_MORE_EVIDENCE
+  MARK_NEEDS_MORE_INFO
   DRAFT_FOLLOWUP_REQUEST
+  DRAFT_INFORMATION_REQUEST
   DRAFT_APPROVAL_NOTE
   DRAFT_DENIAL_REASON
   ESCALATE_TO_HUMAN
@@ -125,6 +128,12 @@ enum AgentActionStatus {
 enum GuardrailDecision {
   ALLOWED
   BLOCKED
+}
+
+enum FollowupRequestType {
+  EVIDENCE_REQUEST
+  FIELD_CLARIFICATION
+  MIXED_INFO_REQUEST
 }
 
 model Document {
@@ -376,14 +385,21 @@ model FollowupDraft {
   runId String
   run ExtractionRun @relation(fields: [runId],references: [id],onDelete: Cascade)
 
+  requestType FollowupRequestType @default(EVIDENCE_REQUEST)
+
   subject String
   body String
+  
   requestedEvidence Json
+  requestedFields Json @default("[]")
+  fieldRequests Json @default("[]")
+
   status String @default("DRAFTED")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([runId])
+  @@index([requestType])
   @@map("followup_drafts")
 }

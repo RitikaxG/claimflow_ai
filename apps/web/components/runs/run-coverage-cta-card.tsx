@@ -20,7 +20,7 @@ export function RunCoverageCtaCard({ runId, status }: RunCoverageCtaCardProps) {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-semibold text-gray-900">
-              Claim Coverage Decision
+              Claim Coverage Assessment
             </h2>
 
             <span className="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
@@ -29,14 +29,14 @@ export function RunCoverageCtaCard({ runId, status }: RunCoverageCtaCardProps) {
           </div>
 
           <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Ask whether this extracted claim is covered under the policy. The
-            answer will cite retrieved policy clauses and show retrieval
+            Ask whether this extracted claim appears covered under the policy.
+            The answer will cite retrieved policy clauses and show retrieval
             evidence on a dedicated page.
           </p>
 
           {!isAvailable ? (
             <p className="mt-3 text-sm text-yellow-700">
-              Coverage answering is available after extraction + validation.
+              Coverage assessment is available after extraction + validation.
               Current status: <span className="font-semibold">{status}</span>
             </p>
           ) : null}

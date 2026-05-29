@@ -6,8 +6,8 @@ import { parseAgentToolCall } from "../planner/parse-agent-tool-call";
 import { toPrismaJson } from "../tools/prisma-json";
 import { evaluateAgentAction } from "../guardrails";
 import { executeAgentTool } from "./execute-agent-tool";
-import { markNeedsMoreEvidenceTool } from "../tools";
-
+import { markNeedsMoreInfoTool } from "../tools";
+import { buildFieldRequests } from "../tools/information-request-metadata";
 function isRecord(value : unknown): value is Record<string,unknown> {
     return typeof value === "object" && !Array.isArray(value) && value !== null;
 };
@@ -104,37 +104,38 @@ function getDeterministicProposedAction(
         };
     }
 
-    if(context.requiredEvidence.length > 0){
+    
+
+   if (context.requiredEvidence.length > 0 || context.missingFields.length > 0) {
         const claimNumber = getStringField(context.extractedJson, "claimNumber");
         const recipientLabel =
             getStringField(context.extractedJson, "claimantName") ??
             getStringField(context.extractedJson, "insuredName");
 
-        return {
-            runId : context.runId,
-            action : "DRAFT_FOLLOWUP_REQUEST",
-            rationale : `Required evidence is missing: ${formatList(context.requiredEvidence)}.`,
-            toolName : "draft_followup_request",
-            toolInputJson : {
-                runId : context.runId,
-                missingEvidence : context.requiredEvidence,
-                claimNumber,
-                recipientLabel,
-            },
-        };
-    }
+        const fieldRequests = buildFieldRequests(context.missingFields);
 
-    if(context.missingFields.length > 0){
+        const parts: string[] = [];
+
+        if (context.requiredEvidence.length > 0) {
+            parts.push(`required evidence is missing: ${formatList(context.requiredEvidence)}`);
+        }
+
+        if (context.missingFields.length > 0) {
+            parts.push(`required extracted fields are missing: ${formatList(context.missingFields)}`);
+        }
+
         return {
-            runId : context.runId,
-            action : "ASK_CLARIFICATION",
-            rationale : `Required extracted fields are missing: ${formatList(context.missingFields)}.`,
-            toolName : "ask_clarification",
-            toolInputJson : {
-                runId : context.runId,
-                question : `Please provide the missing claim field(s): ${formatList(context.missingFields)}.`,
-                reason : `Validation found missing extracted field(s): ${formatList(context.missingFields)}.`,
-                missingFields : context.missingFields,
+            runId: context.runId,
+            action: "DRAFT_INFORMATION_REQUEST",
+            rationale: parts.join("; "),
+            toolName: "draft_information_request",
+            toolInputJson: {
+            runId: context.runId,
+            requestedEvidence: context.requiredEvidence,
+            requestedFields: context.missingFields,
+            fieldRequests,
+            claimNumber,
+            recipientLabel,
             },
         };
     }
@@ -246,14 +247,19 @@ export async function runAgentStep(runId : string){
     let deterministicPostActionOutput: unknown = null;
     let deterministicPostActionSucceeded = true;
 
-    if(proposedAction.action === "DRAFT_FOLLOWUP_REQUEST" && toolSucceeded){
-        deterministicPostActionOutput = await markNeedsMoreEvidenceTool.invoke({
+    if (
+        (proposedAction.action === "DRAFT_INFORMATION_REQUEST" ||
+            proposedAction.action === "DRAFT_FOLLOWUP_REQUEST") &&
+        toolSucceeded
+        ) {
+        deterministicPostActionOutput = await markNeedsMoreInfoTool.invoke({
             runId,
-            missingEvidence : getMissingEvidenceForPostAction({
-                context,
-                proposedAction,
+            missingEvidence: getMissingEvidenceForPostAction({
+            context,
+            proposedAction,
             }),
-            note : "Deterministic post-action after follow-up draft creation.",
+            missingFields: context.missingFields,
+            note: "Deterministic post-action after information request draft creation.",
         });
 
         deterministicPostActionSucceeded = didToolSucceed(deterministicPostActionOutput);
@@ -291,7 +297,7 @@ export async function runAgentStep(runId : string){
                 toolName: proposedAction.toolName,
                 deterministicPostAction: 
                 proposedAction.action === "DRAFT_FOLLOWUP_REQUEST" && toolSucceeded
-                ? "MARK_NEEDS_MORE_EVIDENCE"
+                ? "MARK_NEEDS_MORE_INFO"
                 : null,
             }),
         },

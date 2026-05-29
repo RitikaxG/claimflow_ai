@@ -45,14 +45,21 @@ export type AgentActionLogRecord = {
 };
 
 export type FollowupDraftRecord = {
-    id : string,
-    runId : string,
-    subject : string,
-    body : string,
-    requestedEvidence : unknown,
-    status : string,
-    createdAt : string,
-    updatedAt : string,
+  id: string;
+  runId: string;
+
+  requestType: FollowupRequestType;
+
+  subject: string;
+  body: string;
+
+  requestedEvidence: unknown;
+  requestedFields: unknown;
+  fieldRequests: unknown;
+
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ReviewTaskSummaryRecord = {
@@ -207,6 +214,25 @@ type AdditionalEvidenceInput = {
     }[],
 }
 
+type AdditionalInformationInput = {
+  evidenceItems?: {
+    label: string;
+    note?: string;
+  }[];
+  fieldValues?: {
+    field: string;
+    label?: string;
+    value: string;
+    note?: string;
+  }[];
+};
+
+export type FollowupRequestType =
+  | "EVIDENCE_REQUEST"
+  | "FIELD_CLARIFICATION"
+  | "MIXED_INFO_REQUEST";
+
+
 type DashboardStore = {
     runs : ExtractionRunRecord[],
 
@@ -258,6 +284,10 @@ type DashboardStore = {
     validateRun : (runId : string) => Promise<void>;
     runAgentStep : (runId : string) => Promise<void>;
     submitAdditionalEvidence : (runId : string, input : AdditionalEvidenceInput) => Promise<void>;
+    submitAdditionalInformation: (
+        runId: string,
+        input: AdditionalInformationInput,
+    ) => Promise<void>;
     reopenReviewTask : (taskId : string) => Promise<void>;
     deleteDocument : (documentId : string, deletedReason? : string) => Promise<void>;
 };
@@ -758,6 +788,35 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             set({
                 error : getErrorMessage(error, "Failed to reopen review task."),
                 isReopeningReviewTask : false,
+            });
+        }
+    },
+    submitAdditionalInformation: async (
+        runId: string,
+        input: AdditionalInformationInput,
+        ) => {
+        set({
+            isSubmittingAdditionalEvidence: true,
+            error: null,
+            successMessage: null,
+        });
+
+        try {
+            await axios.post(
+            `/api/extraction-runs/${runId}/additional-information`,
+            input,
+            );
+
+            set({
+            isSubmittingAdditionalEvidence: false,
+            successMessage: "Additional information recorded.",
+            });
+
+            await get().fetchRun(runId);
+        } catch (error) {
+            set({
+            error: getErrorMessage(error, "Failed to record additional information."),
+            isSubmittingAdditionalEvidence: false,
             });
         }
     },

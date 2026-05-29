@@ -50,7 +50,17 @@ ActionPermissionRule
     NO_ACTION: {
         permission : "ALLOW",
         reason : "Safe no-op."
-    }
+    },
+    MARK_NEEDS_MORE_INFO: {
+        permission: "ALLOW",
+        reason: "Moves review workflow toward missing information resolution.",
+    },
+
+    DRAFT_INFORMATION_REQUEST: {
+        permission: "ALLOW",
+        reason:
+            "Draft-only action for missing claim information or evidence. Does not send email.",
+    },
 };
 
 export function getActionPermission(

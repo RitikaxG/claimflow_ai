@@ -134,6 +134,54 @@ function removeReceivedEvidence(input : {
     });
 }
 
+function getResolvedFieldsFromEvents(
+  events: Array<{
+    type: string;
+    metadata: unknown;
+  }>,
+): string[] {
+  return events
+    .filter(
+    (event) =>
+        event.type === "ADDITIONAL_EVIDENCE_RECEIVED" ||
+        event.type === "ADDITIONAL_INFORMATION_RECEIVED",
+    )
+    .flatMap((event) => {
+      if (!isRecord(event.metadata)) {
+        return [];
+      }
+
+      const fieldValues = event.metadata.fieldValues;
+
+      if (!Array.isArray(fieldValues)) {
+        return [];
+      }
+
+      return fieldValues
+        .map((item) => {
+          if (!isRecord(item)) {
+            return null;
+          }
+
+          const field = item.field;
+
+          return typeof field === "string" && field.trim().length > 0
+            ? field
+            : null;
+        })
+        .filter((item): item is string => item !== null);
+    });
+}
+
+function removeResolvedFields(input: {
+  missingFields: string[];
+  resolvedFields: string[];
+}) {
+  const resolvedKeys = new Set(input.resolvedFields.map((item) => item.trim()));
+
+  return input.missingFields.filter((item) => !resolvedKeys.has(item));
+}
+
 export async function buildAgentContext(
     runId: string
 ) : Promise<ClaimStateForAgent> {
@@ -181,16 +229,6 @@ export async function buildAgentContext(
         run.reviewTask,
     );
 
-/**
- * Source priority:
- * 1. correctedValidationJson from latest human review decision
- * 2. original validationJson from machine validation
- *
- * Important:
- * Do not erase missingFields / requiredEvidence just because review is final.
- * A rejected claim can still have unresolved evidence.
- * An edited-and-approved claim may have correctedValidationJson that resolves it.
- */
     const effectiveValidationJson =
         latestCorrectedValidationJson ?? run.validationJson;
 
@@ -205,19 +243,24 @@ export async function buildAgentContext(
     );
 
     const receivedEvidenceFromEvents = getReceivedEvidenceFromEvents(run.events);
+    const resolvedFieldsFromEvents = getResolvedFieldsFromEvents(run.events);
 
     const requiredEvidence = removeReceivedEvidence({
         requiredEvidence : requiredEvidenceFromValidation,
         receivedEvidence : receivedEvidenceFromEvents,
     });
 
-    const missingFields =
-    missingFieldsFromValidation.length > 0
-        ? missingFieldsFromValidation
-        : latestCorrectedValidationJson
-        ? []
-        : getStringArray(run.missingFieldsJson);
+    const rawMissingFields =
+        missingFieldsFromValidation.length > 0
+            ? missingFieldsFromValidation
+            : latestCorrectedValidationJson
+            ? []
+            : getStringArray(run.missingFieldsJson);
 
+    const missingFields = removeResolvedFields({
+        missingFields: rawMissingFields,
+        resolvedFields: resolvedFieldsFromEvents,
+    });
 
     const duplicateSignals = getDuplicateSignals(run.events);
     const retryCount = getRetryCount(run.events);

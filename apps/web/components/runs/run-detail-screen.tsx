@@ -15,6 +15,7 @@ import { NeedsReviewCallout } from "./needs-review-callout";
 import { SourceDocumentCard } from "./source-document-card";
 import { RunCoverageCtaCard } from "./run-coverage-cta-card";
 import { RunAgentStepCtaCard } from "./run-agent-step-cta-card";
+import { NextRecommendedActionCard } from "./next-recommended-action-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -54,6 +55,8 @@ export function RunDetailScreen() {
         <DocumentMetadataCard document={selectedRun.document} />
         <RunStatusCard run={selectedRun} />
       </div>
+
+      <NextRecommendedActionCard run={selectedRun} />
 
       <SourceDocumentCard document={selectedRun.document} />
 

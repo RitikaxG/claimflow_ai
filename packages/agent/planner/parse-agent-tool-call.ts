@@ -1,15 +1,20 @@
 import { ProposedAgentActionSchema, type ProposedAgentAction, type AgentActionType } from "@repo/shared/schemas";
 
 const TOOL_NAME_TO_ACTION = {
-    retrieve_policy_clauses : "RETRIEVE_POLICY_CLAUSES",
-    create_review_task : "CREATE_REVIEW_TASK",
-    draft_followup_request : "DRAFT_FOLLOWUP_REQUEST",
-    mark_needs_more_evidence : "MARK_NEEDS_MORE_EVIDENCE",
-    escalate_to_human : "ESCALATE_TO_HUMAN",
-    draft_approval_note : "DRAFT_APPROVAL_NOTE",
-    draft_denial_reason : "DRAFT_DENIAL_REASON",
-    ask_clarification : "ASK_CLARIFICATION",
-    no_action: "NO_ACTION",
+  retrieve_policy_clauses: "RETRIEVE_POLICY_CLAUSES",
+  create_review_task: "CREATE_REVIEW_TASK",
+
+  draft_information_request: "DRAFT_INFORMATION_REQUEST",
+  draft_followup_request: "DRAFT_FOLLOWUP_REQUEST",
+
+  mark_needs_more_info: "MARK_NEEDS_MORE_INFO",
+  mark_needs_more_evidence: "MARK_NEEDS_MORE_EVIDENCE",
+
+  escalate_to_human: "ESCALATE_TO_HUMAN",
+  draft_approval_note: "DRAFT_APPROVAL_NOTE",
+  draft_denial_reason: "DRAFT_DENIAL_REASON",
+  ask_clarification: "ASK_CLARIFICATION",
+  no_action: "NO_ACTION",
 } satisfies Record<string, AgentActionType>;
 
 type ClaimflowToolName = keyof typeof TOOL_NAME_TO_ACTION;
