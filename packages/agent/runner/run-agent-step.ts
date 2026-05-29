@@ -76,15 +76,6 @@ function formatList(values : string[]): string {
     return values.join(", ");
 }
 
-/**
- * Deterministic workflow routing for high-confidence, non-LLM cases.
- *
- * The LLM is still used for ambiguous workflow routing, but obvious state-machine
- * cases should not depend on prompt-following:
- * - final review task -> no_action
- * - missing required evidence -> draft_followup_request
- * - missing extracted fields -> ask_clarification
- */
 function getDeterministicProposedAction(
     context : ClaimStateForAgent,
 ) : ProposedAgentAction | null {
@@ -295,10 +286,12 @@ export async function runAgentStep(runId : string){
                 action: proposedAction.action,
                 status: workflowSucceeded ? "EXECUTED" : "FAILED",
                 toolName: proposedAction.toolName,
-                deterministicPostAction: 
-                proposedAction.action === "DRAFT_FOLLOWUP_REQUEST" && toolSucceeded
-                ? "MARK_NEEDS_MORE_INFO"
-                : null,
+                deterministicPostAction:
+                (proposedAction.action === "DRAFT_INFORMATION_REQUEST" ||
+                    proposedAction.action === "DRAFT_FOLLOWUP_REQUEST") &&
+                toolSucceeded
+                    ? "MARK_NEEDS_MORE_INFO"
+                    : null,
             }),
         },
     });

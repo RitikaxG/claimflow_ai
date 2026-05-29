@@ -92,7 +92,11 @@ function getReceivedEvidenceFromEvents(
     }>,
 ): string[] {
     return events
-        .filter((event) => event.type === "ADDITIONAL_EVIDENCE_RECEIVED")
+        .filter(
+        (event) =>
+            event.type === "ADDITIONAL_EVIDENCE_RECEIVED" ||
+            event.type === "ADDITIONAL_INFORMATION_RECEIVED",
+        )
         .flatMap((event) => {
             if(!isRecord(event.metadata)){
                 return [];
