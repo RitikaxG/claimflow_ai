@@ -14,6 +14,7 @@ import { ConflictsCard } from "./conflicts-card";
 import { NeedsReviewCallout } from "./needs-review-callout";
 import { SourceDocumentCard } from "./source-document-card";
 import { RunCoverageCtaCard } from "./run-coverage-cta-card";
+import { RunAgentStepCtaCard } from "./run-agent-step-cta-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -67,8 +68,26 @@ export function RunDetailScreen() {
       <ConflictsCard validationJson={selectedRun.validationJson} />
 
       <RunCoverageCtaCard runId={selectedRun.id} status={selectedRun.status} />
-      
-      <RunTimeline events={selectedRun.events} />
+
+      <RunAgentStepCtaCard
+        runId={selectedRun.id}
+        reviewTaskStatus={selectedRun.reviewTask?.status ?? null}
+        latestActionType={selectedRun.agentActionLogs?.[0]?.action ?? null}
+        latestActionStatus={selectedRun.agentActionLogs?.[0]?.status ?? null}
+      />
+
+      <RunTimeline
+        events={selectedRun.events}
+        title="Run Timeline"
+        maxItems={8}
+        excludeTypes={[
+          "AGENT_STEP_STARTED",
+          "AGENT_ACTION_PROPOSED",
+          "AGENT_ACTION_BLOCKED",
+          "AGENT_TOOL_EXECUTED",
+          "FOLLOWUP_DRAFT_CREATED",
+        ]}
+      />
     </div>
   );
 }

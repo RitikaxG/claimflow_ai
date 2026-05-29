@@ -30,6 +30,44 @@ export type ExtractionEventRecord = {
     createdAt : string,
 };
 
+export type AgentActionLogRecord = {
+    id : string,
+    runId : string,
+    action : string,
+    status : string,
+    rationale : string | null,
+    guardrailDecision : string | null,
+    blockedReason : string | null,
+    toolName : string | null,
+    toolInputJson : unknown | null,
+    toolOutputJson : unknown | null,
+    createdAt : string,
+};
+
+export type FollowupDraftRecord = {
+    id : string,
+    runId : string,
+    subject : string,
+    body : string,
+    requestedEvidence : unknown,
+    status : string,
+    createdAt : string,
+    updatedAt : string,
+};
+
+export type ReviewTaskSummaryRecord = {
+    id : string,
+    runId : string,
+    status : ReviewTaskStatus,
+    priority : ReviewPriority,
+    reasonJson : unknown,
+    assignedTo : string | null,
+    startedAt : string | null,
+    completedAt : string | null,
+    createdAt : string,
+    updatedAt : string,
+};
+
 export type ExtractionRunRecord = {
     id : string,
     documentId : string,
@@ -51,6 +89,10 @@ export type ExtractionRunRecord = {
 
     document : DocumentRecord,
     events : ExtractionEventRecord[],
+
+    reviewTask? : ReviewTaskSummaryRecord | null,
+    agentActionLogs? : AgentActionLogRecord[],
+    followupDrafts? : FollowupDraftRecord[],
 };
 
 type UploadResponse = {
@@ -177,6 +219,7 @@ type DashboardStore = {
 
     isExtractingRun : boolean,
     isValidatingRun : boolean,
+    isRunningAgentStep : boolean,
 
     deletingDocumentId : string | null,
 
@@ -203,6 +246,7 @@ type DashboardStore = {
     
     extractRun : (runId : string) => Promise<void>;
     validateRun : (runId : string) => Promise<void>;
+    runAgentStep : (runId : string) => Promise<void>;
     deleteDocument : (documentId : string, deletedReason? : string) => Promise<void>;
 };
 
@@ -241,6 +285,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
     isExtractingRun : false,
     isValidatingRun : false,
+    isRunningAgentStep : false,
 
     deletingDocumentId : null,
 
@@ -621,6 +666,34 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
                 error : getErrorMessage(error, "Failed to edit and approve review task."),
                 reviewTaskActionInFlight : null,
             })
+        }
+    },
+
+    runAgentStep: async(runId : string) => {
+        set({
+            isRunningAgentStep : true,
+            error : null,
+            successMessage : null,
+        });
+
+        try{
+            await axios.post(`/api/extraction-runs/${runId}/agent-step`);
+
+            set({
+                isRunningAgentStep : false,
+                successMessage : "Agent step completed.",
+            })
+
+            await get().fetchRun(runId);
+            await get().fetchRuns();
+            await get().fetchReviewTasks();
+        }catch(error){
+            set({
+                error : getErrorMessage(error, "Failed to run agent step."),
+                isRunningAgentStep : false,
+            });
+
+            await get().fetchRun(runId);
         }
     }
 }));
