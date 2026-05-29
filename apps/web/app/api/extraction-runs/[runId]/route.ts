@@ -19,6 +19,17 @@ export async function GET(_request : Request, { params } : Params ) {
         where : { id : runId },
         include : {
             document : true,
+            reviewTask : true,
+            followupDrafts : {
+                orderBy : {
+                    createdAt : "desc"
+                }
+            },
+            agentActionLogs : {
+                orderBy : {
+                    createdAt : "desc"
+                }
+            },
             events : {
                 orderBy : { createdAt : "asc" },
             },

@@ -15,6 +15,7 @@
     "@repo/db": "workspace:*",
     "@repo/rag": "workspace:*",
     "@repo/shared": "workspace:*",
+    "@repo/agent":"workspace:*",
     "@repo/ui": "*",
     "axios": "^1.16.0",
     "jq": "^1.7.2",
