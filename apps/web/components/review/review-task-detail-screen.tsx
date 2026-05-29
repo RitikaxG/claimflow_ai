@@ -9,7 +9,7 @@ import {
 import { ReviewTaskStatusBadge } from "./review-task-status-badge";
 import { RunStatusBadge } from "../dashboard/run-status-badge";
 import { HumanCorrectionForm } from "./human-correction-form";
-import { AdditionalEvidencePanel } from "./additional-evidence-panel";
+import { AdditionalInformationPanel } from "./additional-information-panel";
 
 type ReviewTaskDetailScreenProps = {
   taskId: string;
@@ -53,25 +53,7 @@ function isTerminalReviewStatus(status: ReviewTaskRecord["status"]) {
   return (
     status === "APPROVED" ||
     status === "EDITED_AND_APPROVED" ||
-    status === "REJECTED" 
-  );
-}
-
-function JsonPanel({
-  title,
-  value,
-}: {
-  title: string;
-  value: unknown;
-}) {
-  return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-950">{title}</h2>
-
-      <pre className="mt-4 max-h-[420px] overflow-auto rounded-xl bg-gray-950 p-4 text-xs text-gray-100">
-        {prettyJson(value)}
-      </pre>
-    </section>
+    status === "REJECTED"
   );
 }
 
@@ -494,15 +476,15 @@ function DecisionActionsPanel({
               </h3>
 
               <p className="mt-1 text-sm text-orange-700">
-                Use this when the claim needs missing evidence or clarification.
-                Notes are required.
+                Use this when the claim needs missing information, evidence, or
+                clarification. Notes are required.
               </p>
 
               <textarea
                 required
                 value={moreInfoNotes}
                 onChange={(event) => setMoreInfoNotes(event.target.value)}
-                placeholder="Example: Please provide FIR number and police report."
+                placeholder="Example: Please provide policy number, FIR number, or police report."
                 className="mt-3 min-h-24 w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 outline-none focus:border-orange-400"
               />
 
@@ -522,12 +504,12 @@ function DecisionActionsPanel({
         {task.status === "NEEDS_MORE_INFO" ? (
           <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
             <p className="text-sm font-medium text-amber-900">
-              Waiting for requested evidence.
+              Waiting for requested information or evidence.
             </p>
 
             <p className="mt-1 text-sm text-amber-800">
-              Record the received evidence from the panel on the left to reopen this
-              review.
+              Record the received information/evidence from the panel on the
+              left to reopen this review.
             </p>
           </div>
         ) : null}
@@ -606,10 +588,10 @@ function ReviewWorkspace({ task }: { task: ReviewTaskRecord }) {
   return (
     <div className="space-y-6">
       {task.status === "NEEDS_MORE_INFO" ? (
-        <AdditionalEvidencePanel task={task} />
+        <AdditionalInformationPanel task={task} />
       ) : null}
 
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-6">
           {task.status === "IN_REVIEW" ? (
             <HumanCorrectionForm
@@ -652,7 +634,9 @@ function ReviewWorkspace({ task }: { task: ReviewTaskRecord }) {
   );
 }
 
-export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) {
+export function ReviewTaskDetailScreen({
+  taskId,
+}: ReviewTaskDetailScreenProps) {
   const selectedReviewTask = useDashboardStore(
     (state) => state.selectedReviewTask,
   );
@@ -749,7 +733,9 @@ export function ReviewTaskDetailScreen({ taskId }: ReviewTaskDetailScreenProps) 
                     <p>Source type: {task.run.document.sourceType}</p>
                     <p>Priority: {task.priority}</p>
                     <p>Task created: {formatDate(task.createdAt)}</p>
-                    <p>Run status: {task.run.status.replaceAll("_", " ")}</p>
+                    <p>
+                      Extraction status: {task.run.status.replaceAll("_", " ")}
+                    </p>
 
                     {task.startedAt ? (
                       <p>Started: {formatDate(task.startedAt)}</p>
