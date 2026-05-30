@@ -10,6 +10,7 @@ import { ReviewTaskStatusBadge } from "./review-task-status-badge";
 import { RunStatusBadge } from "../dashboard/run-status-badge";
 import { HumanCorrectionForm } from "./human-correction-form";
 import { AdditionalInformationPanel } from "./additional-information-panel";
+import { ReceivedInformationSummaryCard } from "./received-information-summary-card";
 
 type ReviewTaskDetailScreenProps = {
   taskId: string;
@@ -509,7 +510,8 @@ function DecisionActionsPanel({
 
             <p className="mt-1 text-sm text-amber-800">
               Record the received information/evidence from the panel on the
-              left to reopen this review.
+              left. The review will reopen to PENDING, then you can start review
+              again for approve, edit & approve, reject, or request more info.
             </p>
           </div>
         ) : null}
@@ -586,12 +588,14 @@ function ReviewWorkspace({ task }: { task: ReviewTaskRecord }) {
   };
 
   return (
-    <div className="space-y-6">
-      {task.status === "NEEDS_MORE_INFO" ? (
-        <AdditionalInformationPanel task={task} />
-      ) : null}
+  <div className="space-y-6">
+    {task.status === "NEEDS_MORE_INFO" ? (
+      <AdditionalInformationPanel task={task} />
+    ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+    <ReceivedInformationSummaryCard task={task} />
+
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-6">
           {task.status === "IN_REVIEW" ? (
             <HumanCorrectionForm
@@ -664,7 +668,7 @@ export function ReviewTaskDetailScreen({
         <header className="space-y-4">
           <div>
             <p className="text-sm font-medium text-gray-500">
-              Week 2 Day 6 · Edit and Approve
+              Week 4 Day 6 · Evidence follow-up + human verification
             </p>
 
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950">
@@ -672,8 +676,8 @@ export function ReviewTaskDetailScreen({
             </h1>
 
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Open a validation failure, inspect the AI output, correct the
-              claim fields, and store a human-reviewed decision.
+              Inspect the AI output, record received information when the agent pauses
+              the review, reopen the task, and store the final human-reviewed decision.
             </p>
           </div>
 

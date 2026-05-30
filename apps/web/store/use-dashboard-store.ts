@@ -253,7 +253,7 @@ type DashboardStore = {
     isExtractingRun : boolean,
     isValidatingRun : boolean,
     isRunningAgentStep : boolean,
-    isSubmittingAdditionalEvidence : boolean,
+    isSubmittingAdditionalInformation : boolean,
     isReopeningReviewTask : boolean,
     
 
@@ -287,8 +287,8 @@ type DashboardStore = {
     submitAdditionalInformation: (
         runId: string,
         input: AdditionalInformationInput,
-    ) => Promise<void>;
-    reopenReviewTask : (taskId : string) => Promise<void>;
+    ) => Promise<boolean>;
+    reopenReviewTask : (taskId : string) => Promise<boolean>;
     deleteDocument : (documentId : string, deletedReason? : string) => Promise<void>;
 };
 
@@ -328,7 +328,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     isExtractingRun : false,
     isValidatingRun : false,
     isRunningAgentStep : false,
-    isSubmittingAdditionalEvidence : false,
+    isSubmittingAdditionalInformation : false,
     isReopeningReviewTask : false,
 
     deletingDocumentId : null,
@@ -742,7 +742,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     },
     submitAdditionalEvidence : async(runId : string, input : AdditionalEvidenceInput) => {
         set({
-            isSubmittingAdditionalEvidence : true,
+            isSubmittingAdditionalInformation : true,
             error : null,
             successMessage : null,
         });
@@ -754,7 +754,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             );
 
             set({
-                isSubmittingAdditionalEvidence : false,
+                isSubmittingAdditionalInformation : false,
                 successMessage : "Additional evidence recorded.",
             });
 
@@ -762,7 +762,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         }catch(error){
             set({
                 error : getErrorMessage(error, "Failed to record additional evidence."),
-                isSubmittingAdditionalEvidence : false,
+                isSubmittingAdditionalInformation : false,
             });
         }
     },
@@ -779,16 +779,20 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             set({
                 isReopeningReviewTask : false,
-                successMessage : "Review reopened.",
+                successMessage : "Review reopened to PENDING. Start review again to continue human verification.",
             });
 
             await get().fetchReviewTask(taskId);
             await get().fetchReviewTasks();
+
+            return true;
         }catch(error){
             set({
                 error : getErrorMessage(error, "Failed to reopen review task."),
                 isReopeningReviewTask : false,
             });
+
+            return false;
         }
     },
     submitAdditionalInformation: async (
@@ -796,7 +800,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         input: AdditionalInformationInput,
         ) => {
         set({
-            isSubmittingAdditionalEvidence: true,
+            isSubmittingAdditionalInformation: true,
             error: null,
             successMessage: null,
         });
@@ -808,16 +812,20 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             );
 
             set({
-            isSubmittingAdditionalEvidence: false,
+            isSubmittingAdditionalInformation: false,
             successMessage: "Additional information recorded.",
             });
 
             await get().fetchRun(runId);
+
+            return true;
         } catch (error) {
             set({
             error: getErrorMessage(error, "Failed to record additional information."),
-            isSubmittingAdditionalEvidence: false,
+            isSubmittingAdditionalInformation: false,
             });
+
+            return false;
         }
     },
 }));

@@ -195,7 +195,7 @@ export function AdditionalEvidencePanel({ task } : AdditionalEvidencePanelProps)
     );
 
     const isSubmittingAdditionalEvidence = useDashboardStore(
-        (state) => state.isSubmittingAdditionalEvidence,
+        (state) => state.isSubmittingAdditionalInformation,
     );
 
     const isReopeningReviewTask = useDashboardStore(

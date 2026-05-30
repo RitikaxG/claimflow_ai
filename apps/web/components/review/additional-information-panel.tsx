@@ -406,9 +406,9 @@ export function AdditionalInformationPanel({
 
   const reopenReviewTask = useDashboardStore((state) => state.reopenReviewTask);
 
-  const isSubmittingAdditionalEvidence = useDashboardStore(
-    (state) => state.isSubmittingAdditionalEvidence,
-  );
+ const isSubmittingAdditionalInformation = useDashboardStore(
+  (state) => state.isSubmittingAdditionalInformation,
+);
 
   const isReopeningReviewTask = useDashboardStore(
     (state) => state.isReopeningReviewTask,
@@ -423,7 +423,7 @@ export function AdditionalInformationPanel({
     setFieldNotes({});
   }, [requestedFieldsKey]);
 
-  const isBusy = isSubmittingAdditionalEvidence || isReopeningReviewTask;
+  const isBusy = isSubmittingAdditionalInformation || isReopeningReviewTask;
 
   const evidenceItems = buildEvidenceItems({
     selectedLabels,
@@ -485,10 +485,14 @@ export function AdditionalInformationPanel({
       return;
     }
 
-    await submitAdditionalInformation(task.runId, {
-      evidenceItems,
-      fieldValues: fieldValueItems,
+    const recorded = await submitAdditionalInformation(task.runId, {
+        evidenceItems,
+        fieldValues: fieldValueItems,
     });
+
+    if (!recorded) {
+        return;
+    }
 
     await reopenReviewTask(task.id);
   };
@@ -502,7 +506,8 @@ export function AdditionalInformationPanel({
 
         <p className="text-sm text-amber-800">
           This review is paused because the agent requested missing information
-          or evidence. Record what was received, then reopen the review.
+          or evidence. Record what was received, reopen the review to PENDING,
+          then start review again for final human verification.
         </p>
       </div>
 
@@ -806,15 +811,15 @@ export function AdditionalInformationPanel({
           className="rounded-lg bg-gray-950 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
         >
           {isBusy
-            ? "Recording information..."
-            : "Record information and reopen review"}
+            ? "Recording information and reopening..."
+            : "Record information and reopen to PENDING"}
         </button>
       </form>
 
       <p className="mt-3 text-xs text-amber-800">
         Recording received information does not automatically edit the extracted
-        JSON. After reopening, the reviewer should use Edit & approve to update
-        the corrected JSON.
+        JSON. After reopening to PENDING, start the review again. If field values
+        changed, use Edit & approve to update the corrected JSON.
       </p>
     </section>
   );
