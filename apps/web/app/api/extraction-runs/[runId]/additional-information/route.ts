@@ -115,28 +115,47 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Run not found." }, { status: 404 });
   }
 
-  const event = await prisma.extractionEvent.create({
-    data: {
-      runId,
-      type: "ADDITIONAL_INFORMATION_RECEIVED",
-      message: [
-        evidenceItems.length > 0
-          ? `Evidence received: ${evidenceItems.map((item) => item.label).join(", ")}`
-          : null,
-        fieldValues.length > 0
-          ? `Field values received: ${fieldValues.map((item) => item.field).join(", ")}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join(" | "),
-      metadata: {
-        evidenceItems,
-        fieldValues,
-      },
-    },
-  });
+  const result = await prisma.$transaction(async (tx) => {
+    const event = await tx.extractionEvent.create({
+        data: {
+        runId,
+        type: "ADDITIONAL_INFORMATION_RECEIVED",
+        message: [
+            evidenceItems.length > 0
+            ? `Evidence received: ${evidenceItems
+                .map((item) => item.label)
+                .join(", ")}`
+            : null,
+            fieldValues.length > 0
+            ? `Field values received: ${fieldValues
+                .map((item) => item.field)
+                .join(", ")}`
+            : null,
+        ]
+            .filter(Boolean)
+            .join(" | "),
+        metadata: {
+            evidenceItems,
+            fieldValues,
+        },
+        },
+    });
 
-  return NextResponse.json({
-    event,
-  });
+    const updatedDraft = await tx.followupDraft.updateMany({
+        where: {
+        runId,
+        status: "DRAFTED",
+        },
+        data: {
+        status: "INFO_RECEIVED",
+        },
+    });
+
+    return {
+        event,
+        updatedDraftCount: updatedDraft.count,
+    };
+    });
+
+    return NextResponse.json(result);
 }

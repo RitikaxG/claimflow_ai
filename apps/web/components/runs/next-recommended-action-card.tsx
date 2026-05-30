@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import type { ExtractionRunRecord } from "../../store/use-dashboard-store";
+import type {
+  ExtractionEventRecord,
+  ExtractionRunRecord,
+} from "../../store/use-dashboard-store";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -19,6 +22,108 @@ function getStringArrayFromRecord(value: unknown, key: string) {
     : [];
 }
 
+function normalizeEvidenceLabel(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function normalizeFieldKey(value: string) {
+  return value.trim();
+}
+
+function getReceivedEvidenceFromEvents(events: ExtractionEventRecord[]) {
+  return events
+    .filter(
+      (event) =>
+        event.type === "ADDITIONAL_INFORMATION_RECEIVED" ||
+        event.type === "ADDITIONAL_EVIDENCE_RECEIVED",
+    )
+    .flatMap((event) => {
+      if (!isRecord(event.metadata)) {
+        return [];
+      }
+
+      const evidenceItems = event.metadata.evidenceItems;
+
+      if (!Array.isArray(evidenceItems)) {
+        return [];
+      }
+
+      return evidenceItems
+        .map((item) => {
+          if (!isRecord(item)) {
+            return null;
+          }
+
+          return typeof item.label === "string" && item.label.trim().length > 0
+            ? item.label
+            : null;
+        })
+        .filter((item): item is string => item !== null);
+    });
+}
+
+function getReceivedFieldsFromEvents(events: ExtractionEventRecord[]) {
+  return events
+    .filter((event) => event.type === "ADDITIONAL_INFORMATION_RECEIVED")
+    .flatMap((event) => {
+      if (!isRecord(event.metadata)) {
+        return [];
+      }
+
+      const fieldValues = event.metadata.fieldValues;
+
+      if (!Array.isArray(fieldValues)) {
+        return [];
+      }
+
+      return fieldValues
+        .map((item) => {
+          if (!isRecord(item)) {
+            return null;
+          }
+
+          return typeof item.field === "string" && item.field.trim().length > 0
+            ? item.field
+            : null;
+        })
+        .filter((item): item is string => item !== null);
+    });
+}
+
+function removeReceivedEvidence(input: {
+  requiredEvidence: string[];
+  receivedEvidence: string[];
+}) {
+  const receivedKeys = new Set(
+    input.receivedEvidence.map((item) => normalizeEvidenceLabel(item)),
+  );
+
+  return input.requiredEvidence.filter((item) => {
+    return !receivedKeys.has(normalizeEvidenceLabel(item));
+  });
+}
+
+function removeReceivedFields(input: {
+  missingFields: string[];
+  receivedFields: string[];
+}) {
+  const receivedKeys = new Set(
+    input.receivedFields.map((item) => normalizeFieldKey(item)),
+  );
+
+  return input.missingFields.filter((item) => {
+    return !receivedKeys.has(normalizeFieldKey(item));
+  });
+}
+
+function hasReceivedInformation(events: ExtractionEventRecord[]) {
+  return events.some(
+    (event) =>
+      event.type === "ADDITIONAL_INFORMATION_RECEIVED" ||
+      event.type === "ADDITIONAL_EVIDENCE_RECEIVED",
+  );
+}
+
 function isFinalReviewStatus(status?: string | null) {
   return (
     status === "APPROVED" ||
@@ -32,17 +137,31 @@ export function NextRecommendedActionCard({
 }: {
   run: ExtractionRunRecord;
 }) {
-  const missingFields = getStringArrayFromRecord(
+  const rawMissingFields = getStringArrayFromRecord(
     run.validationJson,
     "missingFields",
   );
 
-  const requiredEvidence = getStringArrayFromRecord(
+  const rawRequiredEvidence = getStringArrayFromRecord(
     run.validationJson,
     "requiredEvidence",
   );
 
+  const receivedEvidence = getReceivedEvidenceFromEvents(run.events);
+  const receivedFields = getReceivedFieldsFromEvents(run.events);
+
+  const missingFields = removeReceivedFields({
+    missingFields: rawMissingFields,
+    receivedFields,
+  });
+
+  const requiredEvidence = removeReceivedEvidence({
+    requiredEvidence: rawRequiredEvidence,
+    receivedEvidence,
+  });
+
   const reviewStatus = run.reviewTask?.status ?? null;
+  const infoWasReceived = hasReceivedInformation(run.events);
 
   if (isFinalReviewStatus(reviewStatus)) {
     return (
@@ -97,7 +216,7 @@ export function NextRecommendedActionCard({
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <div className="rounded-xl bg-white p-3">
             <p className="text-xs font-semibold uppercase text-gray-500">
-              Missing fields
+              Unresolved missing fields
             </p>
 
             <p className="mt-1 text-sm text-gray-800">
@@ -107,7 +226,7 @@ export function NextRecommendedActionCard({
 
           <div className="rounded-xl bg-white p-3">
             <p className="text-xs font-semibold uppercase text-gray-500">
-              Required evidence
+              Unresolved required evidence
             </p>
 
             <p className="mt-1 text-sm text-gray-800">
@@ -124,6 +243,40 @@ export function NextRecommendedActionCard({
         >
           Run agent step
         </Link>
+      </section>
+    );
+  }
+
+  if (infoWasReceived && (reviewStatus === "PENDING" || reviewStatus === "IN_REVIEW")) {
+    return (
+      <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Next recommended action
+        </h2>
+
+        <p className="mt-2 text-sm text-emerald-800">
+          Requested information/evidence has been recorded. Continue human
+          verification from the review task, or run the agent again to route the
+          next safe workflow action.
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          {run.reviewTask ? (
+            <Link
+              href={`/review/${run.reviewTask.id}`}
+              className="inline-flex rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white"
+            >
+              Continue review
+            </Link>
+          ) : null}
+
+          <Link
+            href={`/runs/${run.id}/agent-step`}
+            className="inline-flex rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-800"
+          >
+            Run agent again
+          </Link>
+        </div>
       </section>
     );
   }

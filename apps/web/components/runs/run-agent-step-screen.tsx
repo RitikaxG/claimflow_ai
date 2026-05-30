@@ -45,6 +45,7 @@ export function RunAgentStepScreen() {
 
   const latestDraft = selectedRun.followupDrafts?.[0] ?? null;
   const agentActionLogs = selectedRun.agentActionLogs ?? [];
+  const latestAgentAction = agentActionLogs[0] ?? null;
 
   return (
     <div className="space-y-6">
@@ -115,12 +116,52 @@ export function RunAgentStepScreen() {
             {agentActionLogs[0]?.status ?? "No action yet"}
           </p>
         </div>
+
+        {latestAgentAction ? (
+        <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-lg font-semibold text-gray-900">
+                Latest agent action
+            </h2>
+
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                {latestAgentAction.action}
+            </span>
+
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                {latestAgentAction.status}
+            </span>
+
+            {latestAgentAction.guardrailDecision ? (
+                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                Guardrail: {latestAgentAction.guardrailDecision}
+                </span>
+            ) : null}
+            </div>
+
+            {latestAgentAction.rationale ? (
+            <p className="mt-3 text-sm text-gray-600">
+                {latestAgentAction.rationale}
+            </p>
+            ) : null}
+
+            {latestAgentAction.toolName ? (
+            <p className="mt-2 text-sm text-gray-600">
+                Tool:{" "}
+                <span className="font-mono text-gray-900">
+                {latestAgentAction.toolName}
+                </span>
+            </p>
+            ) : null}
+        </section>
+        ) : null}
       </section>
 
       <FollowupDraftPanel
         draft={latestDraft}
         reviewTaskId={selectedRun.reviewTask?.id ?? null}
         reviewTaskStatus={selectedRun.reviewTask?.status ?? null}
+        events={selectedRun.events}
       />
 
       <AgentActionLogCard logs={agentActionLogs} />
@@ -130,6 +171,8 @@ export function RunAgentStepScreen() {
         title="Recent Agent Timeline"
         maxItems={8}
       />
+
+      
     </div>
   );
 }
