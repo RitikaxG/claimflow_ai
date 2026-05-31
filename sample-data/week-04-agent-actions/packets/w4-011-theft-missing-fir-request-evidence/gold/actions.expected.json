@@ -18,9 +18,7 @@
   ],
   "expectedActions": [
     "DRAFT_INFORMATION_REQUEST",
-    "DRAFT_FOLLOWUP_REQUEST",
-    "MARK_NEEDS_MORE_INFO",
-    "MARK_NEEDS_MORE_EVIDENCE"
+    "MARK_NEEDS_MORE_INFO"
   ],
   "expectedFinalStatus": "NEEDS_MORE_INFO",
   "expectFollowupDraft": true,
