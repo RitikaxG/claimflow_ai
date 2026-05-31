@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-009-document-belongs-to-different-claim",
+  "title": "Document mismatch should escalate to human",
+  "initialState": "DOCUMENT_MISMATCH",
+  "tags": [
+    "document-mismatch",
+    "escalation"
+  ],
+  "description": "Wrong-claim evidence must not be used for automated claim reasoning."
+}

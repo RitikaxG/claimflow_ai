@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-002-missing-policy-run-rag",
+  "title": "Ready claim without policy evidence should run policy lookup",
+  "initialState": "VALIDATED_READY_POLICY_MISSING",
+  "tags": [
+    "rag",
+    "policy-lookup"
+  ],
+  "description": "A clean extraction still needs policy grounding before approval or denial notes."
+}

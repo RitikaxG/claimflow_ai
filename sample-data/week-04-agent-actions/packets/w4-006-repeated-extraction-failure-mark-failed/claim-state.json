@@ -1,0 +1,24 @@
+{
+  "runId": "w4-006-repeated-extraction-failure-mark-failed",
+  "runStatus": "FAILED",
+  "extractedJson": null,
+  "validationJson": {
+    "workflowSignal": "REPEATED_EXTRACTION_FAILURE",
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": [
+      "Extraction failed three times."
+    ]
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": null,
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 3,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

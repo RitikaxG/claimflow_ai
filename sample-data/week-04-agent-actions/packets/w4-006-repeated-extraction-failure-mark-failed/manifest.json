@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-006-repeated-extraction-failure-mark-failed",
+  "title": "Repeated extraction failure should escalate instead of retrying forever",
+  "initialState": "RETRY_LIMIT_EXCEEDED",
+  "tags": [
+    "retry-limit",
+    "escalation"
+  ],
+  "description": "Once retry limit is hit, automated processing should stop and human review should take over."
+}

@@ -1,0 +1,23 @@
+{
+  "packetId": "w4-008-two-claims-in-one-email",
+  "initialState": "MULTIPLE_CLAIMS_DETECTED",
+  "allowedActions": [
+    "ESCALATE_TO_HUMAN",
+    "CREATE_REVIEW_TASK"
+  ],
+  "blockedActions": [
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "ESCALATE_TO_HUMAN",
+    "CREATE_REVIEW_TASK"
+  ],
+  "expectedFinalStatus": "PENDING",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": false
+}

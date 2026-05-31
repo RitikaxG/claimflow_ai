@@ -1,0 +1,29 @@
+{
+  "runId": "w4-009-document-belongs-to-different-claim",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-009",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Vehicle damage reported after incident."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [
+    "Uploaded invoice references claim CLM-OTHER instead of current claim."
+  ],
+  "previousAgentActions": []
+}

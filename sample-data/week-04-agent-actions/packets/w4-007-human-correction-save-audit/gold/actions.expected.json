@@ -1,0 +1,22 @@
+{
+  "packetId": "w4-007-human-correction-save-audit",
+  "initialState": "FINAL_REVIEW_COMPLETED",
+  "allowedActions": [
+    "NO_ACTION"
+  ],
+  "blockedActions": [
+    "DRAFT_INFORMATION_REQUEST",
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "NO_ACTION"
+  ],
+  "expectedFinalStatus": "NO_ACTION",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": false
+}

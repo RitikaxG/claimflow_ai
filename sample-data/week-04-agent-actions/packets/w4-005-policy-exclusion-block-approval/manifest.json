@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-005-policy-exclusion-block-approval",
+  "title": "Policy exclusion should block approval and allow denial draft with evidence",
+  "initialState": "POLICY_EXCLUSION_FOUND",
+  "tags": [
+    "guardrail",
+    "policy-exclusion"
+  ],
+  "description": "Denial reasoning may be drafted only because policy evidence exists. Final rejection is still unsafe."
+}

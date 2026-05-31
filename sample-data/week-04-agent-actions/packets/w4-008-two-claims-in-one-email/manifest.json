@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-008-two-claims-in-one-email",
+  "title": "Two claims in one email should escalate to human",
+  "initialState": "MULTIPLE_CLAIMS_DETECTED",
+  "tags": [
+    "multi-document",
+    "escalation"
+  ],
+  "description": "Multiple claim packets in one input should be separated by a human before decision drafting."
+}

@@ -1,0 +1,16 @@
+{
+  "packetId": "w4-007-human-correction-save-audit",
+  "tools": [
+    "retrieve_policy_clauses",
+    "create_review_task",
+    "draft_information_request",
+    "draft_followup_request",
+    "mark_needs_more_info",
+    "mark_needs_more_evidence",
+    "escalate_to_human",
+    "draft_approval_note",
+    "draft_denial_reason",
+    "ask_clarification",
+    "no_action"
+  ]
+}

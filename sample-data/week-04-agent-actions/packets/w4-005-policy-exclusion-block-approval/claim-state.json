@@ -1,0 +1,29 @@
+{
+  "runId": "w4-005-policy-exclusion-block-approval",
+  "runStatus": "COMPLETED",
+  "extractedJson": {
+    "claimNumber": "CLM-005",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Vehicle damage reported after incident."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": [],
+    "policyExclusionDetected": true,
+    "coverageOutcome": "POLICY_EXCLUSION"
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": null,
+  "latestRetrievalStatus": "ENOUGH_EVIDENCE",
+  "coverageDecision": "NOT_COVERED",
+  "hasPolicyEvidence": true,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

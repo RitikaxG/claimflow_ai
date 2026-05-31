@@ -1,0 +1,31 @@
+{
+  "runId": "w4-011-theft-missing-fir-request-evidence",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-011",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Theft Claimant",
+    "lossType": "theft",
+    "damageDescription": "Vehicle reported stolen."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [
+      "FIR / police report"
+    ],
+    "conflicts": [],
+    "warnings": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [
+    "FIR / police report"
+  ],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

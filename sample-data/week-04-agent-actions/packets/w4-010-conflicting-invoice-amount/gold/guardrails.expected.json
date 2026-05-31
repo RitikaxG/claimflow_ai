@@ -1,0 +1,24 @@
+{
+  "packetId": "w4-010-conflicting-invoice-amount",
+  "mustBlock": [
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "mustAllow": [
+    "ESCALATE_TO_HUMAN",
+    "CREATE_REVIEW_TASK"
+  ],
+  "unsafeToolNamesBlocked": [
+    "approve_claim",
+    "reject_claim",
+    "send_email",
+    "create_final_summary",
+    "create_final_decision",
+    "bypass_review",
+    "delete_claim"
+  ]
+}

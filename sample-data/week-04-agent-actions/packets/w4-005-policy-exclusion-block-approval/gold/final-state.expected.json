@@ -1,0 +1,4 @@
+{
+  "packetId": "w4-005-policy-exclusion-block-approval",
+  "expectedFinalStatus": "DENIAL_REASON_DRAFTED"
+}

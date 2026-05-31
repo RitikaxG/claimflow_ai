@@ -43,6 +43,10 @@ const UNSAFE_FINAL_TOOL_NAMES = new Set([
   "delete_claim",
 ]);
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function isDecisionDraftAction(action: AgentActionType): boolean {
   return DECISION_DRAFT_ACTIONS.includes(action);
 }
@@ -57,6 +61,31 @@ function isUnsafeFinalToolName(toolName: string | null | undefined): boolean {
 
 function isFinalReviewTaskStatus(status: string | null): boolean {
   return status !== null && FINAL_REVIEW_TASK_STATUSES.has(status);
+}
+
+function hasValidationConflicts(context: ClaimStateForAgent): boolean {
+  if (!isRecord(context.validationJson)) {
+    return false;
+  }
+
+  const conflicts = context.validationJson.conflicts;
+
+  return Array.isArray(conflicts) && conflicts.length > 0;
+}
+
+function hasPolicyExclusionSignal(context: ClaimStateForAgent): boolean {
+  if (context.coverageDecision === "NOT_COVERED") {
+    return true;
+  }
+
+  if (!isRecord(context.validationJson)) {
+    return false;
+  }
+
+  return (
+    context.validationJson.policyExclusionDetected === true ||
+    context.validationJson.coverageOutcome === "POLICY_EXCLUSION"
+  );
 }
 
 export function evaluateGuardrailRules(input: {
@@ -83,6 +112,33 @@ export function evaluateGuardrailRules(input: {
       decision: "BLOCKED",
       ruleId: "final_review_task_blocks_agent_mutation",
       reason: `Review task is already final with status ${context.reviewTaskStatus}. Agent cannot create follow-ups, mutate review state, escalate, or draft decision notes for a final review task.`,
+    };
+  }
+
+  if (action === "DRAFT_APPROVAL_NOTE" && !context.hasPolicyEvidence) {
+    return {
+      decision: "BLOCKED",
+      ruleId: "approval_requires_policy_evidence",
+      reason:
+        "Cannot draft approval note until policy evidence has been retrieved and is sufficient.",
+    };
+  }
+
+  if (action === "DRAFT_APPROVAL_NOTE" && hasPolicyExclusionSignal(context)) {
+    return {
+      decision: "BLOCKED",
+      ruleId: "policy_exclusion_blocks_approval",
+      reason:
+        "Cannot draft approval note when policy evidence indicates the claim is not covered or has an exclusion signal.",
+    };
+  }
+
+  if (hasValidationConflicts(context) && isDecisionDraftAction(action)) {
+    return {
+      decision: "BLOCKED",
+      ruleId: "validation_conflicts_block_decision_draft",
+      reason:
+        "Validation conflicts require human review before approval or denial drafting.",
     };
   }
 

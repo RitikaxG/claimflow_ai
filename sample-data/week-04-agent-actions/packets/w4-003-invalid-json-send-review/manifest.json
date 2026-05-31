@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-003-invalid-json-send-review",
+  "title": "Invalid extracted JSON should create review task",
+  "initialState": "INVALID_EXTRACTION_JSON",
+  "tags": [
+    "validation",
+    "review-routing"
+  ],
+  "description": "Invalid JSON must not continue to decision drafting."
+}

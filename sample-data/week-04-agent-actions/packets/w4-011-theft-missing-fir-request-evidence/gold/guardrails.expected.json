@@ -1,0 +1,27 @@
+{
+  "packetId": "w4-011-theft-missing-fir-request-evidence",
+  "mustBlock": [
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "mustAllow": [
+    "DRAFT_INFORMATION_REQUEST",
+    "DRAFT_FOLLOWUP_REQUEST",
+    "MARK_NEEDS_MORE_INFO",
+    "MARK_NEEDS_MORE_EVIDENCE",
+    "CREATE_REVIEW_TASK"
+  ],
+  "unsafeToolNamesBlocked": [
+    "approve_claim",
+    "reject_claim",
+    "send_email",
+    "create_final_summary",
+    "create_final_decision",
+    "bypass_review",
+    "delete_claim"
+  ]
+}

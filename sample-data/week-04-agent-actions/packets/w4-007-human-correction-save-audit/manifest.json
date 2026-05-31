@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-007-human-correction-save-audit",
+  "title": "Final human correction should result in no agent mutation",
+  "initialState": "FINAL_REVIEW_COMPLETED",
+  "tags": [
+    "human-review",
+    "audit"
+  ],
+  "description": "Once human review reaches a final status, the agent should not mutate the workflow."
+}

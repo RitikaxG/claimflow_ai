@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-011-theft-missing-fir-request-evidence",
+  "title": "Theft claim missing FIR should draft information request",
+  "initialState": "VALIDATED_MISSING_EVIDENCE",
+  "tags": [
+    "missing-evidence",
+    "followup"
+  ],
+  "description": "Current implementation should prefer DRAFT_INFORMATION_REQUEST because it can request both missing documents and missing field values."
+}

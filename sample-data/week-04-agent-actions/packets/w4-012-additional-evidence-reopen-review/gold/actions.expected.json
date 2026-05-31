@@ -1,0 +1,22 @@
+{
+  "packetId": "w4-012-additional-evidence-reopen-review",
+  "initialState": "ADDITIONAL_EVIDENCE_RECEIVED_REOPENED",
+  "allowedActions": [
+    "RETRIEVE_POLICY_CLAUSES",
+    "ESCALATE_TO_HUMAN"
+  ],
+  "blockedActions": [
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "RETRIEVE_POLICY_CLAUSES"
+  ],
+  "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": true
+}

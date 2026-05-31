@@ -1,0 +1,20 @@
+{
+  "packetId": "w4-004-clean-claim-draft-approval-note",
+  "initialState": "READY_WITH_POLICY_EVIDENCE",
+  "allowedActions": [
+    "DRAFT_APPROVAL_NOTE",
+    "ESCALATE_TO_HUMAN"
+  ],
+  "blockedActions": [
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "DRAFT_APPROVAL_NOTE"
+  ],
+  "expectedFinalStatus": "APPROVAL_NOTE_DRAFTED",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": false
+}

@@ -1,0 +1,23 @@
+{
+  "packetId": "w4-003-invalid-json-send-review",
+  "initialState": "INVALID_EXTRACTION_JSON",
+  "allowedActions": [
+    "CREATE_REVIEW_TASK",
+    "ESCALATE_TO_HUMAN"
+  ],
+  "blockedActions": [
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "CREATE_REVIEW_TASK",
+    "ESCALATE_TO_HUMAN"
+  ],
+  "expectedFinalStatus": "PENDING",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": false
+}

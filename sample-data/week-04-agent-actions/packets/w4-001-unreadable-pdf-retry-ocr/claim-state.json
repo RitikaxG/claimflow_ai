@@ -1,0 +1,24 @@
+{
+  "runId": "w4-001-unreadable-pdf-retry-ocr",
+  "runStatus": "FAILED",
+  "extractedJson": null,
+  "validationJson": {
+    "workflowSignal": "UNREADABLE_DOCUMENT",
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": [
+      "OCR text was unreadable."
+    ]
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": null,
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

@@ -1,0 +1,27 @@
+{
+  "runId": "w4-004-clean-claim-draft-approval-note",
+  "runStatus": "COMPLETED",
+  "extractedJson": {
+    "claimNumber": "CLM-004",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Vehicle damage reported after incident."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": null,
+  "latestRetrievalStatus": "ENOUGH_EVIDENCE",
+  "coverageDecision": "COVERED",
+  "hasPolicyEvidence": true,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

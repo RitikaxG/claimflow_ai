@@ -1,0 +1,24 @@
+{
+  "runId": "w4-003-invalid-json-send-review",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": null,
+  "validationJson": {
+    "workflowSignal": "INVALID_JSON",
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": [
+      "Model output could not be parsed as claim schema."
+    ]
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": null,
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

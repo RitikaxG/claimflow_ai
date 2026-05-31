@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-010-conflicting-invoice-amount",
+  "title": "Conflicting invoice amount should escalate to human",
+  "initialState": "CONFLICTING_DOCUMENT_VALUES",
+  "tags": [
+    "conflict",
+    "escalation"
+  ],
+  "description": "Conflicting claim values should not produce approval or denial drafts."
+}

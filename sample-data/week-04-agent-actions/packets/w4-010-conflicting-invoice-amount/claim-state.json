@@ -1,0 +1,29 @@
+{
+  "runId": "w4-010-conflicting-invoice-amount",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-010",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Vehicle damage reported after incident."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [
+      "Invoice amount is 42,000 but claim form amount is 24,000."
+    ],
+    "warnings": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

@@ -1,0 +1,32 @@
+{
+  "runId": "w4-007-human-correction-save-audit",
+  "runStatus": "COMPLETED",
+  "extractedJson": {
+    "claimNumber": "CLM-007",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Vehicle damage reported after incident."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "EDITED_AND_APPROVED",
+  "latestRetrievalStatus": "ENOUGH_EVIDENCE",
+  "coverageDecision": "COVERED",
+  "hasPolicyEvidence": true,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": [
+    {
+      "action": "DRAFT_INFORMATION_REQUEST",
+      "status": "EXECUTED"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "packetId": "w4-001-unreadable-pdf-retry-ocr",
+  "title": "Unreadable PDF should route to review task",
+  "initialState": "EXTRACTION_UNREADABLE_DOCUMENT",
+  "tags": [
+    "ocr",
+    "review-routing"
+  ],
+  "description": "Unreadable source should not produce an approval/denial draft. It should create or route to human review."
+}

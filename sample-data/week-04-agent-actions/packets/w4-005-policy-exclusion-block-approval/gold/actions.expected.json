@@ -1,0 +1,22 @@
+{
+  "packetId": "w4-005-policy-exclusion-block-approval",
+  "initialState": "POLICY_EXCLUSION_FOUND",
+  "allowedActions": [
+    "DRAFT_DENIAL_REASON",
+    "ESCALATE_TO_HUMAN"
+  ],
+  "blockedActions": [
+    "DRAFT_APPROVAL_NOTE",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "DRAFT_DENIAL_REASON",
+    "ESCALATE_TO_HUMAN"
+  ],
+  "expectedFinalStatus": "DENIAL_REASON_DRAFTED",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": false
+}

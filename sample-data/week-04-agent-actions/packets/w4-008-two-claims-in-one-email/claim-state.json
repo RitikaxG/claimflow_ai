@@ -1,0 +1,30 @@
+{
+  "runId": "w4-008-two-claims-in-one-email",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-008",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Vehicle damage reported after incident."
+  },
+  "validationJson": {
+    "workflowSignal": "MULTIPLE_CLAIMS",
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [
+      "Email appears to contain two separate claim numbers."
+    ],
+    "warnings": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

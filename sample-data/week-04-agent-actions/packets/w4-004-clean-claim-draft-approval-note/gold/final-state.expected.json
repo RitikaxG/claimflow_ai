@@ -1,0 +1,4 @@
+{
+  "packetId": "w4-004-clean-claim-draft-approval-note",
+  "expectedFinalStatus": "APPROVAL_NOTE_DRAFTED"
+}

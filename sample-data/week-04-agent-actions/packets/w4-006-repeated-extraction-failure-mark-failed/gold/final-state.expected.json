@@ -1,0 +1,4 @@
+{
+  "packetId": "w4-006-repeated-extraction-failure-mark-failed",
+  "expectedFinalStatus": "PENDING"
+}

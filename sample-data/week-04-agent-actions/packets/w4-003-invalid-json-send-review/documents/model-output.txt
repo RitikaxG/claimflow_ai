@@ -1,0 +1,1 @@
+{ claimNumber: CLM-003, lossType: own_damage, missing closing braces

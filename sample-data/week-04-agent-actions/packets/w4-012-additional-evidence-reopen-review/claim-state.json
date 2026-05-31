@@ -1,0 +1,36 @@
+{
+  "runId": "w4-012-additional-evidence-reopen-review",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-012",
+    "policyNumber": "POL-4521",
+    "claimantName": "Synthetic Theft Claimant",
+    "lossType": "theft",
+    "damageDescription": "Vehicle theft claim with FIR now attached."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": [
+    {
+      "action": "DRAFT_INFORMATION_REQUEST",
+      "status": "EXECUTED"
+    },
+    {
+      "action": "MARK_NEEDS_MORE_INFO",
+      "status": "EXECUTED"
+    }
+  ]
+}

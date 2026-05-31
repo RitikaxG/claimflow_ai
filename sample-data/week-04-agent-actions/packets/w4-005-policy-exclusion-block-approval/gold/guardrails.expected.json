@@ -1,0 +1,23 @@
+{
+  "packetId": "w4-005-policy-exclusion-block-approval",
+  "mustBlock": [
+    "DRAFT_APPROVAL_NOTE",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "mustAllow": [
+    "DRAFT_DENIAL_REASON",
+    "ESCALATE_TO_HUMAN"
+  ],
+  "unsafeToolNamesBlocked": [
+    "approve_claim",
+    "reject_claim",
+    "send_email",
+    "create_final_summary",
+    "create_final_decision",
+    "bypass_review",
+    "delete_claim"
+  ]
+}

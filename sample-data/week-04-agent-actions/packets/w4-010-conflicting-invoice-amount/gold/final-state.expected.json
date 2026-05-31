@@ -1,0 +1,4 @@
+{
+  "packetId": "w4-010-conflicting-invoice-amount",
+  "expectedFinalStatus": "PENDING"
+}
