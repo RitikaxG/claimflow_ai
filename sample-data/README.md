@@ -8,7 +8,8 @@ Each week adds a small, controlled dataset that tests one new system capability:
 Week 1 → extraction + validation failures
 Week 2 → human review workflow failures
 Week 3 → policy RAG + citation failures
-Future weeks → agent, memory, gateway, repo assistant, tuning-decision failures
+Week 4 → agent action routing + guardrail failures
+Future weeks → memory, gateway, repo assistant, tuning-decision failures
 ```
 
 The goal is not to collect random sample files.
@@ -24,6 +25,7 @@ The goal is to grow a repeatable failure dataset that proves ClaimFlow AI behave
 | Week 1 | [`auto-insurance/v1`](./auto-insurance/v1) | Missing fields, extraction mismatch, invalid or partial claim data, required evidence gaps | Claim documents can be extracted into structured JSON and validated deterministically | `bun run eval:week1:export` + `bun run eval:week1` | [`week-1-eval.md`](./auto-insurance/v1/eval-results/week-1-eval.md), [`week-1-eval.json`](./auto-insurance/v1/eval-results/week-1-eval.json) |
 | Week 2 | [`week-02-review-failures`](./week-02-review-failures) | Low-confidence extraction, duplicate uploads, unreadable files, missing evidence, bad workflow states, reviewer decisions | Unsafe or incomplete AI output is routed into human review instead of silently completing | `bun run eval:week2:review` | [`week-2-review-workflow-eval.md`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.md), [`week-2-review-workflow-eval.json`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.json) |
 | Week 3 | [`week-03-policy-rag`](./week-03-policy-rag) | Wrong policy retrieval, missing citations, unsupported coverage answers, false approvals, weak retrieval evidence | Coverage answers are grounded in retrieved policy clauses and refuse or route to review when evidence is insufficient | `bun run rag:load-policies`, `bun run rag:embed-policies`, `bun run rag:smoke:retrieval-cases`, `bun run eval:week3:rag` | [`week-3-policy-rag-eval.md`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.md), [`week-3-policy-rag-eval.json`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.json) |
+| Week 4 | [`week-04-agent-actions`](./week-04-agent-actions) | Wrong tool choice, unsafe final actions, missing-information routing failures, policy-lookup ordering errors, duplicate/conflict/mismatch routing | The agent can choose the next safe workflow action while guardrails block approval/rejection/email/final-decision tools | `bun run eval:week4:agent` | [`week-4-agent-actions-eval.md`](./week-04-agent-actions/eval-results/week-4-agent-actions-eval.md), [`week-4-agent-actions-eval.json`](./week-04-agent-actions/eval-results/week-4-agent-actions-eval.json) |
 
 ---
 
@@ -44,7 +46,7 @@ Week 3:
 When answering coverage questions, can the system retrieve policy evidence, cite it, and refuse unsupported answers?
 
 Week 4:
-When an agent chooses an action, can the system block unsafe or invalid tool calls?
+When an agent chooses an action, can the system select the safest workflow tool and block unsafe final actions?
 
 Week 5:
 When memory is introduced, can the system reuse past corrections safely without overwriting source-of-truth evidence?
@@ -68,6 +70,7 @@ When fine-tuning is considered, can the system decide based on evidence whether 
 | Extraction eval | `auto-insurance/v1` | schema validity, field match, missing fields, required evidence, final validation status |
 | Review workflow eval | `week-02-review-failures` | review task creation, review status transitions, review decisions, review events, duplicate/failure handling |
 | Policy RAG eval | `week-03-policy-rag` | required clause retrieval, decision correctness, citation presence, citation support, unsupported-answer refusal, false approval rate |
+| Agent action eval | `week-04-agent-actions` | tool selection, guardrail blocking, unsafe action rate, false approval rate, final workflow state match, information-request post-action behavior |
 
 ---
 
@@ -131,6 +134,8 @@ bun run rag:load-policies
 bun run rag:embed-policies
 bun run rag:smoke:retrieval-cases
 bun run eval:week3:rag
+
+bun run eval:week4:agent
 ```
 
 ---
@@ -199,6 +204,36 @@ Unsupported or weakly grounded answers must not become approvals.
 
 ---
 
+### Week 4 — Agent actions + guardrails
+
+Proved:
+
+```txt
+claim state
++ available tools
+→ agent proposes one workflow action
+→ guardrails allow or block
+→ safe workflow state transition
+```
+
+Main safety property:
+
+```txt
+The agent can draft workflow notes and requests, but it cannot approve, reject, send, delete, bypass review, or finalize claims.
+```
+
+The updated missing-information loop is:
+
+```txt
+missing evidence / missing fields
+→ DRAFT_INFORMATION_REQUEST
+→ MARK_NEEDS_MORE_INFO
+→ ADDITIONAL_INFORMATION_RECEIVED
+→ review reopened
+```
+
+---
+
 ## Most important regression metrics
 
 Across weeks, the most important safety metrics are:
@@ -207,8 +242,11 @@ Across weeks, the most important safety metrics are:
 false_completion_rate = 0
 false_approval_rate = 0
 unsupported_answer_rate = 0
+unsafe_action_rate = 0
+blocked_invalid_action_rate should stay high
 citation_support_rate should stay high once RAG is introduced
 review_routing_accuracy should stay high after Week 2
+post_action_accuracy should stay high after Week 4
 ```
 
 For this project, a flashy demo is not enough.
