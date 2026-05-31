@@ -3,12 +3,11 @@
   "initialState": "VALIDATED_MISSING_EVIDENCE",
   "allowedActions": [
     "DRAFT_INFORMATION_REQUEST",
-    "DRAFT_FOLLOWUP_REQUEST",
     "MARK_NEEDS_MORE_INFO",
-    "MARK_NEEDS_MORE_EVIDENCE",
     "CREATE_REVIEW_TASK"
   ],
   "blockedActions": [
+    "RETRIEVE_POLICY_CLAUSES",
     "DRAFT_APPROVAL_NOTE",
     "DRAFT_DENIAL_REASON",
     "APPROVE_CLAIM",
@@ -17,10 +16,12 @@
     "CREATE_FINAL_SUMMARY"
   ],
   "expectedActions": [
-    "DRAFT_INFORMATION_REQUEST",
-    "MARK_NEEDS_MORE_INFO"
+    "DRAFT_INFORMATION_REQUEST"
   ],
   "expectedFinalStatus": "NEEDS_MORE_INFO",
   "expectFollowupDraft": true,
-  "expectPolicyLookup": false
+  "expectPolicyLookup": false,
+  "expectedPostActions": [
+    "MARK_NEEDS_MORE_INFO"
+  ]
 }

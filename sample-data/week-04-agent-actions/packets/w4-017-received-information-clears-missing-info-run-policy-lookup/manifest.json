@@ -1,0 +1,11 @@
+{
+  "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+  "title": "Received information should prevent repeated information request",
+  "initialState": "MISSING_INFO_RESOLVED_AWAITING_POLICY_LOOKUP",
+  "tags": [
+    "additional-information",
+    "reopen-review",
+    "policy-lookup"
+  ],
+  "description": "Tests the post-information state: once missing fields/evidence are resolved, the next action should be policy lookup."
+}

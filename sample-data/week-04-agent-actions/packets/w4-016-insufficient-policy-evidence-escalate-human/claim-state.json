@@ -1,0 +1,31 @@
+{
+  "runId": "w4-016-insufficient-policy-evidence-escalate-human",
+  "runStatus": "COMPLETED",
+  "extractedJson": {
+    "claimNumber": "CLM-016",
+    "policyNumber": "POL-016",
+    "claimantName": "Synthetic RAG Weak Evidence Claimant",
+    "lossType": "own_damage",
+    "incidentDate": "2026-05-13",
+    "damageDescription": "Engine damage after water ingress."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": [
+      "Retrieved clauses are not enough to support a coverage note."
+    ],
+    "lowConfidence": true
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": "INSUFFICIENT_EVIDENCE",
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

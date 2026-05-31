@@ -1,0 +1,36 @@
+{
+  "runId": "w4-018-final-review-with-missing-info-audit-no-action",
+  "runStatus": "COMPLETED",
+  "extractedJson": {
+    "claimNumber": "CLM-018",
+    "claimantName": "Synthetic Final Review Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Claim was finalized by human reviewer."
+  },
+  "validationJson": {
+    "missingFields": [
+      "policyNumber"
+    ],
+    "requiredEvidence": [
+      "repairInvoice"
+    ],
+    "conflicts": [],
+    "warnings": [
+      "Missing information remains in validation audit, but human review has already finalized the task."
+    ]
+  },
+  "missingFields": [
+    "policyNumber"
+  ],
+  "requiredEvidence": [
+    "repairInvoice"
+  ],
+  "reviewTaskStatus": "APPROVED",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

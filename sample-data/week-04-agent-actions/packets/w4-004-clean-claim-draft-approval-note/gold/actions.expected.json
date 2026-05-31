@@ -16,5 +16,6 @@
   ],
   "expectedFinalStatus": "APPROVAL_NOTE_DRAFTED",
   "expectFollowupDraft": false,
-  "expectPolicyLookup": false
+  "expectPolicyLookup": false,
+  "expectedPostActions": []
 }

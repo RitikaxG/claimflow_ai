@@ -1,6 +1,14 @@
 # Week 4 Agent Action Dataset
 
-This dataset evaluates whether the ClaimFlow AI agent chooses safe and correct workflow actions.
+This dataset evaluates whether the ClaimFlow AI agent chooses safe and correct workflow actions for the updated Week 4 agentic workflow.
+
+## Updated Week 4 workflow
+
+The current workflow unifies missing documents and missing extracted fields under one information-request loop:
+
+`missing evidence / missing fields → DRAFT_INFORMATION_REQUEST → MARK_NEEDS_MORE_INFO → ADDITIONAL_INFORMATION_RECEIVED → review reopened`
+
+The agent must not approve claims, reject claims, send emails, delete claims, bypass review, or create final claim decisions.
 
 ## Packet structure
 
@@ -28,15 +36,18 @@ Each packet contains:
 - document mismatch
 - conflicting invoice amount
 - theft claim missing FIR
-- additional evidence received and review reopened
+- missing extracted fields
+- mixed missing fields and missing evidence
+- additional information received and review reopened
+- duplicate claim signal
+- insufficient policy evidence
+- final review mutation blocking
 
-## Important implementation note
+## Current tool preference
 
-The original Week 4 plan used `DRAFT_FOLLOWUP_REQUEST` and `MARK_NEEDS_MORE_EVIDENCE`.
+The preferred missing-information path is:
 
-The current ClaimFlow implementation also supports the more general pair:
+- `draft_information_request`
+- deterministic post-action: `mark_needs_more_info`
 
-- `DRAFT_INFORMATION_REQUEST`
-- `MARK_NEEDS_MORE_INFO`
-
-This is intentional because a claim can be missing both documents and extracted field values.
+Legacy evidence-only/follow-up tools are intentionally not included in the packet gold files or available tool lists.

@@ -1,0 +1,48 @@
+{
+  "runId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-017",
+    "policyNumber": "POL-017",
+    "claimantName": "Synthetic Received Info Claimant",
+    "lossType": "theft",
+    "incidentDate": "2026-05-14",
+    "damageDescription": "Vehicle theft reported; FIR details were later provided."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": [],
+    "receivedInformationSummary": {
+      "evidenceItems": [
+        "firCopy"
+      ],
+      "fieldValues": [
+        {
+          "field": "policyNumber",
+          "value": "POL-017"
+        }
+      ]
+    }
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "IN_REVIEW",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": [
+    {
+      "action": "DRAFT_INFORMATION_REQUEST",
+      "status": "EXECUTED"
+    },
+    {
+      "action": "MARK_NEEDS_MORE_INFO",
+      "status": "EXECUTED"
+    }
+  ]
+}

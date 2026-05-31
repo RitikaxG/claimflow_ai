@@ -1,0 +1,4 @@
+{
+  "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+  "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED"
+}

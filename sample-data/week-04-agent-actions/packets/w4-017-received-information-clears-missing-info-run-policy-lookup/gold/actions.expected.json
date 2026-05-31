@@ -1,0 +1,24 @@
+{
+  "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+  "initialState": "MISSING_INFO_RESOLVED_AWAITING_POLICY_LOOKUP",
+  "allowedActions": [
+    "RETRIEVE_POLICY_CLAUSES"
+  ],
+  "blockedActions": [
+    "DRAFT_INFORMATION_REQUEST",
+    "MARK_NEEDS_MORE_INFO",
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "RETRIEVE_POLICY_CLAUSES"
+  ],
+  "expectedPostActions": [],
+  "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": true
+}

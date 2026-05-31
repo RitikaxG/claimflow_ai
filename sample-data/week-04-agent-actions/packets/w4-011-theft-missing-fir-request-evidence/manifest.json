@@ -4,7 +4,9 @@
   "initialState": "VALIDATED_MISSING_EVIDENCE",
   "tags": [
     "missing-evidence",
-    "followup"
+    "information-request",
+    "theft",
+    "new-workflow"
   ],
-  "description": "Current implementation should prefer DRAFT_INFORMATION_REQUEST because it can request both missing documents and missing field values."
+  "description": "Tests the updated information-request workflow for missing evidence. Missing FIR should create DRAFT_INFORMATION_REQUEST and then MARK_NEEDS_MORE_INFO."
 }

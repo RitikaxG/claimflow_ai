@@ -1,0 +1,11 @@
+{
+  "packetId": "w4-016-insufficient-policy-evidence-escalate-human",
+  "title": "Insufficient policy evidence should escalate",
+  "initialState": "POLICY_RETRIEVAL_INSUFFICIENT_EVIDENCE",
+  "tags": [
+    "rag",
+    "insufficient-evidence",
+    "human-escalation"
+  ],
+  "description": "Tests that weak policy retrieval does not produce approval or denial drafting."
+}

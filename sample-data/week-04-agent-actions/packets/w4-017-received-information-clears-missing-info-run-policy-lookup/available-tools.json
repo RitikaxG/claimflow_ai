@@ -1,0 +1,14 @@
+{
+  "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+  "tools": [
+    "retrieve_policy_clauses",
+    "create_review_task",
+    "draft_information_request",
+    "mark_needs_more_info",
+    "escalate_to_human",
+    "draft_approval_note",
+    "draft_denial_reason",
+    "ask_clarification",
+    "no_action"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "packetId": "w4-015-duplicate-claim-escalate-human",
+  "title": "Duplicate claim signal should escalate to human",
+  "initialState": "DUPLICATE_CLAIM_SIGNAL",
+  "tags": [
+    "duplicate",
+    "guardrails",
+    "human-escalation"
+  ],
+  "description": "Tests that duplicate claim signals stop normal automated processing and route to human review."
+}

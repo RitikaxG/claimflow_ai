@@ -18,5 +18,6 @@
   ],
   "expectedFinalStatus": "DENIAL_REASON_DRAFTED",
   "expectFollowupDraft": false,
-  "expectPolicyLookup": false
+  "expectPolicyLookup": false,
+  "expectedPostActions": []
 }

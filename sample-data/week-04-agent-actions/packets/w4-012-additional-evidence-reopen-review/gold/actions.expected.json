@@ -18,5 +18,6 @@
   ],
   "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
   "expectFollowupDraft": false,
-  "expectPolicyLookup": true
+  "expectPolicyLookup": true,
+  "expectedPostActions": []
 }

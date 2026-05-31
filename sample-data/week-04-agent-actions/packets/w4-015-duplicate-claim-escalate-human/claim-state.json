@@ -1,0 +1,32 @@
+{
+  "runId": "w4-015-duplicate-claim-escalate-human",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-015",
+    "policyNumber": "POL-015",
+    "claimantName": "Synthetic Duplicate Claimant",
+    "lossType": "own_damage",
+    "incidentDate": "2026-05-12",
+    "damageDescription": "Front bumper damage after parking collision."
+  },
+  "validationJson": {
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": [
+      "Possible duplicate claim detected for same claimant and incident date."
+    ]
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [
+    "Existing extraction run appears to contain the same claim number and incident date."
+  ],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

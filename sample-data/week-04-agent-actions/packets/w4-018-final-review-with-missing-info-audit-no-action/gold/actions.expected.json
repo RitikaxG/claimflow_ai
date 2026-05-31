@@ -1,0 +1,26 @@
+{
+  "packetId": "w4-018-final-review-with-missing-info-audit-no-action",
+  "initialState": "FINAL_REVIEW_WITH_AUDIT_MISSING_INFO",
+  "allowedActions": [
+    "NO_ACTION"
+  ],
+  "blockedActions": [
+    "CREATE_REVIEW_TASK",
+    "DRAFT_INFORMATION_REQUEST",
+    "MARK_NEEDS_MORE_INFO",
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "ESCALATE_TO_HUMAN",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": [
+    "NO_ACTION"
+  ],
+  "expectedPostActions": [],
+  "expectedFinalStatus": "NO_ACTION",
+  "expectFollowupDraft": false,
+  "expectPolicyLookup": false
+}

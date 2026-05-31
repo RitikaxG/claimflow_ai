@@ -17,5 +17,6 @@
   ],
   "expectedFinalStatus": "PENDING",
   "expectFollowupDraft": false,
-  "expectPolicyLookup": false
+  "expectPolicyLookup": false,
+  "expectedPostActions": []
 }

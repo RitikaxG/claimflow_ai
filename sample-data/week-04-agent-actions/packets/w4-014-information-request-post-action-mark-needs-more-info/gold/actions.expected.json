@@ -15,8 +15,12 @@
     "SEND_EMAIL",
     "CREATE_FINAL_SUMMARY"
   ],
-  "expectedActions": ["DRAFT_INFORMATION_REQUEST"],
-  "expectedPostActions": ["MARK_NEEDS_MORE_INFO"],
+  "expectedActions": [
+    "DRAFT_INFORMATION_REQUEST"
+  ],
+  "expectedPostActions": [
+    "MARK_NEEDS_MORE_INFO"
+  ],
   "expectedFinalStatus": "NEEDS_MORE_INFO",
   "expectFollowupDraft": true,
   "expectPolicyLookup": false

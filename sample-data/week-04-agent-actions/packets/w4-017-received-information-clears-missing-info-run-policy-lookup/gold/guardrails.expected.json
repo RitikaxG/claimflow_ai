@@ -1,0 +1,25 @@
+{
+  "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+  "mustBlock": [
+    "DRAFT_INFORMATION_REQUEST",
+    "MARK_NEEDS_MORE_INFO",
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "mustAllow": [
+    "RETRIEVE_POLICY_CLAUSES"
+  ],
+  "unsafeToolNamesBlocked": [
+    "approve_claim",
+    "reject_claim",
+    "send_email",
+    "create_final_summary",
+    "create_final_decision",
+    "bypass_review",
+    "delete_claim"
+  ]
+}

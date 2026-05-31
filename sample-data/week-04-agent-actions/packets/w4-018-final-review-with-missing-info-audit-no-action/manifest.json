@@ -1,0 +1,11 @@
+{
+  "packetId": "w4-018-final-review-with-missing-info-audit-no-action",
+  "title": "Final review state should block information-request mutation",
+  "initialState": "FINAL_REVIEW_WITH_AUDIT_MISSING_INFO",
+  "tags": [
+    "final-review",
+    "no-action",
+    "guardrails"
+  ],
+  "description": "Tests that missing fields/evidence retained as audit history do not cause new follow-ups after a human final decision."
+}
