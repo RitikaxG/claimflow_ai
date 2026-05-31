@@ -1,0 +1,26 @@
+{
+  "runId": "w4-013-missing-fields-draft-information-request",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-013",
+    "claimantName": "Synthetic Missing Fields Claimant",
+    "lossType": "own_damage",
+    "damageDescription": "Vehicle damage reported after a parking collision."
+  },
+  "validationJson": {
+    "missingFields": ["policyNumber", "incidentDate"],
+    "requiredEvidence": [],
+    "conflicts": [],
+    "warnings": ["Policy number and incident date were not found in the submitted document."]
+  },
+  "missingFields": ["policyNumber", "incidentDate"],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

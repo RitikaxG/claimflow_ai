@@ -1,0 +1,7 @@
+{
+  "packetId": "w4-014-information-request-post-action-mark-needs-more-info",
+  "title": "Information request should trigger MARK_NEEDS_MORE_INFO post-action",
+  "initialState": "VALIDATED_MISSING_FIELDS_AND_EVIDENCE",
+  "tags": ["post-action", "mark-needs-more-info", "information-request", "new-tool"],
+  "description": "Tests that DRAFT_INFORMATION_REQUEST is followed by the deterministic MARK_NEEDS_MORE_INFO post-action."
+}

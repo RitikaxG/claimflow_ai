@@ -1,0 +1,6 @@
+{
+  "packetId": "w4-013-missing-fields-draft-information-request",
+  "expectedFinalStatus": "NEEDS_MORE_INFO",
+  "expectedFollowupDraftStatus": "DRAFTED",
+  "expectedReviewTaskStatus": "NEEDS_MORE_INFO"
+}

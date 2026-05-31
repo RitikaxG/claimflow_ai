@@ -1,0 +1,22 @@
+{
+  "packetId": "w4-013-missing-fields-draft-information-request",
+  "initialState": "VALIDATED_MISSING_FIELDS",
+  "allowedActions": [
+    "DRAFT_INFORMATION_REQUEST",
+    "MARK_NEEDS_MORE_INFO",
+    "CREATE_REVIEW_TASK"
+  ],
+  "blockedActions": [
+    "DRAFT_APPROVAL_NOTE",
+    "DRAFT_DENIAL_REASON",
+    "APPROVE_CLAIM",
+    "REJECT_CLAIM",
+    "SEND_EMAIL",
+    "CREATE_FINAL_SUMMARY"
+  ],
+  "expectedActions": ["DRAFT_INFORMATION_REQUEST"],
+  "expectedPostActions": ["MARK_NEEDS_MORE_INFO"],
+  "expectedFinalStatus": "NEEDS_MORE_INFO",
+  "expectFollowupDraft": true,
+  "expectPolicyLookup": false
+}

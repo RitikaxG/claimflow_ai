@@ -1,0 +1,1 @@
+Claimant reports vehicle damage after a parking collision. Claim number CLM-013 is present, but the policy number and incident date are missing from the submitted text.

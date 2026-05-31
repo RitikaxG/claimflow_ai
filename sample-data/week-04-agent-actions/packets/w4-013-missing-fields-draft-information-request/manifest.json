@@ -1,0 +1,7 @@
+{
+  "packetId": "w4-013-missing-fields-draft-information-request",
+  "title": "Missing extracted fields should draft information request",
+  "initialState": "VALIDATED_MISSING_FIELDS",
+  "tags": ["missing-fields", "information-request", "new-tool"],
+  "description": "Tests the newer DRAFT_INFORMATION_REQUEST tool for missing extracted fields, not just missing evidence."
+}

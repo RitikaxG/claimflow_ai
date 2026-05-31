@@ -1,0 +1,30 @@
+{
+  "runId": "w4-014-information-request-post-action-mark-needs-more-info",
+  "runStatus": "NEEDS_REVIEW",
+  "extractedJson": {
+    "claimNumber": "CLM-014",
+    "claimantName": "Synthetic Mixed Missing Info Claimant",
+    "lossType": "third_party_damage",
+    "damageDescription": "Third-party damage claim submitted with incomplete details."
+  },
+  "validationJson": {
+    "missingFields": ["policyNumber", "thirdPartyName"],
+    "requiredEvidence": ["third-party damage photos", "police report"],
+    "conflicts": [],
+    "warnings": [
+      "Policy number missing.",
+      "Third-party details missing.",
+      "Required evidence not attached."
+    ]
+  },
+  "missingFields": ["policyNumber", "thirdPartyName"],
+  "requiredEvidence": ["third-party damage photos", "police report"],
+  "reviewTaskStatus": "PENDING",
+  "latestRetrievalStatus": null,
+  "coverageDecision": null,
+  "hasPolicyEvidence": false,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "previousAgentActions": []
+}

@@ -1,0 +1,7 @@
+{
+  "packetId": "w4-014-information-request-post-action-mark-needs-more-info",
+  "expectedFinalStatus": "NEEDS_MORE_INFO",
+  "expectedPostActions": ["MARK_NEEDS_MORE_INFO"],
+  "expectedFollowupDraftStatus": "DRAFTED",
+  "expectedReviewTaskStatus": "NEEDS_MORE_INFO"
+}
