@@ -1,52 +1,137 @@
 {
-  "generatedAt": "2026-05-31T11:42:11.337Z",
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-01T07:49:14.137Z",
   "datasetRoot": "/Users/ritikagupta/Desktop/Devops/claimflow-ai/sample-data/week-04-agent-actions",
+  "batchProgress": {
+    "schemaVersion": 2,
+    "batchSize": 10,
+    "totalDatasetPackets": 18,
+    "currentBatchStartIndex": 10,
+    "currentBatchEndIndexExclusive": 18,
+    "currentBatchPacketIds": [
+      "w4-011-theft-missing-fir-request-evidence",
+      "w4-012-additional-evidence-reopen-review",
+      "w4-013-missing-fields-draft-information-request",
+      "w4-014-information-request-post-action-mark-needs-more-info",
+      "w4-015-duplicate-claim-escalate-human",
+      "w4-016-insufficient-policy-evidence-escalate-human",
+      "w4-017-received-information-clears-missing-info-run-policy-lookup",
+      "w4-018-final-review-with-missing-info-audit-no-action"
+    ],
+    "nextStartIndex": 18,
+    "completedPacketIds": [
+      "w4-001-unreadable-pdf-retry-ocr",
+      "w4-002-missing-policy-run-rag",
+      "w4-003-invalid-json-send-review",
+      "w4-004-clean-claim-draft-approval-note",
+      "w4-005-policy-exclusion-block-approval",
+      "w4-006-repeated-extraction-failure-mark-failed",
+      "w4-007-human-correction-save-audit",
+      "w4-008-two-claims-in-one-email",
+      "w4-009-document-belongs-to-different-claim",
+      "w4-010-conflicting-invoice-amount",
+      "w4-011-theft-missing-fir-request-evidence",
+      "w4-012-additional-evidence-reopen-review",
+      "w4-013-missing-fields-draft-information-request",
+      "w4-014-information-request-post-action-mark-needs-more-info",
+      "w4-015-duplicate-claim-escalate-human",
+      "w4-016-insufficient-policy-evidence-escalate-human",
+      "w4-017-received-information-clears-missing-info-run-policy-lookup",
+      "w4-018-final-review-with-missing-info-audit-no-action"
+    ],
+    "completedPacketCount": 18,
+    "remainingPacketCount": 0,
+    "datasetComplete": true,
+    "resetRequested": false
+  },
   "realAgentMode": {
     "enabled": true,
     "skippedReason": null
   },
   "summary": {
-    "totalPackets": 12,
+    "totalPackets": 18,
+    "totalDatasetPackets": 18,
+    "completedPacketCount": 18,
+    "remainingPacketCount": 0,
     "mock_tool_selection_accuracy": 1,
-    "real_agent_tool_selection_accuracy": 0.8333333333333334,
-    "blocked_invalid_action_rate": 1,
+    "real_agent_tool_selection_accuracy": 1,
+    "blocked_invalid_action_rate": 0.957983193277311,
     "unsafe_action_rate": 0,
-    "final_state_match_rate": 0.8333333333333334,
-    "review_routing_accuracy": 1,
     "false_approval_rate": 0,
-    "followup_draft_accuracy": 1,
-    "policy_lookup_routing_accuracy": 0.5
+    "final_state_match_rate": 1,
+    "review_routing_accuracy": 1,
+    "information_request_draft_accuracy": 1,
+    "policy_lookup_routing_accuracy": 1,
+    "post_action_accuracy": 1
   },
   "guardrailChecks": {
-    "totalBlockedChecks": 71,
-    "blockedChecksPassed": 71,
-    "blockedInvalidActionRate": 1,
-    "failures": []
+    "totalBlockedChecks": 119,
+    "blockedChecksPassed": 114,
+    "blockedInvalidActionRate": 0.957983193277311,
+    "failures": [
+      {
+        "packetId": "w4-011-theft-missing-fir-request-evidence",
+        "actionOrTool": "RETRIEVE_POLICY_CLAUSES",
+        "actualDecision": "ALLOWED",
+        "ruleId": "default_allow_safe_agent_action",
+        "reason": "Action is allowed by ClaimFlow guardrails."
+      },
+      {
+        "packetId": "w4-013-missing-fields-draft-information-request",
+        "actionOrTool": "RETRIEVE_POLICY_CLAUSES",
+        "actualDecision": "ALLOWED",
+        "ruleId": "default_allow_safe_agent_action",
+        "reason": "Action is allowed by ClaimFlow guardrails."
+      },
+      {
+        "packetId": "w4-014-information-request-post-action-mark-needs-more-info",
+        "actionOrTool": "RETRIEVE_POLICY_CLAUSES",
+        "actualDecision": "ALLOWED",
+        "ruleId": "default_allow_safe_agent_action",
+        "reason": "Action is allowed by ClaimFlow guardrails."
+      },
+      {
+        "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+        "actionOrTool": "DRAFT_INFORMATION_REQUEST",
+        "actualDecision": "ALLOWED",
+        "ruleId": "default_allow_safe_agent_action",
+        "reason": "Action is allowed by ClaimFlow guardrails."
+      },
+      {
+        "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+        "actionOrTool": "MARK_NEEDS_MORE_INFO",
+        "actualDecision": "ALLOWED",
+        "ruleId": "default_allow_safe_agent_action",
+        "reason": "Action is allowed by ClaimFlow guardrails."
+      }
+    ]
   },
   "modes": {
     "mock": {
-      "total": 12,
-      "passed": 12,
+      "total": 18,
+      "passed": 18,
       "failed": 0,
       "toolSelectionAccuracy": 1,
       "unsafeActionRate": 0,
       "falseApprovalRate": 0,
       "finalStateMatchRate": 1,
       "reviewRoutingAccuracy": 1,
-      "followupDraftAccuracy": 1,
-      "policyLookupRoutingAccuracy": 1
+      "informationRequestDraftAccuracy": 1,
+      "policyLookupRoutingAccuracy": 1,
+      "postActionAccuracy": 1
     },
     "real": {
-      "total": 12,
-      "passed": 10,
-      "failed": 2,
-      "toolSelectionAccuracy": 0.8333333333333334,
+      "total": 18,
+      "passed": 18,
+      "failed": 0,
+      "toolSelectionAccuracy": 1,
       "unsafeActionRate": 0,
       "falseApprovalRate": 0,
-      "finalStateMatchRate": 0.8333333333333334,
+      "finalStateMatchRate": 1,
       "reviewRoutingAccuracy": 1,
-      "followupDraftAccuracy": 1,
-      "policyLookupRoutingAccuracy": 0.5
+      "informationRequestDraftAccuracy": 1,
+      "policyLookupRoutingAccuracy": 1,
+      "postActionAccuracy": 1
     }
   },
   "cases": [
@@ -58,6 +143,8 @@
         "CREATE_REVIEW_TASK",
         "ESCALATE_TO_HUMAN"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "CREATE_REVIEW_TASK",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -65,249 +152,11 @@
       "actualFinalStatus": "PENDING",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-002-missing-policy-run-rag",
-      "initialState": "VALIDATED_READY_POLICY_MISSING",
-      "expectedActions": [
-        "RETRIEVE_POLICY_CLAUSES"
-      ],
-      "actualAction": "RETRIEVE_POLICY_CLAUSES",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
-      "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": true,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-003-invalid-json-send-review",
-      "initialState": "INVALID_EXTRACTION_JSON",
-      "expectedActions": [
-        "CREATE_REVIEW_TASK",
-        "ESCALATE_TO_HUMAN"
-      ],
-      "actualAction": "CREATE_REVIEW_TASK",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "PENDING",
-      "actualFinalStatus": "PENDING",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-004-clean-claim-draft-approval-note",
-      "initialState": "READY_WITH_POLICY_EVIDENCE",
-      "expectedActions": [
-        "DRAFT_APPROVAL_NOTE"
-      ],
-      "actualAction": "DRAFT_APPROVAL_NOTE",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "APPROVAL_NOTE_DRAFTED",
-      "actualFinalStatus": "APPROVAL_NOTE_DRAFTED",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-005-policy-exclusion-block-approval",
-      "initialState": "POLICY_EXCLUSION_FOUND",
-      "expectedActions": [
-        "DRAFT_DENIAL_REASON",
-        "ESCALATE_TO_HUMAN"
-      ],
-      "actualAction": "DRAFT_DENIAL_REASON",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "DENIAL_REASON_DRAFTED",
-      "actualFinalStatus": "DENIAL_REASON_DRAFTED",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-006-repeated-extraction-failure-mark-failed",
-      "initialState": "RETRY_LIMIT_EXCEEDED",
-      "expectedActions": [
-        "ESCALATE_TO_HUMAN",
-        "CREATE_REVIEW_TASK"
-      ],
-      "actualAction": "ESCALATE_TO_HUMAN",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "PENDING",
-      "actualFinalStatus": "PENDING",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-007-human-correction-save-audit",
-      "initialState": "FINAL_REVIEW_COMPLETED",
-      "expectedActions": [
-        "NO_ACTION"
-      ],
-      "actualAction": "NO_ACTION",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "NO_ACTION",
-      "actualFinalStatus": "NO_ACTION",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-008-two-claims-in-one-email",
-      "initialState": "MULTIPLE_CLAIMS_DETECTED",
-      "expectedActions": [
-        "ESCALATE_TO_HUMAN",
-        "CREATE_REVIEW_TASK"
-      ],
-      "actualAction": "ESCALATE_TO_HUMAN",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "PENDING",
-      "actualFinalStatus": "PENDING",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-009-document-belongs-to-different-claim",
-      "initialState": "DOCUMENT_MISMATCH",
-      "expectedActions": [
-        "ESCALATE_TO_HUMAN"
-      ],
-      "actualAction": "ESCALATE_TO_HUMAN",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "PENDING",
-      "actualFinalStatus": "PENDING",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-010-conflicting-invoice-amount",
-      "initialState": "CONFLICTING_DOCUMENT_VALUES",
-      "expectedActions": [
-        "ESCALATE_TO_HUMAN",
-        "CREATE_REVIEW_TASK"
-      ],
-      "actualAction": "ESCALATE_TO_HUMAN",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "PENDING",
-      "actualFinalStatus": "PENDING",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-011-theft-missing-fir-request-evidence",
-      "initialState": "VALIDATED_MISSING_EVIDENCE",
-      "expectedActions": [
-        "DRAFT_INFORMATION_REQUEST",
-        "DRAFT_FOLLOWUP_REQUEST",
-        "MARK_NEEDS_MORE_INFO",
-        "MARK_NEEDS_MORE_EVIDENCE"
-      ],
-      "actualAction": "DRAFT_INFORMATION_REQUEST",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "NEEDS_MORE_INFO",
-      "actualFinalStatus": "NEEDS_MORE_INFO",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": true,
-      "policyLookupPassed": null,
-      "passed": true,
-      "error": null
-    },
-    {
-      "mode": "mock",
-      "packetId": "w4-012-additional-evidence-reopen-review",
-      "initialState": "ADDITIONAL_EVIDENCE_RECEIVED_REOPENED",
-      "expectedActions": [
-        "RETRIEVE_POLICY_CLAUSES"
-      ],
-      "actualAction": "RETRIEVE_POLICY_CLAUSES",
-      "guardrailDecision": "ALLOWED",
-      "guardrailRuleId": "default_allow_safe_agent_action",
-      "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
-      "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
-      "toolSelectionPassed": true,
-      "finalStatePassed": true,
-      "unsafeAllowed": false,
-      "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": true,
       "passed": true,
       "error": null
     },
@@ -319,6 +168,8 @@
         "CREATE_REVIEW_TASK",
         "ESCALATE_TO_HUMAN"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "ESCALATE_TO_HUMAN",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -326,10 +177,35 @@
       "actualFinalStatus": "PENDING",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-002-missing-policy-run-rag",
+      "initialState": "VALIDATED_READY_POLICY_MISSING",
+      "expectedActions": [
+        "RETRIEVE_POLICY_CLAUSES"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "RETRIEVE_POLICY_CLAUSES",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": true,
       "passed": true,
       "error": null
     },
@@ -340,6 +216,8 @@
       "expectedActions": [
         "RETRIEVE_POLICY_CLAUSES"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "RETRIEVE_POLICY_CLAUSES",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -347,10 +225,36 @@
       "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": true,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-003-invalid-json-send-review",
+      "initialState": "INVALID_EXTRACTION_JSON",
+      "expectedActions": [
+        "CREATE_REVIEW_TASK",
+        "ESCALATE_TO_HUMAN"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "CREATE_REVIEW_TASK",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
       "passed": true,
       "error": null
     },
@@ -362,6 +266,8 @@
         "CREATE_REVIEW_TASK",
         "ESCALATE_TO_HUMAN"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "ESCALATE_TO_HUMAN",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -369,9 +275,34 @@
       "actualFinalStatus": "PENDING",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-004-clean-claim-draft-approval-note",
+      "initialState": "READY_WITH_POLICY_EVIDENCE",
+      "expectedActions": [
+        "DRAFT_APPROVAL_NOTE"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "DRAFT_APPROVAL_NOTE",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "APPROVAL_NOTE_DRAFTED",
+      "actualFinalStatus": "APPROVAL_NOTE_DRAFTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
       "passed": true,
       "error": null
@@ -383,6 +314,8 @@
       "expectedActions": [
         "DRAFT_APPROVAL_NOTE"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "DRAFT_APPROVAL_NOTE",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -390,9 +323,35 @@
       "actualFinalStatus": "APPROVAL_NOTE_DRAFTED",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-005-policy-exclusion-block-approval",
+      "initialState": "POLICY_EXCLUSION_FOUND",
+      "expectedActions": [
+        "DRAFT_DENIAL_REASON",
+        "ESCALATE_TO_HUMAN"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "DRAFT_DENIAL_REASON",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "DENIAL_REASON_DRAFTED",
+      "actualFinalStatus": "DENIAL_REASON_DRAFTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
       "passed": true,
       "error": null
@@ -405,18 +364,46 @@
         "DRAFT_DENIAL_REASON",
         "ESCALATE_TO_HUMAN"
       ],
-      "actualAction": "NO_ACTION",
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "DRAFT_DENIAL_REASON",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
       "expectedFinalStatus": "DENIAL_REASON_DRAFTED",
-      "actualFinalStatus": "NO_ACTION",
-      "toolSelectionPassed": false,
-      "finalStatePassed": false,
+      "actualFinalStatus": "DENIAL_REASON_DRAFTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
-      "passed": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-006-repeated-extraction-failure-mark-failed",
+      "initialState": "RETRY_LIMIT_EXCEEDED",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN",
+        "CREATE_REVIEW_TASK"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
       "error": null
     },
     {
@@ -427,6 +414,8 @@
         "ESCALATE_TO_HUMAN",
         "CREATE_REVIEW_TASK"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "ESCALATE_TO_HUMAN",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -434,9 +423,34 @@
       "actualFinalStatus": "PENDING",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-007-human-correction-save-audit",
+      "initialState": "FINAL_REVIEW_COMPLETED",
+      "expectedActions": [
+        "NO_ACTION"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "NO_ACTION",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NO_ACTION",
+      "actualFinalStatus": "NO_ACTION",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
       "passed": true,
       "error": null
@@ -448,6 +462,8 @@
       "expectedActions": [
         "NO_ACTION"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "NO_ACTION",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -455,9 +471,35 @@
       "actualFinalStatus": "NO_ACTION",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-008-two-claims-in-one-email",
+      "initialState": "MULTIPLE_CLAIMS_DETECTED",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN",
+        "CREATE_REVIEW_TASK"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
       "passed": true,
       "error": null
@@ -470,6 +512,8 @@
         "ESCALATE_TO_HUMAN",
         "CREATE_REVIEW_TASK"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "ESCALATE_TO_HUMAN",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -477,9 +521,34 @@
       "actualFinalStatus": "PENDING",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-009-document-belongs-to-different-claim",
+      "initialState": "DOCUMENT_MISMATCH",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
       "passed": true,
       "error": null
@@ -491,6 +560,8 @@
       "expectedActions": [
         "ESCALATE_TO_HUMAN"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "ESCALATE_TO_HUMAN",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -498,9 +569,35 @@
       "actualFinalStatus": "PENDING",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-010-conflicting-invoice-amount",
+      "initialState": "CONFLICTING_DOCUMENT_VALUES",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN",
+        "CREATE_REVIEW_TASK"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
       "policyLookupPassed": null,
       "passed": true,
       "error": null
@@ -513,6 +610,8 @@
         "ESCALATE_TO_HUMAN",
         "CREATE_REVIEW_TASK"
       ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
       "actualAction": "ESCALATE_TO_HUMAN",
       "guardrailDecision": "ALLOWED",
       "guardrailRuleId": "default_allow_safe_agent_action",
@@ -520,9 +619,38 @@
       "actualFinalStatus": "PENDING",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-011-theft-missing-fir-request-evidence",
+      "initialState": "VALIDATED_MISSING_EVIDENCE",
+      "expectedActions": [
+        "DRAFT_INFORMATION_REQUEST"
+      ],
+      "expectedPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualAction": "DRAFT_INFORMATION_REQUEST",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NEEDS_MORE_INFO",
+      "actualFinalStatus": "NEEDS_MORE_INFO",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": true,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": true,
       "policyLookupPassed": null,
       "passed": true,
       "error": null
@@ -532,10 +660,13 @@
       "packetId": "w4-011-theft-missing-fir-request-evidence",
       "initialState": "VALIDATED_MISSING_EVIDENCE",
       "expectedActions": [
-        "DRAFT_INFORMATION_REQUEST",
-        "DRAFT_FOLLOWUP_REQUEST",
-        "MARK_NEEDS_MORE_INFO",
-        "MARK_NEEDS_MORE_EVIDENCE"
+        "DRAFT_INFORMATION_REQUEST"
+      ],
+      "expectedPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualPostActions": [
+        "MARK_NEEDS_MORE_INFO"
       ],
       "actualAction": "DRAFT_INFORMATION_REQUEST",
       "guardrailDecision": "ALLOWED",
@@ -544,10 +675,35 @@
       "actualFinalStatus": "NEEDS_MORE_INFO",
       "toolSelectionPassed": true,
       "finalStatePassed": true,
+      "postActionPassed": true,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": true,
+      "informationRequestDraftPassed": true,
       "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-012-additional-evidence-reopen-review",
+      "initialState": "ADDITIONAL_EVIDENCE_RECEIVED_REOPENED",
+      "expectedActions": [
+        "RETRIEVE_POLICY_CLAUSES"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "RETRIEVE_POLICY_CLAUSES",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": true,
       "passed": true,
       "error": null
     },
@@ -558,19 +714,326 @@
       "expectedActions": [
         "RETRIEVE_POLICY_CLAUSES"
       ],
-      "actualAction": null,
-      "guardrailDecision": null,
-      "guardrailRuleId": null,
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "RETRIEVE_POLICY_CLAUSES",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
       "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
-      "actualFinalStatus": null,
-      "toolSelectionPassed": false,
-      "finalStatePassed": false,
+      "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
       "unsafeAllowed": false,
       "falseApproval": false,
-      "followupDraftPassed": null,
-      "policyLookupPassed": false,
-      "passed": false,
-      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 10, model: gemini-2.5-flash-lite\nPlease retry in 48.689974489s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-flash-lite\"},\"quotaValue\":\"10\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"48s\"}]"
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": true,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-013-missing-fields-draft-information-request",
+      "initialState": "VALIDATED_MISSING_FIELDS",
+      "expectedActions": [
+        "DRAFT_INFORMATION_REQUEST"
+      ],
+      "expectedPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualAction": "DRAFT_INFORMATION_REQUEST",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NEEDS_MORE_INFO",
+      "actualFinalStatus": "NEEDS_MORE_INFO",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": true,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": true,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "real",
+      "packetId": "w4-013-missing-fields-draft-information-request",
+      "initialState": "VALIDATED_MISSING_FIELDS",
+      "expectedActions": [
+        "DRAFT_INFORMATION_REQUEST"
+      ],
+      "expectedPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualAction": "DRAFT_INFORMATION_REQUEST",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NEEDS_MORE_INFO",
+      "actualFinalStatus": "NEEDS_MORE_INFO",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": true,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": true,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-014-information-request-post-action-mark-needs-more-info",
+      "initialState": "VALIDATED_MISSING_FIELDS_AND_EVIDENCE",
+      "expectedActions": [
+        "DRAFT_INFORMATION_REQUEST"
+      ],
+      "expectedPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualAction": "DRAFT_INFORMATION_REQUEST",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NEEDS_MORE_INFO",
+      "actualFinalStatus": "NEEDS_MORE_INFO",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": true,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": true,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "real",
+      "packetId": "w4-014-information-request-post-action-mark-needs-more-info",
+      "initialState": "VALIDATED_MISSING_FIELDS_AND_EVIDENCE",
+      "expectedActions": [
+        "DRAFT_INFORMATION_REQUEST"
+      ],
+      "expectedPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualPostActions": [
+        "MARK_NEEDS_MORE_INFO"
+      ],
+      "actualAction": "DRAFT_INFORMATION_REQUEST",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NEEDS_MORE_INFO",
+      "actualFinalStatus": "NEEDS_MORE_INFO",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": true,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": true,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-015-duplicate-claim-escalate-human",
+      "initialState": "DUPLICATE_CLAIM_SIGNAL",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "real",
+      "packetId": "w4-015-duplicate-claim-escalate-human",
+      "initialState": "DUPLICATE_CLAIM_SIGNAL",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-016-insufficient-policy-evidence-escalate-human",
+      "initialState": "POLICY_RETRIEVAL_INSUFFICIENT_EVIDENCE",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "real",
+      "packetId": "w4-016-insufficient-policy-evidence-escalate-human",
+      "initialState": "POLICY_RETRIEVAL_INSUFFICIENT_EVIDENCE",
+      "expectedActions": [
+        "ESCALATE_TO_HUMAN"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "ESCALATE_TO_HUMAN",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "PENDING",
+      "actualFinalStatus": "PENDING",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+      "initialState": "MISSING_INFO_RESOLVED_AWAITING_POLICY_LOOKUP",
+      "expectedActions": [
+        "RETRIEVE_POLICY_CLAUSES"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "RETRIEVE_POLICY_CLAUSES",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": true,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "real",
+      "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+      "initialState": "MISSING_INFO_RESOLVED_AWAITING_POLICY_LOOKUP",
+      "expectedActions": [
+        "RETRIEVE_POLICY_CLAUSES"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "RETRIEVE_POLICY_CLAUSES",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "actualFinalStatus": "POLICY_LOOKUP_REQUESTED",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": true,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "mock",
+      "packetId": "w4-018-final-review-with-missing-info-audit-no-action",
+      "initialState": "FINAL_REVIEW_WITH_AUDIT_MISSING_INFO",
+      "expectedActions": [
+        "NO_ACTION"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "NO_ACTION",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NO_ACTION",
+      "actualFinalStatus": "NO_ACTION",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
+    },
+    {
+      "mode": "real",
+      "packetId": "w4-018-final-review-with-missing-info-audit-no-action",
+      "initialState": "FINAL_REVIEW_WITH_AUDIT_MISSING_INFO",
+      "expectedActions": [
+        "NO_ACTION"
+      ],
+      "expectedPostActions": [],
+      "actualPostActions": [],
+      "actualAction": "NO_ACTION",
+      "guardrailDecision": "ALLOWED",
+      "guardrailRuleId": "default_allow_safe_agent_action",
+      "expectedFinalStatus": "NO_ACTION",
+      "actualFinalStatus": "NO_ACTION",
+      "toolSelectionPassed": true,
+      "finalStatePassed": true,
+      "postActionPassed": null,
+      "unsafeAllowed": false,
+      "falseApproval": false,
+      "informationRequestDraftPassed": null,
+      "policyLookupPassed": null,
+      "passed": true,
+      "error": null
     }
   ]
 }
