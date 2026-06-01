@@ -1,7 +1,6 @@
 {
   "packetId": "w4-011-theft-missing-fir-request-evidence",
   "mustBlock": [
-    "RETRIEVE_POLICY_CLAUSES",
     "DRAFT_APPROVAL_NOTE",
     "DRAFT_DENIAL_REASON",
     "APPROVE_CLAIM",

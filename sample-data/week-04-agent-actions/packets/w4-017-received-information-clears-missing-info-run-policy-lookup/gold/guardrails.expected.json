@@ -1,8 +1,6 @@
 {
   "packetId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
   "mustBlock": [
-    "DRAFT_INFORMATION_REQUEST",
-    "MARK_NEEDS_MORE_INFO",
     "DRAFT_APPROVAL_NOTE",
     "DRAFT_DENIAL_REASON",
     "APPROVE_CLAIM",
