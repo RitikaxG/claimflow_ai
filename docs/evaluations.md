@@ -189,6 +189,9 @@ The eval checks whether a single agent step can safely decide the next workflow 
 
 Current result:
 
+![Week 4 Eval Result](../docs/week-04/images/eval-result.png)
+
+
 - Week 4 agent eval completed.
 - Dataset: `sample-data/week-04-agent-actions`
 - Eval command: `bun run eval:week4:agent`
