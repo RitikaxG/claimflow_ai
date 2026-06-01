@@ -2,41 +2,9 @@
 
 Week 4 added a guarded agent step to ClaimFlow AI.
 
-The goal was not to make the model approve or reject claims. The goal was to connect the existing ClaimFlow workflow into one clear product loop:
+The goal was not to make the model approve, reject, or fully automate claim decisions. The goal was to let the system use the current claim state to suggest and execute the next safe workflow action, while keeping final decisions inside the human review loop.
 
-```txt
-extraction + validation
-→ human review state
-→ policy retrieval context
-→ agent suggests one safe next action
-→ guardrails approve/block
-→ workflow tool executes
-→ human reviewer makes the final decision
-```
-
-This week proves that ClaimFlow AI can use an agent as a workflow router while keeping final claim decisions inside the human review loop.
-
----
-
-## Public demo
-
-Demo: https://x.com/RitikaxG/status/2061398296137199908?s=20
-
-The demo shows the full Week 4 loop:
-
-```txt
-validated claim
-→ next recommended action asks to run agent step
-→ agent step proposes draft_information_request
-→ information request draft is created
-→ review moves to NEEDS_MORE_INFO
-→ reviewer records requested FIR evidence
-→ review reopens
-→ human review starts
-→ human approves / rejects / edits & approves / requests more info
-```
-
-This connects the work from the first four weeks:
+This week connects the earlier project layers:
 
 ```txt
 Week 1: extraction + validation
@@ -45,156 +13,149 @@ Week 3: policy retrieval / RAG
 Week 4: guarded agent workflow routing
 ```
 
+The agent routes workflow. Guardrails enforce safety. Humans make final decisions.
+
+---
+
+## Public demo
+
+Demo: https://x.com/RitikaxG/status/2061398296137199908?s=20
+
+The demo proves the end-to-end product loop from a validated claim to an agent-suggested information request, review pause, received information, reopened review, and final human decision.
+
+The detailed screen-by-screen workflow lives in:
+
+```txt
+docs/week-4/agentic-workflow.md
+```
+
+This ship log only records what Week 4 shipped, why it mattered, and what was verified.
+
 ---
 
 ## What shipped
 
 ### 1. Single explicit agent step
 
-The agent does not run continuously in the background.
-
-The product exposes one explicit action:
+Week 4 introduced one explicit action:
 
 ```txt
 Run Agent Step
 ```
 
-This makes the workflow reviewable:
+The agent does not run continuously in the background.
 
-```txt
-user clicks Run Agent Step
-→ system loads current claim state
-→ deterministic routing checks obvious cases
-→ LangChain proposes one workflow tool only when needed
-→ guardrails evaluate the proposed action
-→ the allowed tool executes
-→ the latest agent action is shown in the UI
-```
+A reviewer intentionally starts the agent step. The backend then loads the current claim state, checks deterministic routing rules, optionally asks LangChain to propose one workflow tool, evaluates the proposal through guardrails, executes the allowed tool, and persists the result.
 
-The important design decision was to make the agent step visible and interruptible instead of hiding it as automatic backend behavior.
+This makes the agent step explainable and auditable.
 
 ---
 
-### 2. Next recommended action on the run page
+### 2. Real backend agent runner
 
-After document extraction and validation, the run page can suggest the next action for that document.
+The agent runner moved from isolated tool tests to a real database-backed workflow.
 
-For a claim that needs workflow routing, the recommendation asks the reviewer to run the agent step.
-
-This makes the product flow clearer:
+The runner now supports:
 
 ```txt
-document is uploaded
-→ AI extracts structured claim JSON
-→ validation detects missing fields / evidence / conflicts
-→ run page suggests the next safe action
-→ reviewer runs one agent step
+AGENT_STEP_STARTED event
+claim context loading
+deterministic pre-routing
+LangChain tool proposal when needed
+tool-call parsing
+AGENT_ACTION_PROPOSED event
+guardrail evaluation
+blocked / executed / failed action logging
+tool execution through registered ClaimFlow tools
+AGENT_TOOL_EXECUTED event
 ```
 
-The recommendation is not the agent itself. It is the UI bridge between deterministic extraction/validation and the new Week 4 agent workflow.
+This turns the agent from a prompt demo into a workflow subsystem.
 
 ---
 
-### 3. Agent step page
+### 3. Deterministic routing before LangChain
 
-The agent step page gives the reviewer a dedicated place to run the agent.
+Obvious workflow states are handled before the model is called.
 
-When the reviewer clicks the action, the backend executes one `runAgentStep`.
-
-The result is shown as the latest agent action.
-
-For the tested theft claim, the latest agent action was:
+Current deterministic routing:
 
 ```txt
-DRAFT_INFORMATION_REQUEST
+final review task
+→ no_action
+
+missing fields or required evidence
+→ draft_information_request
+
+otherwise
+→ call LangChain agent
 ```
 
-This means the agent did not try to approve or reject the claim. It identified that the claim was incomplete and selected a safe workflow tool.
+This was an important design decision.
+
+The model should not be used for states the backend can decide safely and deterministically. For example, if a required field or required document is missing, the system should request that information before attempting policy reasoning.
 
 ---
 
-### 4. Information request workflow
+### 4. LangChain tool-calling integration
 
-The agent now treats missing evidence and missing extracted fields as the same product problem:
+LangChain is used for one narrow responsibility:
+
+```txt
+choose the next safe workflow tool when deterministic routing is not enough
+```
+
+The model receives the current claim state and must return exactly one tool call.
+
+LangChain does not directly mutate the database. It does not approve or reject claims. It does not send emails.
+
+The backend remains in control:
+
+```txt
+LangChain proposes
+→ parser normalizes the tool call
+→ guardrails evaluate the action
+→ executeAgentTool invokes a registered ClaimFlow tool
+→ database stores the outcome
+```
+
+---
+
+### 5. Information request workflow
+
+Missing evidence and missing extracted fields are now treated as one workflow problem:
 
 ```txt
 the claim cannot continue until more information is received
 ```
 
-For example, a theft claim missing FIR evidence should not move to final approval.
+Week 4 introduced the generalized information request path:
 
-The agent creates an information request draft that explains what is missing.
+```txt
+draft_information_request
+→ mark_needs_more_info
+→ review waits in NEEDS_MORE_INFO
+→ requested information is recorded
+→ review reopens
+```
 
-The request can include:
+This replaced the weaker split between evidence follow-up and field clarification.
+
+The information request draft can represent:
 
 ```txt
 missing evidence
 missing field values
-or both
-```
-
-This replaced the older split mental model where missing evidence and missing fields behaved like separate workflows.
-
----
-
-### 5. Review pauses at `NEEDS_MORE_INFO`
-
-Creating a draft is not enough by itself.
-
-After the information request draft is created, ClaimFlow also moves the review task into:
-
-```txt
-NEEDS_MORE_INFO
-```
-
-This makes the workflow durable.
-
-The system is no longer only producing text. It changes the review state to show that the claim is waiting for requested information.
-
----
-
-### 6. Reviewer records requested information
-
-The reviewer can open the review task and record the requested information.
-
-In the tested flow, the reviewer records that FIR evidence was received.
-
-This creates an auditable event:
-
-```txt
-ADDITIONAL_INFORMATION_RECEIVED
-```
-
-The original AI extraction remains immutable. Received information is recorded as workflow evidence. If a field value needs to correct the extracted JSON, the human reviewer still owns that correction through the review path.
-
----
-
-### 7. Review reopens
-
-After requested information is recorded, the review workflow reopens.
-
-The next agent step or human review does not see the same claim state as before.
-
-The agent context builder accounts for received evidence and resolved fields, so the agent should not keep asking for the same FIR or same missing field once it has been recorded.
-
-This is the important loop:
-
-```txt
-missing info detected
-→ request drafted
-→ review waits
-→ info received
-→ review reopens
-→ updated state is used
+mixed missing information
 ```
 
 ---
 
-### 8. Human review remains final authority
+### 6. Human-in-the-loop boundary preserved
 
-After review reopens, the reviewer can start human review.
+The agent can suggest the next workflow step, but it cannot make final claim decisions.
 
-The reviewer can then:
+Human reviewers still own:
 
 ```txt
 approve
@@ -203,64 +164,13 @@ edit and approve
 request more information
 ```
 
-The agent can suggest the next workflow action, but it cannot make the final claim decision.
-
-This preserves the Week 2 human-in-the-loop design while adding Week 4 agent routing.
-
----
-
-## Where LangChain fits
-
-LangChain is used only for tool selection when the deterministic router does not already know the obvious safe action.
-
-The model receives the current claim state and proposes exactly one tool call.
-
-It does not directly mutate the database.
-
-It does not approve or reject claims.
-
-It does not send emails.
-
-The backend still controls execution:
-
-```txt
-LangChain proposes
-→ parser normalizes the tool call
-→ guardrails evaluate
-→ executeAgentTool runs only registered ClaimFlow tools
-→ database logs the result
-```
-
-The model is a proposer. ClaimFlow remains the workflow authority.
-
----
-
-## Deterministic routing before the model
-
-Not every case should go to the model.
-
-The backend first checks obvious workflow states:
-
-```txt
-final review task
-→ no_action
-
-missing fields or missing evidence
-→ draft_information_request
-
-otherwise
-→ call LangChain agent
-```
-
-This prevents the model from making unnecessary or semantically wrong choices for common states.
-
-For example, if `policyNumber` is missing, the system should request missing information before trying policy retrieval.
+This keeps Week 4 aligned with the Week 2 review system instead of bypassing it.
 
 ---
 
 ## Active tools
 
-The active registered agent tools are:
+The active registered tools for the Week 4 agent workflow are:
 
 ```txt
 retrieve_policy_clauses
@@ -280,7 +190,7 @@ ask_clarification
 draft_followup_request
 ```
 
-A compatibility note:
+Compatibility note:
 
 ```txt
 mark_needs_more_evidence exists in the codebase,
@@ -292,57 +202,28 @@ through the generalized information request workflow.
 
 ## Tool responsibilities
 
-### `draft_information_request`
+| Tool | Responsibility |
+|---|---|
+| `retrieve_policy_clauses` | Retrieves policy chunks for grounded coverage reasoning. |
+| `create_review_task` | Creates or reuses a human review task. |
+| `draft_information_request` | Creates or reuses a draft request for missing fields, evidence, or both. |
+| `mark_needs_more_info` | Moves or creates the review task in `NEEDS_MORE_INFO`. |
+| `escalate_to_human` | Routes ambiguous, risky, duplicate, conflicting, or low-confidence cases to a reviewer. |
+| `draft_approval_note` | Produces a draft-only approval-style note when evidence and policy support are sufficient. |
+| `draft_denial_reason` | Produces a draft-only denial-style rationale when policy evidence supports likely denial. |
+| `no_action` | Safely does nothing when the review is already final or no useful workflow action exists. |
 
-Creates or reuses a persisted information request draft for missing fields, missing evidence, or both.
-
-This was required because missing fields and missing evidence are both blocking workflow states.
-
-### `mark_needs_more_info`
-
-Moves or creates the review task in `NEEDS_MORE_INFO`.
-
-This was required because a draft alone does not pause the workflow.
-
-### `retrieve_policy_clauses`
-
-Retrieves policy chunks for grounded coverage reasoning.
-
-This connects Week 3 RAG to the Week 4 agent step.
-
-### `escalate_to_human`
-
-Routes ambiguous, risky, conflicting, duplicate, or low-confidence cases to human review.
-
-This is the safe fallback when the agent should not continue.
-
-### `draft_approval_note`
-
-Creates a draft-only approval-style note when evidence and policy support are sufficient.
-
-It does not approve the claim.
-
-### `draft_denial_reason`
-
-Creates a draft-only denial-style rationale when policy evidence supports a likely denial.
-
-It does not reject the claim.
-
-### `create_review_task`
-
-Creates or reuses a review task when human review is needed.
-
-### `no_action`
-
-Returns a safe no-op when the review is already final or no useful mutation is needed.
+The important rule is that tools execute only after ClaimFlow guardrails allow the proposed action.
 
 ---
 
 ## Guardrails shipped
 
-Guardrails keep the agent inside the ClaimFlow workflow boundary.
+Week 4 added deterministic guardrails around proposed agent actions.
 
-They block unsafe actions such as:
+Guardrails block unsafe tools and unsafe workflow mutations.
+
+Blocked unsafe actions include:
 
 ```txt
 approve_claim
@@ -354,34 +235,27 @@ create_final_decision
 create_final_summary
 ```
 
-They also block unsafe workflow mutations.
+Guardrails also prevent the agent from mutating review workflow after a final human decision.
 
-For example:
-
-```txt
-final review status
-→ block follow-ups, escalations, decision drafts, and review mutations
-```
-
-Decision-support actions are conditional.
-
-For example:
+Final review statuses are treated as terminal:
 
 ```txt
-draft_approval_note
-→ requires policy evidence
-→ blocked if missing fields remain
-→ blocked if required evidence remains
-→ blocked if policy exclusion signal exists
+APPROVED
+EDITED_AND_APPROVED
+REJECTED
 ```
 
-This keeps the agent useful without giving it final authority.
+Decision-drafting actions are conditional. For example, `draft_approval_note` is blocked if required evidence is missing, required fields are missing, policy evidence is missing, validation conflicts exist, or policy evidence indicates an exclusion.
+
+This keeps the model useful as a workflow assistant without making it the decision maker.
 
 ---
 
-## What is persisted
+## Persistence and audit trail
 
-The Week 4 workflow persists the agent step in multiple places:
+Week 4 stores the agent workflow in durable records instead of only returning text.
+
+Persisted records include:
 
 ```txt
 AgentActionLog
@@ -392,64 +266,111 @@ ReviewEvent history
 ADDITIONAL_INFORMATION_RECEIVED event
 ```
 
-The agent action log records proposed, executed, blocked, or failed actions.
+This makes the agent step inspectable after it runs.
 
-The extraction timeline shows when the agent step started, what action was proposed, and whether the tool executed.
+The system can answer:
 
-The review task records whether the claim is waiting for more information or ready for human review.
+```txt
+What action did the agent propose?
+Was it allowed or blocked?
+Which tool executed?
+What did the tool output?
+Did review state change?
+What information was later received?
+```
 
 ---
 
 ## What the demo proves
 
-The Week 4 demo proves the full integration loop:
+The public demo proves that Week 4 is integrated into the existing product workflow.
+
+It shows that ClaimFlow can:
 
 ```txt
-1. A document is already extracted and validated.
-2. The run page suggests running the agent step.
-3. The reviewer opens the agent step page.
-4. The reviewer runs one agent step.
-5. The agent proposes a safe tool.
-6. Guardrails allow the tool.
-7. The information request draft is created.
-8. Review moves to NEEDS_MORE_INFO.
-9. Reviewer records requested FIR evidence.
-10. Review reopens.
-11. Human review starts.
-12. Human reviewer approves the claim.
+detect an incomplete claim
+suggest running the agent step
+draft a missing-information request
+pause review in NEEDS_MORE_INFO
+record requested information
+reopen review
+return control to the human reviewer
+complete the final decision through HITL review
 ```
 
-The important point is not just that the model selected a tool.
+The important proof is not only that LangChain selected a tool.
 
-The important point is that the selected tool moved the real product workflow forward without bypassing human review.
+The important proof is that the selected tool moved a real workflow forward without bypassing review safety.
 
 ---
 
-## What changed from previous weeks
+## Evaluation and smoke-test coverage
 
-### Week 1
+Week 4 added validation around the agent workflow.
 
-Week 1 proved that documents can be extracted into structured JSON and validated.
+The tested behavior includes:
 
-### Week 2
+```txt
+agent creates information request
+review moves to NEEDS_MORE_INFO
+reviewer records evidence / field values
+ADDITIONAL_INFORMATION_RECEIVED event is saved
+active draft becomes resolved / info received
+review reopens to PENDING
+reviewer starts review again
+human can approve, edit and approve, reject, or request more info
+agent does not repeatedly ask for the same received information
+```
 
-Week 2 proved that incomplete or risky outputs can route into human review.
+The final commands for the week were:
 
-### Week 3
+```bash
+bun run db:migrate
+bun run db:generate
+bun run check-types
+bun run eval:week4:agent
+bun run rag:smoke:retrieval-cases
+```
 
-Week 3 proved that policy retrieval can support coverage reasoning with retrieved clauses.
+The evaluation focus for Week 4 is:
 
-### Week 4
+```txt
+tool selection correctness
+invalid action blocking
+unsafe action rate
+guardrail behavior
+final workflow state correctness
+```
 
-Week 4 connects those pieces with a guarded agent step.
+---
 
-The agent reads the existing claim state and suggests the next safe workflow action.
+## Key design decisions
+
+### Agent as proposer, not authority
+
+The model proposes one action. ClaimFlow decides whether that action is allowed.
+
+### Deterministic routing before LLM
+
+Simple workflow states are routed by code before calling the model.
+
+### Drafts instead of sends
+
+The agent can draft information requests and decision notes, but it does not send emails or finalize claims.
+
+### Human review remains the final gate
+
+The final claim decision is still made through the human review workflow.
+
+### Information requests unify missing fields and missing evidence
+
+Missing required documents and missing extracted fields now use one consistent workflow loop.
 
 ---
 
 ## Known limitations
 
-The Week 4 agent is still intentionally narrow.
+Week 4 is intentionally narrow.
 
 Current limitations:
 
@@ -459,10 +380,10 @@ no autonomous multi-step chains
 no email sending
 no final approval or rejection
 no automatic overwrite of extracted JSON
-no memory-based reuse of past human corrections yet
+no memory-based reuse of past reviewer corrections yet
 ```
 
-These are intentional boundaries for safety and explainability.
+These limits are intentional because the goal was a safe, inspectable workflow agent.
 
 ---
 
@@ -470,22 +391,22 @@ These are intentional boundaries for safety and explainability.
 
 Week 5 should focus on memory.
 
-The next useful question is:
+The next question is:
 
 ```txt
 Can ClaimFlow reuse past reviewer corrections safely?
 ```
 
-Possible Week 5 directions:
+Possible Week 5 work:
 
 ```txt
 remember repeated correction patterns
 reuse resolved missing-field mappings
-use past human decisions as guidance
-avoid overwriting source-of-truth evidence
+learn from prior reviewer decisions
+avoid overwriting source-of-truth extraction
 keep memory behind reviewable guardrails
 ```
 
-Week 4 created the agent workflow boundary.
+Week 4 created the guarded agent workflow boundary.
 
 Week 5 can add memory inside that boundary.
