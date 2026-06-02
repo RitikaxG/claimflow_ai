@@ -274,7 +274,167 @@ This keeps the system safe and enterprise-realistic.
 
 ---
 
-## 8. Final definition
+## 8. How ClaimFlow AI reduces LLM calls
+
+Agentic systems can become expensive if every workflow step is sent to the LLM. ClaimFlow AI reduces unnecessary LLM calls by keeping the agent loop narrow, deterministic where possible, and guarded.
+
+### 8.1 Deterministic actions before LLM tool-calling
+
+ClaimFlow does not always need the LLM to decide the next action.
+
+Some workflow states are obvious and can be handled before invoking the agent model.
+
+Examples:
+
+```txt
+If review task is already final
+→ no_action
+
+If required evidence is missing
+→ draft_information_request
+
+If required extracted fields are missing
+→ draft_information_request
+```
+
+This means simple routing cases can be resolved using application logic instead of spending an LLM call just to select an obvious tool.
+
+In practice, this keeps the LLM focused on ambiguous workflow decisions rather than routine state transitions.
+
+---
+
+### 8.2 Guardrails reduce wasted execution
+
+ClaimFlow uses deterministic guardrails after an action is proposed.
+
+The guardrails check whether the action is safe before the tool executes.
+
+They block unsafe actions such as:
+
+- approving a claim,
+- rejecting a claim,
+- sending an email,
+- deleting a claim,
+- bypassing review,
+- creating a final claim decision.
+
+They also block risky decision-note drafting when:
+
+- policy evidence is missing,
+- required evidence is missing,
+- required fields are missing,
+- validation conflicts exist,
+- policy retrieval is insufficient,
+- duplicate signals exist,
+- retry limits are exceeded.
+
+This reduces waste because unsafe actions are stopped early. The system does not continue into unnecessary tool execution or additional agent steps after a blocked action.
+
+---
+
+### 8.3 Single safe workflow action per agent step
+
+ClaimFlow does not let the agent freely chain many tools in one uncontrolled loop.
+
+Each agent step proposes exactly one action.
+
+```txt
+Agent step
+→ propose one action
+→ guardrail check
+→ execute or block
+→ log result
+→ stop at current safe workflow state
+```
+
+This prevents long, expensive multi-tool loops.
+
+It also makes each step easier to debug, evaluate, and replay.
+
+The workflow can continue later, but each continuation starts from the updated database state rather than from a long hidden model conversation.
+
+---
+
+### 8.4 Database state replaces repeated context reasoning
+
+ClaimFlow stores workflow state in Postgres instead of relying only on model memory.
+
+Important state is saved as structured records:
+
+- extraction run status,
+- extracted JSON,
+- validation JSON,
+- missing fields,
+- required evidence,
+- review task status,
+- coverage question status,
+- follow-up drafts,
+- agent action logs,
+- timeline events.
+
+Because the state is persisted, the next agent step can read the latest structured state directly instead of asking the LLM to reconstruct what happened from a long conversation transcript.
+
+This reduces token usage and makes the workflow more reliable.
+
+---
+
+### 8.5 Existing review tasks and drafts can be reused
+
+ClaimFlow avoids duplicate workflow work.
+
+If a review task already exists, the system can reuse or escalate the existing task instead of creating another one.
+
+If a matching information request draft already exists, the system can reuse the draft instead of creating a duplicate.
+
+This reduces unnecessary tool execution, duplicate database records, and extra LLM reasoning around the same unresolved issue.
+
+---
+
+### 8.6 Human-in-the-loop prevents expensive autonomous loops
+
+ClaimFlow does not try to make the agent solve every uncertain case.
+
+When the claim has missing evidence, conflicts, low confidence, duplicate signals, or insufficient policy evidence, the system routes toward human review instead of continuing automated reasoning indefinitely.
+
+The loop is intentionally bounded:
+
+```txt
+Ambiguous or risky claim
+→ escalate / create review task
+→ human reviewer decides
+```
+
+This is cheaper, safer, and more realistic for insurance workflows than allowing the model to repeatedly call tools until it guesses a final answer.
+
+---
+
+### 8.7 Summary: cost-control pattern
+
+ClaimFlow reduces LLM calls through four main design choices:
+
+| Cost-control design | Effect |
+|---|---|
+| Deterministic pre-actions | Avoids LLM calls for obvious routing decisions |
+| Guardrails | Blocks unsafe or wasteful actions before execution |
+| One action per agent step | Prevents uncontrolled multi-tool loops |
+| Persisted workflow state | Reduces repeated context reconstruction |
+| Draft/review reuse | Avoids duplicate workflow actions |
+| Human review fallback | Stops costly automation on risky cases |
+
+So the ClaimFlow agent loop is not designed to maximize autonomy. It is designed to maximize safe workflow progress per LLM call.
+
+The goal is:
+
+```txt
+Use deterministic logic where possible.
+Use the LLM only when workflow judgment is useful.
+Use guardrails before execution.
+Use humans for final decisions.
+```
+
+---
+
+## 9. Final definition
 
 ClaimFlow AI is an agentic claim-intake and review-routing system.
 
