@@ -468,10 +468,10 @@ model WorkflowMemory {
   evidenceJson Json?
 
   sourceRunId String?
-  sourceRun ExtractionRun? @relation("WorkflowMemorySourceRun",fields: [sourceRunId], references: [id], onDelete: Cascade)
+  sourceRun ExtractionRun? @relation("WorkflowMemorySourceRun",fields: [sourceRunId], references: [id], onDelete: SetNull)
 
   sourceReviewDecisionId String?
-  sourceReviewDecision ReviewDecision? @relation("WorkflowMemorySourceReviewDecision", fields: [sourceReviewDecisionId], references: [id], onDelete: Cascade)
+  sourceReviewDecision ReviewDecision? @relation("WorkflowMemorySourceReviewDecision", fields: [sourceReviewDecisionId], references: [id], onDelete: SetNull)
   
   sourceCoverageQuestionId String?
   sourceAgentActionLogId String?
