@@ -136,6 +136,40 @@ enum FollowupRequestType {
   MIXED_INFO_REQUEST
 }
 
+enum WorkflowMemoryKind {
+  HUMAN_CORRECTION
+  PRIOR_REJECTION
+  PRIOR_REVIEW_DECISION
+  CLAIMANT_PATTERN
+  VENDOR_PATTERN
+  POLICY_HISTORY
+  RECURRING_ERROR_PATTERN
+}
+
+enum WorkflowMemoryStatus {
+  ACTIVE
+  STRENGTHENED
+  WEAKENED
+  SUPERSEDED
+  RETIRED
+}
+
+enum WorkflowMemoryRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum MemoryUpdateType {
+  CREATED
+  STRENGTHENED
+  WEAKENED
+  SUPERSEDED
+  RETIRED
+  FEEDBACK_RECORDED
+  GENERALIZED
+}
+
 model Document {
   id String @id @default(cuid())
 
@@ -169,6 +203,10 @@ model ExtractionRun {
 
   documentId String
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  sourceWorkflowMemories WorkflowMemory[] @relation("WorkflowMemorySourceRun")
+  memoryHits MemoryHit[]
+  memoryUpdates MemoryUpdate[]
 
   status ExtractionRunStatus @default(UPLOADED)
 
@@ -249,6 +287,9 @@ model ReviewDecision {
 
   taskId String
   task ReviewTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  sourceWorkflowMemories WorkflowMemory[] @relation("WorkflowMemorySourceReviewDecision")
+  memoryUpdates MemoryUpdate[]
 
   decision ReviewDecisionType
 
@@ -358,6 +399,8 @@ model AgentActionLog {
   runId String
   run ExtractionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
 
+  memoryHits MemoryHit[]
+
   action AgentActionType
   status AgentActionStatus
 
@@ -402,4 +445,118 @@ model FollowupDraft {
   @@index([runId])
   @@index([requestType])
   @@map("followup_drafts")
+}
+
+model WorkflowMemory {
+  id String @id @default(cuid())
+
+  kind WorkflowMemoryKind
+  status WorkflowMemoryStatus @default(ACTIVE)
+
+  riskLevel WorkflowMemoryRiskLevel @default(LOW)
+  confidence Float @default(0.6)
+
+  summary String
+  safeUse String
+  mustNotDo Json @default("[]")
+
+  entityType String?
+  entityId String?
+
+  fieldPath String?
+  tags Json @default("[]")
+  evidenceJson Json?
+
+  sourceRunId String?
+  sourceRun ExtractionRun? @relation("WorkflowMemorySourceRun",fields: [sourceRunId], references: [id], onDelete: Cascade)
+
+  sourceReviewDecisionId String?
+  sourceReviewDecision ReviewDecision? @relation("WorkflowMemorySourceReviewDecision", fields: [sourceReviewDecisionId], references: [id], onDelete: Cascade)
+  
+  sourceCoverageQuestionId String?
+  sourceAgentActionLogId String?
+
+  confirmedCount Int @default(0)
+  contradictedCount Int @default(0)
+
+  supersededByMemoryId String?
+  supersededByMemory WorkflowMemory? @relation("MemorySupersession", fields: [supersededByMemoryId], references: [id], onDelete: SetNull)
+  supersedes WorkflowMemory[] @relation("MemorySupersession")
+
+  hits MemoryHit[]
+  updates MemoryUpdate[]
+
+  lastUsedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kind])
+  @@index([status])
+  @@index([riskLevel])
+  @@index([entityType, entityId])
+  @@index([fieldPath])
+  @@index([sourceRunId])
+  @@index([sourceReviewDecisionId])
+  @@index([status, kind])
+  @@index([status, entityType, entityId])
+  @@map("workflow_memories")
+}
+
+model MemoryHit {
+  id String @id @default(cuid())
+
+  memoryId String
+  memory WorkflowMemory @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+
+  runId String
+  run ExtractionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  score Int
+  matchedOn Json @default("[]")
+  retrievalReason String?
+
+  usedByAgent Boolean @default(false)
+
+  agentActionLogId String?
+  agentActionLog AgentActionLog? @relation(fields: [agentActionLogId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([memoryId])
+  @@index([runId])
+  @@index([score])
+  @@index([usedByAgent])
+  @@index([agentActionLogId])
+  @@map("memory_hits")
+}
+
+model MemoryUpdate {
+  id String @id @default(cuid())
+
+  memoryId String
+  memory WorkflowMemory @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+
+  updateType MemoryUpdateType
+
+  runId String?
+  run ExtractionRun? @relation(fields: [runId], references: [id], onDelete: SetNull)
+
+  reviewDecisionId String?
+  reviewDecision ReviewDecision? @relation(fields: [reviewDecisionId], references: [id], onDelete: SetNull)
+
+  beforeStatus WorkflowMemoryStatus?
+  afterStatus WorkflowMemoryStatus?
+
+  confidenceDelta Float?
+  note String?
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([memoryId])
+  @@index([updateType])
+  @@index([runId])
+  @@index([reviewDecisionId])
+  @@index([createdAt])
+  @@map("memory_updates")
 }
