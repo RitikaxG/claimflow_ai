@@ -1,0 +1,68 @@
+[
+  {
+    "correctionId": "HCORR-W5-001",
+    "sourcePacketId": "w2-013-edit-and-approve",
+    "historicalClaimId": "HCLAIM-W5-001",
+    "reviewDecisionType": "EDIT_AND_APPROVE",
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-001",
+    "fieldPath": "policyNumber",
+    "beforeValue": null,
+    "afterValue": "POL-W2-013",
+    "correctionReason": "AI extraction missed policy number even though reviewer found it in the submitted claim email.",
+    "reviewerNote": "Policy number corrected before approval.",
+    "shouldCreateMemory": true,
+    "memoryKind": "HUMAN_CORRECTION",
+    "riskLevel": "MEDIUM",
+    "safeUse": "Warn the agent/reviewer to verify policyNumber for future claims from this claimant.",
+    "mustNotDo": [
+      "overwrite extractedJson.policyNumber",
+      "treat old policyNumber as current truth",
+      "approve claim based on this correction"
+    ]
+  },
+  {
+    "correctionId": "HCORR-W5-002",
+    "sourcePacketId": "w4-007-human-correction-save-audit",
+    "historicalClaimId": "HCLAIM-W5-001",
+    "reviewDecisionType": "EDIT_AND_APPROVE",
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-001",
+    "fieldPath": "insuredName",
+    "beforeValue": "Dev Aroa",
+    "afterValue": "Dev Arora",
+    "correctionReason": "Reviewer corrected a spelling error in the insured name during audit save.",
+    "reviewerNote": "Name spelling fixed; keep an audit trail.",
+    "shouldCreateMemory": true,
+    "memoryKind": "HUMAN_CORRECTION",
+    "riskLevel": "LOW",
+    "safeUse": "When the same claimant has low-confidence name extraction, ask reviewer to verify spelling against current documents.",
+    "mustNotDo": [
+      "replace current insuredName from memory",
+      "merge near-name claimants without stable identifiers",
+      "treat spelling memory as fraud evidence"
+    ]
+  },
+  {
+    "correctionId": "HCORR-W5-003",
+    "sourcePacketId": "w4-conflicting-invoice-amount-escalate",
+    "historicalClaimId": "HCLAIM-W5-009",
+    "reviewDecisionType": "REQUEST_MORE_INFO",
+    "entityType": "VENDOR",
+    "entityId": "VEND-W5-001",
+    "fieldPath": "invoice.amount",
+    "beforeValue": "78000",
+    "afterValue": "52000",
+    "correctionReason": "Reviewer found that two documents had conflicting invoice amounts and requested human validation.",
+    "reviewerNote": "Do not choose between invoice amounts automatically.",
+    "shouldCreateMemory": true,
+    "memoryKind": "VENDOR_PATTERN",
+    "riskLevel": "HIGH",
+    "safeUse": "For this vendor, flag conflicting invoice amounts for human review.",
+    "mustNotDo": [
+      "overwrite invoice.amount",
+      "pick the lower or higher amount automatically",
+      "reject or approve based only on vendor memory"
+    ]
+  }
+]
