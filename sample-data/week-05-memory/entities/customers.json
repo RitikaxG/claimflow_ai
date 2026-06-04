@@ -1,0 +1,45 @@
+[
+{
+"customerId": "CUST-W5-001",
+"displayName": "Dev Arora",
+"synthetic": true,
+"knownPolicyNumbers": ["POL-W2-013"],
+"notes": "Used for prior human correction memory around missing policyNumber."
+},
+{
+"customerId": "CUST-W5-002",
+"displayName": "Meera Iyer",
+"synthetic": true,
+"knownPolicyNumbers": ["POL-W5-002"],
+"notes": "Used for third-party claim police-report memory."
+},
+{
+"customerId": "CUST-W5-003",
+"displayName": "Aarav Mehta",
+"synthetic": true,
+"knownPolicyNumbers": ["POL-W5-003"],
+"notes": "Used for suspicious claimant prior rejection memory."
+},
+{
+"customerId": "CUST-W5-004",
+"displayName": "Kavya Nair",
+"synthetic": true,
+"knownPolicyNumbers": [],
+"notes": "Used for missing policyNumber and incidentDate recurring error pattern."
+},
+{
+"customerId": "CUST-W5-005",
+"displayName": "Rohan Sen",
+"synthetic": true,
+"knownPolicyNumbers": ["POL-W5-005"],
+"notes": "Used for duplicate claim and repeated similar loss examples."
+},
+{
+"customerId": "CUST-W5-006",
+"displayName": "Dev Aroora",
+"synthetic": true,
+"knownPolicyNumbers": ["POL-W5-006"],
+"notes": "Same-name / near-name irrelevant-memory control; should not match Dev Arora without stable ID."
+}
+]
+

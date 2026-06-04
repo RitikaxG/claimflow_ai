@@ -1,0 +1,23 @@
+[
+{
+"vendorId": "VEND-W5-001",
+"displayName": "Metro Auto Works",
+"vendorType": "repair_garage",
+"synthetic": true,
+"notes": "Used for repeated inflated invoice and conflicting invoice amount examples."
+},
+{
+"vendorId": "VEND-W5-002",
+"displayName": "SafeTow Services",
+"vendorType": "towing_vendor",
+"synthetic": true,
+"notes": "Neutral vendor used as irrelevant-memory control."
+},
+{
+"vendorId": "VEND-W5-003",
+"displayName": "Northside Glass Repair",
+"vendorType": "repair_garage",
+"synthetic": true,
+"notes": "Used for clean approval-note control when current policy evidence is enough."
+}
+]

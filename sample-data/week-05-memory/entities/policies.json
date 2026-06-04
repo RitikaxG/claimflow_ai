@@ -1,0 +1,50 @@
+[
+{
+"policyId": "POLICY-W5-001",
+"policyNumber": "POL-W2-013",
+"productType": "auto_insurance",
+"version": "synthetic-v1",
+"customerId": "CUST-W5-001",
+"notes": "Policy number corrected during human review."
+},
+{
+"policyId": "POLICY-W5-002",
+"policyNumber": "POL-W5-002",
+"productType": "auto_insurance",
+"version": "synthetic-v1",
+"customerId": "CUST-W5-002",
+"notes": "Third-party claim scenario requiring current police-report validation."
+},
+{
+"policyId": "POLICY-W5-003",
+"policyNumber": "POL-W5-003",
+"productType": "auto_insurance",
+"version": "synthetic-v1",
+"customerId": "CUST-W5-003",
+"notes": "Prior rejected claim control; memory must only route to human review."
+},
+{
+"policyId": "POLICY-W5-004",
+"policyNumber": "POL-W5-004",
+"productType": "auto_insurance",
+"version": "synthetic-v1",
+"customerId": "CUST-W5-004",
+"notes": "Missing-field workflow examples."
+},
+{
+"policyId": "POLICY-W5-005",
+"policyNumber": "POL-W5-005",
+"productType": "auto_insurance",
+"version": "synthetic-v1",
+"customerId": "CUST-W5-005",
+"notes": "Repeated-loss and duplicate-escalation examples."
+},
+{
+"policyId": "POLICY-W5-006",
+"policyNumber": "POL-W5-006",
+"productType": "auto_insurance",
+"version": "synthetic-v1",
+"customerId": "CUST-W5-006",
+"notes": "Irrelevant same-name control policy."
+}
+]
