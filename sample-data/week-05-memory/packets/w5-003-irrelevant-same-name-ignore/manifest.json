@@ -1,0 +1,13 @@
+{
+  "packetId": "w5-003-irrelevant-same-name-ignore",
+  "title": "Near-name claimant should not match unrelated memory",
+  "purpose": "Future retrieval eval skeleton for false-positive memory control.",
+  "sourceMemorySeedIds": [],
+  "expectedBehavior": "Ignore Dev Arora memory for Dev Aroora because stable customerId differs.",
+  "mustNotUseMemoryFor": [
+    "same_name_match_only",
+    "field_overwrite",
+    "claim_approval",
+    "claim_rejection"
+  ]
+}

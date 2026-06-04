@@ -1,0 +1,11 @@
+{
+  "packetId": "w5-002-prior-rejection-route-review",
+  "expectedHitMemorySeedIds": ["WMEM-SEED-W5-002"],
+  "expectedIgnoredMemorySeedIds": ["WMEM-SEED-W5-001", "WMEM-SEED-W5-005"],
+  "expectedUse": "route_to_human_review",
+  "mustNotUseFor": [
+    "auto_rejection",
+    "claim_denial",
+    "policy_citation"
+  ]
+}

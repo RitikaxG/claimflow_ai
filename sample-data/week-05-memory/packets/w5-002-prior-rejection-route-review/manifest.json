@@ -1,0 +1,12 @@
+{
+  "packetId": "w5-002-prior-rejection-route-review",
+  "title": "Prior rejection should route similar claimant pattern to review",
+  "purpose": "Future retrieval eval skeleton for high-risk claimant memory.",
+  "sourceMemorySeedIds": ["WMEM-SEED-W5-002"],
+  "expectedBehavior": "Surface prior rejection as a risk signal only.",
+  "mustNotUseMemoryFor": [
+    "auto_rejection",
+    "denial_reason",
+    "policy_evidence"
+  ]
+}

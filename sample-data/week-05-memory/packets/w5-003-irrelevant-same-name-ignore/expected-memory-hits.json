@@ -1,0 +1,12 @@
+{
+  "packetId": "w5-003-irrelevant-same-name-ignore",
+  "expectedHitMemorySeedIds": [],
+  "expectedIgnoredMemorySeedIds": ["WMEM-SEED-W5-001", "WMEM-SEED-W5-002", "WMEM-SEED-W5-005"],
+  "expectedUse": "no_memory_context",
+  "mustNotUseFor": [
+    "same_name_match_only",
+    "field_overwrite",
+    "claim_approval",
+    "claim_rejection"
+  ]
+}

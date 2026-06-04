@@ -1,0 +1,27 @@
+{
+  "packetId": "w5-002-prior-rejection-route-review",
+  "runId": "RUN-W5-002",
+  "claimNumber": "CLM-W5-002",
+  "customerId": "CUST-W5-003",
+  "policyId": "POLICY-W5-003",
+  "vendorId": null,
+  "runStatus": "VALIDATING",
+  "extractedJson": {
+    "claimNumber": "CLM-W5-002",
+    "insuredName": "Aarav Mehta",
+    "policyNumber": "POL-W5-003",
+    "incidentDate": "2026-05-29",
+    "lossType": "own_damage"
+  },
+  "validationJson": {
+    "isValid": true,
+    "missingFields": [],
+    "conflicts": [],
+    "riskSignals": ["similar claimant details to prior rejected claim"]
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "PENDING",
+  "retrievalStatus": null,
+  "policyDecision": null
+}

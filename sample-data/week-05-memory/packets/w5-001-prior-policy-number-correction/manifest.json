@@ -1,0 +1,12 @@
+{
+  "packetId": "w5-001-prior-policy-number-correction",
+  "title": "Prior policyNumber correction should surface memory but not overwrite current extraction",
+  "purpose": "Future retrieval eval skeleton for claimant-specific human correction memory.",
+  "sourceMemorySeedIds": ["WMEM-SEED-W5-001"],
+  "expectedBehavior": "Surface memory as a verification hint only.",
+  "mustNotUseMemoryFor": [
+    "field_overwrite",
+    "claim_approval",
+    "claim_rejection"
+  ]
+}
