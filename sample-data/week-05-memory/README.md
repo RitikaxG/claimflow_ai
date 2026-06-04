@@ -363,7 +363,7 @@ recurring workflow patterns
 
 Why this file exists:
 
-Day 3 can read this file and create actual `WorkflowMemory` records.
+This file helps to create actual `WorkflowMemory` records.
 
 Each observation includes:
 
@@ -411,10 +411,10 @@ This file contains seed memory cards shaped like the Prisma `WorkflowMemory` mod
 
 Why this file exists:
 
-- Previews the DB records Day 3 will eventually write
+- Previews the DB records that will be eventually written
 - Keeps memory cards compact
 - Keeps safe-use and must-not-do rules attached to every memory
-- Gives Day 4 retrieval something to test against conceptually
+- Gives retrieval something to test against conceptually
 
 Each seed memory includes:
 
@@ -474,7 +474,7 @@ The `packets/` folder contains future test skeletons.
 
 These are not full Week 5 evals yet.
 
-They prepare Day 4 retrieval testing by defining:
+They prepare retrieval testing by defining:
 
 ```txt
 new claim state
