@@ -1,0 +1,134 @@
+[
+  {
+    "agentHistoryId": "AAH-W5-001",
+    "sourcePacketId": "w4-013-missing-fields-draft-information-request",
+    "historicalClaimId": "HCLAIM-W5-004",
+    "agentAction": "DRAFT_INFORMATION_REQUEST",
+    "agentActionStatus": "EXECUTED",
+    "postAction": "MARK_NEEDS_MORE_INFO",
+    "inputSignals": {
+      "missingFields": ["policyNumber", "incidentDate"],
+      "requiredEvidence": [],
+      "reviewTaskStatus": "PENDING"
+    },
+    "outcome": "Correctly asked for missing extracted fields instead of vague clarification.",
+    "shouldCreateMemory": true,
+    "memoryKind": "RECURRING_ERROR_PATTERN",
+    "safeUse": "When policyNumber and incidentDate are missing, prefer a structured information request.",
+    "mustNotDo": [
+      "ask a vague clarification",
+      "approve without missing fields",
+      "overwrite missing fields from memory"
+    ]
+  },
+  {
+    "agentHistoryId": "AAH-W5-002",
+    "sourcePacketId": "w4-018-final-review-with-missing-info-audit-no-action",
+    "historicalClaimId": "HCLAIM-W5-005",
+    "agentAction": "NO_ACTION",
+    "agentActionStatus": "EXECUTED",
+    "postAction": "KEEP_FINAL_REVIEW_STATE",
+    "inputSignals": {
+      "missingFields": ["policyNumber"],
+      "reviewTaskStatus": "IN_REVIEW",
+      "previousAgentActions": ["DRAFT_INFORMATION_REQUEST", "MARK_NEEDS_MORE_INFO"]
+    },
+    "outcome": "Correctly avoided another action once the claim was already in final review state.",
+    "shouldCreateMemory": true,
+    "memoryKind": "RECURRING_ERROR_PATTERN",
+    "safeUse": "If final review is already active, do not draft duplicate requests or repeat workflow actions.",
+    "mustNotDo": [
+      "create another review task",
+      "send a new request",
+      "bypass final review"
+    ]
+  },
+  {
+    "agentHistoryId": "AAH-W5-003",
+    "sourcePacketId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+    "historicalClaimId": "HCLAIM-W5-006",
+    "agentAction": "RETRIEVE_POLICY_CLAUSES",
+    "agentActionStatus": "EXECUTED",
+    "postAction": "CONTINUE_POLICY_LOOKUP",
+    "inputSignals": {
+      "missingFields": [],
+      "receivedInformation": ["policyNumber", "incidentDate"],
+      "reviewTaskStatus": "NEEDS_MORE_INFO",
+      "previousAgentActions": ["DRAFT_INFORMATION_REQUEST"]
+    },
+    "outcome": "Correctly continued after missing information was supplied.",
+    "shouldCreateMemory": true,
+    "memoryKind": "RECURRING_ERROR_PATTERN",
+    "safeUse": "When current received information clears missing fields, continue workflow instead of repeating old missing-info request.",
+    "mustNotDo": [
+      "keep the old missing-info loop open",
+      "reuse stale missing field list",
+      "skip validation of newly received information"
+    ]
+  },
+  {
+    "agentHistoryId": "AAH-W5-004",
+    "sourcePacketId": "w4-duplicate-claim-escalate-human",
+    "historicalClaimId": "HCLAIM-W5-007",
+    "agentAction": "ESCALATE_TO_HUMAN",
+    "agentActionStatus": "EXECUTED",
+    "postAction": "CREATE_REVIEW_TASK",
+    "inputSignals": {
+      "duplicateSignals": ["same claimant", "same incidentDate", "similar loss description"],
+      "reviewTaskStatus": "PENDING"
+    },
+    "outcome": "Correctly escalated duplicate-like signals to human review.",
+    "shouldCreateMemory": true,
+    "memoryKind": "CLAIMANT_PATTERN",
+    "safeUse": "Use repeated similar-loss signals as a review-routing signal.",
+    "mustNotDo": [
+      "auto-reject duplicate-like claims",
+      "delete duplicate-like claims",
+      "mark duplicate without current comparison"
+    ]
+  },
+  {
+    "agentHistoryId": "AAH-W5-005",
+    "sourcePacketId": "w4-insufficient-policy-evidence-escalate",
+    "historicalClaimId": "HCLAIM-W5-008",
+    "agentAction": "ESCALATE_TO_HUMAN",
+    "agentActionStatus": "EXECUTED",
+    "postAction": "MARK_NEEDS_MORE_EVIDENCE",
+    "inputSignals": {
+      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
+      "policyDecision": "NEEDS_REVIEW",
+      "reviewTaskStatus": "PENDING"
+    },
+    "outcome": "Correctly escalated instead of drafting an approval or denial reason.",
+    "shouldCreateMemory": true,
+    "memoryKind": "POLICY_HISTORY",
+    "safeUse": "Escalate when current policy evidence is insufficient.",
+    "mustNotDo": [
+      "draft final coverage decision from memory",
+      "treat old policy gap as current evidence",
+      "skip human review"
+    ]
+  },
+  {
+    "agentHistoryId": "AAH-W5-006",
+    "sourcePacketId": "w4-clean-approval-note-with-current-evidence",
+    "historicalClaimId": "HCLAIM-W5-010",
+    "agentAction": "DRAFT_APPROVAL_NOTE",
+    "agentActionStatus": "EXECUTED",
+    "postAction": "SAVE_DRAFT_ONLY",
+    "inputSignals": {
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "policyDecision": "COVERED",
+      "reviewTaskStatus": "PENDING"
+    },
+    "outcome": "Correctly drafted a note only after current policy evidence was enough.",
+    "shouldCreateMemory": true,
+    "memoryKind": "PRIOR_REVIEW_DECISION",
+    "safeUse": "Draft approval notes only when current evidence is enough and guardrails allow draft-only behavior.",
+    "mustNotDo": [
+      "approve claim",
+      "send message",
+      "create final decision"
+    ]
+  }
+]

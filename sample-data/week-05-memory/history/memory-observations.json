@@ -1,0 +1,287 @@
+[
+  {
+    "observationId": "OBS-W5-001",
+    "sourceType": "HUMAN_CORRECTION",
+    "sourceId": "HCORR-W5-001",
+    "sourcePacketId": "w2-013-edit-and-approve",
+    "historicalClaimId": "HCLAIM-W5-001",
+    "observationType": "HUMAN_CORRECTION",
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-001",
+    "fieldPath": "policyNumber",
+    "beforeValue": null,
+    "afterValue": "POL-W2-013",
+    "tags": ["policy_number_missing", "human_verified", "own_damage"],
+    "riskLevel": "MEDIUM",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "HUMAN_CORRECTION",
+    "summary": "Reviewer corrected a missing policyNumber for this claimant.",
+    "safeUse": "Warn future workflow to verify policyNumber if this claimant has another claim.",
+    "mustNotDo": [
+      "overwrite extractedJson.policyNumber",
+      "treat POL-W2-013 as the current policy number",
+      "approve claim based on memory"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w2-013-edit-and-approve",
+      "sourceField": "corrected-extraction.expected.json.policyNumber",
+      "reviewOutcome": "EDITED_AND_APPROVED"
+    }
+  },
+  {
+    "observationId": "OBS-W5-002",
+    "sourceType": "PRIOR_REVIEW_DECISION",
+    "sourceId": "RDEC-W5-001",
+    "sourcePacketId": "w2-014-reject",
+    "historicalClaimId": "HCLAIM-W5-002",
+    "observationType": "PRIOR_REJECTION",
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-003",
+    "fieldPath": null,
+    "beforeValue": null,
+    "afterValue": null,
+    "tags": ["suspicious_claimant_details", "prior_rejection", "human_review"],
+    "riskLevel": "HIGH",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "PRIOR_REJECTION",
+    "summary": "Reviewer previously rejected a claim due to suspicious claimant details.",
+    "safeUse": "Route similar future claimant patterns to human review.",
+    "mustNotDo": [
+      "auto-reject the future claim",
+      "use prior rejection as current policy evidence",
+      "draft denial reason based only on memory"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w2-014-reject",
+      "reviewOutcome": "REJECTED",
+      "decision": "REJECT"
+    }
+  },
+  {
+    "observationId": "OBS-W5-003",
+    "sourceType": "PRIOR_REVIEW_DECISION",
+    "sourceId": "RDEC-W5-002",
+    "sourcePacketId": "w2-015-request-more-info",
+    "historicalClaimId": "HCLAIM-W5-003",
+    "observationType": "PRIOR_REVIEW_DECISION",
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "fieldPath": "requiredEvidence.policeReport",
+    "beforeValue": null,
+    "afterValue": "REQUESTED",
+    "tags": ["third_party_claim", "police_report_required", "request_more_info"],
+    "riskLevel": "MEDIUM",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "PRIOR_REVIEW_DECISION",
+    "summary": "Reviewer requested police report evidence for a third-party claim.",
+    "safeUse": "For current third-party claims, check whether policeReport evidence is present before policy lookup.",
+    "mustNotDo": [
+      "mark current claim missing policeReport without current validation",
+      "reuse old request text blindly",
+      "block claim only because of old request"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w2-015-request-more-info",
+      "requiredEvidence": ["policeReport"],
+      "reviewOutcome": "REQUEST_MORE_INFO"
+    }
+  },
+  {
+    "observationId": "OBS-W5-004",
+    "sourceType": "AGENT_ACTION_HISTORY",
+    "sourceId": "AAH-W5-001",
+    "sourcePacketId": "w4-013-missing-fields-draft-information-request",
+    "historicalClaimId": "HCLAIM-W5-004",
+    "observationType": "RECURRING_ERROR_PATTERN",
+    "entityType": "FIELD_PATH",
+    "entityId": "policyNumber+incidentDate",
+    "fieldPath": "missingFields",
+    "beforeValue": ["policyNumber", "incidentDate"],
+    "afterValue": "DRAFT_INFORMATION_REQUEST",
+    "tags": ["missing_fields", "structured_info_request", "policy_number_missing", "incident_date_missing"],
+    "riskLevel": "MEDIUM",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "RECURRING_ERROR_PATTERN",
+    "summary": "When policyNumber and incidentDate were missing, a structured information request worked better than vague clarification.",
+    "safeUse": "Prefer specific field requests when these current fields are missing.",
+    "mustNotDo": [
+      "fill missing fields from memory",
+      "approve without fields",
+      "ask vague clarification"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w4-013-missing-fields-draft-information-request",
+      "agentAction": "DRAFT_INFORMATION_REQUEST",
+      "postAction": "MARK_NEEDS_MORE_INFO"
+    }
+  },
+  {
+    "observationId": "OBS-W5-005",
+    "sourceType": "AGENT_ACTION_HISTORY",
+    "sourceId": "AAH-W5-002",
+    "sourcePacketId": "w4-018-final-review-with-missing-info-audit-no-action",
+    "historicalClaimId": "HCLAIM-W5-005",
+    "observationType": "RECURRING_ERROR_PATTERN",
+    "entityType": "WORKFLOW_STATE",
+    "entityId": "FINAL_REVIEW",
+    "fieldPath": "reviewTaskStatus",
+    "beforeValue": "IN_REVIEW",
+    "afterValue": "NO_ACTION",
+    "tags": ["final_review", "no_action", "avoid_duplicate_request"],
+    "riskLevel": "HIGH",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "RECURRING_ERROR_PATTERN",
+    "summary": "Final review state should stop the agent from taking additional workflow actions.",
+    "safeUse": "If a claim is already in final review, prefer NO_ACTION and preserve audit trail.",
+    "mustNotDo": [
+      "create duplicate review task",
+      "send another request",
+      "bypass human review"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w4-018-final-review-with-missing-info-audit-no-action",
+      "agentAction": "NO_ACTION"
+    }
+  },
+  {
+    "observationId": "OBS-W5-006",
+    "sourceType": "AGENT_ACTION_HISTORY",
+    "sourceId": "AAH-W5-003",
+    "sourcePacketId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+    "historicalClaimId": "HCLAIM-W5-006",
+    "observationType": "RECURRING_ERROR_PATTERN",
+    "entityType": "WORKFLOW_STATE",
+    "entityId": "MISSING_INFO_LOOP",
+    "fieldPath": "missingFields",
+    "beforeValue": ["policyNumber", "incidentDate"],
+    "afterValue": [],
+    "tags": ["received_information", "clears_missing_info", "continue_policy_lookup"],
+    "riskLevel": "MEDIUM",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "RECURRING_ERROR_PATTERN",
+    "summary": "Received information can clear missing fields and allow policy lookup to continue.",
+    "safeUse": "When current received information clears missing fields, continue workflow after validation.",
+    "mustNotDo": [
+      "reuse stale missing fields",
+      "repeat old request without revalidation",
+      "skip validation of new info"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w4-017-received-information-clears-missing-info-run-policy-lookup",
+      "agentAction": "RETRIEVE_POLICY_CLAUSES"
+    }
+  },
+  {
+    "observationId": "OBS-W5-007",
+    "sourceType": "AGENT_ACTION_HISTORY",
+    "sourceId": "AAH-W5-004",
+    "sourcePacketId": "w4-duplicate-claim-escalate-human",
+    "historicalClaimId": "HCLAIM-W5-007",
+    "observationType": "CLAIMANT_PATTERN",
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-005",
+    "fieldPath": "duplicateSignals",
+    "beforeValue": ["same claimant", "same incidentDate", "similar loss description"],
+    "afterValue": "ESCALATE_TO_HUMAN",
+    "tags": ["duplicate_signal", "repeated_loss", "human_review"],
+    "riskLevel": "HIGH",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "CLAIMANT_PATTERN",
+    "summary": "Duplicate-like signals for this claimant should escalate to human review.",
+    "safeUse": "Use similar current loss patterns as a review-routing signal.",
+    "mustNotDo": [
+      "auto-reject as duplicate",
+      "delete claim",
+      "mark duplicate without current comparison"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w4-duplicate-claim-escalate-human",
+      "agentAction": "ESCALATE_TO_HUMAN"
+    }
+  },
+  {
+    "observationId": "OBS-W5-008",
+    "sourceType": "AGENT_ACTION_HISTORY",
+    "sourceId": "AAH-W5-005",
+    "sourcePacketId": "w4-insufficient-policy-evidence-escalate",
+    "historicalClaimId": "HCLAIM-W5-008",
+    "observationType": "POLICY_HISTORY",
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "fieldPath": "retrievalStatus",
+    "beforeValue": "INSUFFICIENT_EVIDENCE",
+    "afterValue": "ESCALATE_TO_HUMAN",
+    "tags": ["insufficient_policy_evidence", "needs_review", "rag_guardrail"],
+    "riskLevel": "HIGH",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "POLICY_HISTORY",
+    "summary": "Insufficient current policy evidence should escalate instead of producing a final claim decision.",
+    "safeUse": "Escalate when current retrieval is insufficient.",
+    "mustNotDo": [
+      "use memory as policy citation",
+      "draft final decision without current evidence",
+      "overwrite retrievalStatus"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w4-insufficient-policy-evidence-escalate",
+      "retrievalStatus": "INSUFFICIENT_EVIDENCE"
+    }
+  },
+  {
+    "observationId": "OBS-W5-009",
+    "sourceType": "HUMAN_CORRECTION",
+    "sourceId": "HCORR-W5-003",
+    "sourcePacketId": "w4-conflicting-invoice-amount-escalate",
+    "historicalClaimId": "HCLAIM-W5-009",
+    "observationType": "VENDOR_PATTERN",
+    "entityType": "VENDOR",
+    "entityId": "VEND-W5-001",
+    "fieldPath": "invoice.amount",
+    "beforeValue": "78000",
+    "afterValue": "52000",
+    "tags": ["vendor_pattern", "invoice_conflict", "amount_mismatch", "human_review"],
+    "riskLevel": "HIGH",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "VENDOR_PATTERN",
+    "summary": "This vendor has a prior conflicting invoice amount pattern that required human review.",
+    "safeUse": "Flag future invoice amount conflicts from this vendor for human review.",
+    "mustNotDo": [
+      "overwrite invoice amount",
+      "pick an amount automatically",
+      "reject claim based only on vendor memory"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w4-conflicting-invoice-amount-escalate",
+      "fieldPath": "invoice.amount"
+    }
+  },
+  {
+    "observationId": "OBS-W5-010",
+    "sourceType": "AGENT_ACTION_HISTORY",
+    "sourceId": "AAH-W5-006",
+    "sourcePacketId": "w4-clean-approval-note-with-current-evidence",
+    "historicalClaimId": "HCLAIM-W5-010",
+    "observationType": "PRIOR_REVIEW_DECISION",
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "fieldPath": "retrievalStatus",
+    "beforeValue": "ENOUGH_EVIDENCE",
+    "afterValue": "DRAFT_APPROVAL_NOTE",
+    "tags": ["approval_note", "draft_only", "enough_current_policy_evidence"],
+    "riskLevel": "LOW",
+    "shouldCreateMemory": true,
+    "recommendedMemoryKind": "PRIOR_REVIEW_DECISION",
+    "summary": "A clean approval note is allowed only as a draft and only with enough current policy evidence.",
+    "safeUse": "Allow draft approval notes when current evidence is enough and guardrails allow draft-only output.",
+    "mustNotDo": [
+      "approve claim",
+      "send message",
+      "use memory as coverage evidence"
+    ],
+    "evidenceJson": {
+      "sourcePacketId": "w4-clean-approval-note-with-current-evidence",
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "agentAction": "DRAFT_APPROVAL_NOTE"
+    }
+  }
+]

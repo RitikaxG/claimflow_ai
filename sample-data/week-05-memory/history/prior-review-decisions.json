@@ -1,0 +1,77 @@
+[
+  {
+    "decisionHistoryId": "RDEC-W5-001",
+    "sourcePacketId": "w2-014-reject",
+    "historicalClaimId": "HCLAIM-W5-002",
+    "decision": "REJECT",
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-003",
+    "reasonTags": ["suspicious_claimant_details"],
+    "summary": "Reviewer rejected a claim due to suspicious claimant details.",
+    "shouldCreateMemory": true,
+    "memoryKind": "PRIOR_REJECTION",
+    "riskLevel": "HIGH",
+    "safeUse": "Route similar future claimant pattern to human review.",
+    "mustNotDo": [
+      "auto-reject a future claim",
+      "use prior rejection as policy evidence",
+      "draft denial reason based only on memory"
+    ]
+  },
+  {
+    "decisionHistoryId": "RDEC-W5-002",
+    "sourcePacketId": "w2-015-request-more-info",
+    "historicalClaimId": "HCLAIM-W5-003",
+    "decision": "REQUEST_MORE_INFO",
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "reasonTags": ["police_report_required", "third_party_claim"],
+    "summary": "Reviewer requested police report for a third-party claim.",
+    "shouldCreateMemory": true,
+    "memoryKind": "PRIOR_REVIEW_DECISION",
+    "riskLevel": "MEDIUM",
+    "safeUse": "For similar third-party claims, check whether police report evidence is present before policy lookup.",
+    "mustNotDo": [
+      "mark the new claim as missing police report without current validation",
+      "reuse old request text blindly"
+    ]
+  },
+  {
+    "decisionHistoryId": "RDEC-W5-003",
+    "sourcePacketId": "w4-insufficient-policy-evidence-escalate",
+    "historicalClaimId": "HCLAIM-W5-008",
+    "decision": "ESCALATE_TO_HUMAN",
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "reasonTags": ["insufficient_policy_evidence", "coverage_uncertain"],
+    "summary": "Workflow escalated because retrieved policy evidence was insufficient for a final decision.",
+    "shouldCreateMemory": true,
+    "memoryKind": "POLICY_HISTORY",
+    "riskLevel": "HIGH",
+    "safeUse": "When current policy retrieval is insufficient, route to human review instead of drafting a final decision.",
+    "mustNotDo": [
+      "substitute memory for policy citations",
+      "draft approval or denial without current evidence",
+      "treat an old evidence gap as current coverage outcome"
+    ]
+  },
+  {
+    "decisionHistoryId": "RDEC-W5-004",
+    "sourcePacketId": "w4-clean-approval-note-with-current-evidence",
+    "historicalClaimId": "HCLAIM-W5-010",
+    "decision": "DRAFT_APPROVAL_NOTE",
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "reasonTags": ["enough_current_policy_evidence", "draft_only"],
+    "summary": "Agent drafted an approval note only after current policy retrieval had enough evidence.",
+    "shouldCreateMemory": true,
+    "memoryKind": "PRIOR_REVIEW_DECISION",
+    "riskLevel": "LOW",
+    "safeUse": "Remind the agent that approval notes require enough current policy evidence and remain drafts.",
+    "mustNotDo": [
+      "approve automatically",
+      "send approval note automatically",
+      "use memory as the coverage citation"
+    ]
+  }
+]

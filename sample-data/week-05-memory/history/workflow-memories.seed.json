@@ -1,0 +1,205 @@
+[
+  {
+    "memorySeedId": "WMEM-SEED-W5-001",
+    "kind": "HUMAN_CORRECTION",
+    "status": "ACTIVE",
+    "riskLevel": "MEDIUM",
+    "confidence": 0.75,
+    "summary": "Reviewer corrected a missing policyNumber for claimant Dev Arora.",
+    "safeUse": "Ask reviewer to verify policyNumber when a future claim from this claimant has a missing or low-confidence policyNumber.",
+    "mustNotDo": [
+      "overwrite extractedJson.policyNumber",
+      "treat the old policy number as current truth",
+      "approve the claim from memory"
+    ],
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-001",
+    "fieldPath": "policyNumber",
+    "tags": ["human_verified", "policy_number_missing", "field_correction"],
+    "evidenceJson": {
+      "sourceObservationIds": ["OBS-W5-001"],
+      "sourcePacketIds": ["w2-013-edit-and-approve"],
+      "sourceWeeks": [2]
+    },
+    "sourceRunId": null,
+    "sourceReviewDecisionId": null,
+    "sourceCoverageQuestionId": null,
+    "sourceAgentActionLogId": null,
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  },
+  {
+    "memorySeedId": "WMEM-SEED-W5-002",
+    "kind": "PRIOR_REJECTION",
+    "status": "ACTIVE",
+    "riskLevel": "HIGH",
+    "confidence": 0.7,
+    "summary": "A prior claim for this claimant was rejected due to suspicious claimant details.",
+    "safeUse": "Route a future claim with similar current signals to human review.",
+    "mustNotDo": [
+      "auto-reject a future claim",
+      "draft a denial based only on memory",
+      "treat memory as policy evidence"
+    ],
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-003",
+    "fieldPath": null,
+    "tags": ["prior_rejection", "suspicious_claimant_details", "human_review"],
+    "evidenceJson": {
+      "sourceObservationIds": ["OBS-W5-002"],
+      "sourcePacketIds": ["w2-014-reject"],
+      "sourceWeeks": [2]
+    },
+    "sourceRunId": null,
+    "sourceReviewDecisionId": null,
+    "sourceCoverageQuestionId": null,
+    "sourceAgentActionLogId": null,
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  },
+  {
+    "memorySeedId": "WMEM-SEED-W5-003",
+    "kind": "PRIOR_REVIEW_DECISION",
+    "status": "ACTIVE",
+    "riskLevel": "MEDIUM",
+    "confidence": 0.72,
+    "summary": "Third-party claim review previously required policeReport evidence before continuing.",
+    "safeUse": "For current third-party claims, verify whether policeReport evidence is present before policy lookup or follow-up drafting.",
+    "mustNotDo": [
+      "mark policeReport missing without current validation",
+      "reuse old request text blindly",
+      "block a claim using memory alone"
+    ],
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "fieldPath": "requiredEvidence.policeReport",
+    "tags": ["third_party_claim", "police_report_required", "request_more_info"],
+    "evidenceJson": {
+      "sourceObservationIds": ["OBS-W5-003"],
+      "sourcePacketIds": ["w2-015-request-more-info"],
+      "sourceWeeks": [2]
+    },
+    "sourceRunId": null,
+    "sourceReviewDecisionId": null,
+    "sourceCoverageQuestionId": null,
+    "sourceAgentActionLogId": null,
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  },
+  {
+    "memorySeedId": "WMEM-SEED-W5-004",
+    "kind": "RECURRING_ERROR_PATTERN",
+    "status": "ACTIVE",
+    "riskLevel": "MEDIUM",
+    "confidence": 0.68,
+    "summary": "Claims missing policyNumber and incidentDate should get a structured information request.",
+    "safeUse": "When these fields are currently missing, draft a specific information request listing policyNumber and incidentDate.",
+    "mustNotDo": [
+      "fill missing fields from memory",
+      "approve without required fields",
+      "ask vague clarification"
+    ],
+    "entityType": "FIELD_PATH",
+    "entityId": "policyNumber+incidentDate",
+    "fieldPath": "missingFields",
+    "tags": ["missing_fields", "structured_info_request", "policy_number_missing", "incident_date_missing"],
+    "evidenceJson": {
+      "sourceObservationIds": ["OBS-W5-004"],
+      "sourcePacketIds": ["w4-013-missing-fields-draft-information-request"],
+      "sourceWeeks": [4]
+    },
+    "sourceRunId": null,
+    "sourceReviewDecisionId": null,
+    "sourceCoverageQuestionId": null,
+    "sourceAgentActionLogId": null,
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  },
+  {
+    "memorySeedId": "WMEM-SEED-W5-005",
+    "kind": "VENDOR_PATTERN",
+    "status": "ACTIVE",
+    "riskLevel": "HIGH",
+    "confidence": 0.66,
+    "summary": "Metro Auto Works has a prior invoice amount conflict that required human review.",
+    "safeUse": "If current documents from this vendor disagree on invoice amount, route to human review and show the conflict.",
+    "mustNotDo": [
+      "choose an invoice amount automatically",
+      "overwrite extracted invoice amount",
+      "reject or approve based only on vendor memory"
+    ],
+    "entityType": "VENDOR",
+    "entityId": "VEND-W5-001",
+    "fieldPath": "invoice.amount",
+    "tags": ["vendor_pattern", "invoice_conflict", "amount_mismatch"],
+    "evidenceJson": {
+      "sourceObservationIds": ["OBS-W5-009"],
+      "sourcePacketIds": ["w4-conflicting-invoice-amount-escalate"],
+      "sourceWeeks": [4]
+    },
+    "sourceRunId": null,
+    "sourceReviewDecisionId": null,
+    "sourceCoverageQuestionId": null,
+    "sourceAgentActionLogId": null,
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  },
+  {
+    "memorySeedId": "WMEM-SEED-W5-006",
+    "kind": "CLAIMANT_PATTERN",
+    "status": "ACTIVE",
+    "riskLevel": "HIGH",
+    "confidence": 0.64,
+    "summary": "Repeated similar loss signals for this claimant should be reviewed by a human.",
+    "safeUse": "Use current duplicate-like signals as a routing signal for human review.",
+    "mustNotDo": [
+      "auto-reject as duplicate",
+      "delete the new claim",
+      "mark duplicate without current comparison"
+    ],
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-005",
+    "fieldPath": "duplicateSignals",
+    "tags": ["duplicate_signal", "repeated_loss", "human_review"],
+    "evidenceJson": {
+      "sourceObservationIds": ["OBS-W5-007"],
+      "sourcePacketIds": ["w4-duplicate-claim-escalate-human"],
+      "sourceWeeks": [4]
+    },
+    "sourceRunId": null,
+    "sourceReviewDecisionId": null,
+    "sourceCoverageQuestionId": null,
+    "sourceAgentActionLogId": null,
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  },
+  {
+    "memorySeedId": "WMEM-SEED-W5-007",
+    "kind": "POLICY_HISTORY",
+    "status": "ACTIVE",
+    "riskLevel": "HIGH",
+    "confidence": 0.7,
+    "summary": "When current policy retrieval is insufficient, the workflow should escalate instead of drafting final claim decisions.",
+    "safeUse": "Use this as a guardrail reminder to require current policy citations for coverage decisions.",
+    "mustNotDo": [
+      "substitute memory for policy evidence",
+      "draft approval or denial without current citations",
+      "overwrite retrievalStatus"
+    ],
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-002",
+    "fieldPath": "retrievalStatus",
+    "tags": ["insufficient_policy_evidence", "rag_guardrail", "needs_review"],
+    "evidenceJson": {
+      "sourceObservationIds": ["OBS-W5-008"],
+      "sourcePacketIds": ["w4-insufficient-policy-evidence-escalate"],
+      "sourceWeeks": [4]
+    },
+    "sourceRunId": null,
+    "sourceReviewDecisionId": null,
+    "sourceCoverageQuestionId": null,
+    "sourceAgentActionLogId": null,
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  }
+]
