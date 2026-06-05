@@ -3,7 +3,7 @@ import { z } from "zod";
 export const WorkflowMemoryKindSchema = z.enum([
     "HUMAN_CORRECTION",
     "PRIOR_REJECTION",
-    "PRIOR_REVEW_DECISION",
+    "PRIOR_REVIEW_DECISION",
     "CLAIMANT_PATTERN",
     "VENDOR_PATTERN",
     "POLICY_HISTORY",
@@ -40,7 +40,7 @@ export const MemoryObservationSchema = z.object({
     riskLevel : WorkflowMemoryRiskLevelSchema,
     shouldCreateMemory : z.boolean(),
     recommendedMemoryKind : WorkflowMemoryKindSchema,
-    summry : z.string(),
+    summary : z.string(),
     safeUse : z.string(),
     mustNotDo : z.array(z.string()),
     evidenceJson : z.record(z.string(), z.unknown()).nullable().optional(),
