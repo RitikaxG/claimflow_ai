@@ -4,6 +4,7 @@ import {
   MemoryObservationSchema,
 } from "../types";
 import { isRecord } from "../utils/json";
+import { toJsonSafeValue } from "../utils/json";
 
 export type CreateMemoryFromObservationResult = {
   memoryId: string | null;
@@ -72,8 +73,8 @@ function buildEvidenceJson(observation: MemoryObservation): Record<string, unkno
     historicalClaimId: observation.historicalClaimId ?? null,
     sourceType: observation.sourceType,
     sourceId: observation.sourceId,
-    beforeValue: observation.beforeValue ?? null,
-    afterValue: observation.afterValue ?? null,
+    beforeValue: toJsonSafeValue(observation.beforeValue) ?? null,
+    afterValue: toJsonSafeValue(observation.afterValue) ?? null,
   };
 }
 

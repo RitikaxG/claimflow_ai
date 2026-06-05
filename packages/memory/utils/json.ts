@@ -82,3 +82,45 @@ export function stableJsonStringify(value: unknown): string {
 
   return typeof stringified === "string" ? stringified : String(stringified);
 }
+
+export type JsonSafeValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonSafeValue[]
+  | { [key: string]: JsonSafeValue };
+
+export function toJsonSafeValue(value: unknown): JsonSafeValue {
+  if (value === null || typeof value === "undefined") {
+    return null;
+  }
+
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => toJsonSafeValue(item));
+  }
+
+  if (isRecord(value)) {
+    const output: Record<string, JsonSafeValue> = {};
+
+    for (const [key, item] of Object.entries(value)) {
+      output[key] = toJsonSafeValue(item);
+    }
+
+    return output;
+  }
+
+  return String(value);
+}

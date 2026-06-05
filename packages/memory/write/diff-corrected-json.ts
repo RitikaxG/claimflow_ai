@@ -10,7 +10,20 @@ export type CorrectedJsonDiff = {
   beforeValue: unknown;
   afterValue: unknown;
   changeType: "ADDED" | "REMOVED" | "CHANGED";
+  updateSummary: string;
 };
+
+function formatDiffValue(value: unknown): string {
+  if (value === null || typeof value === "undefined") {
+    return "null";
+  }
+
+  if (typeof value === "string") {
+    return `"${value}"`;
+  }
+
+  return stableJsonStringify(value);
+}
 
 const IGNORED_KEYS = new Set(["id", "createdAt", "updatedAt"]);
 
@@ -96,6 +109,9 @@ export function diffCorrectedJson(
         beforeValue: null,
         afterValue,
         changeType: "ADDED",
+        updateSummary: `${fieldPath} was added with value ${formatDiffValue(
+            afterValue,
+        )}`,
       });
 
       continue;
@@ -107,6 +123,9 @@ export function diffCorrectedJson(
         beforeValue,
         afterValue: null,
         changeType: "REMOVED",
+        updateSummary: `${fieldPath} was removed. Previous value was ${formatDiffValue(
+            beforeValue,
+        )}`,
       });
 
       continue;
@@ -118,7 +137,10 @@ export function diffCorrectedJson(
         beforeValue,
         afterValue,
         changeType: "CHANGED",
-      });
+        updateSummary: `${fieldPath} changed from ${formatDiffValue(
+      beforeValue,
+    )} to ${formatDiffValue(afterValue)}`,
+    });
     }
   }
 
