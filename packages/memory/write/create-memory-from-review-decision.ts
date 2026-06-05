@@ -183,6 +183,7 @@ function classifyDiff(input: {
         reviewDecisionId,
         fieldPath: diff.fieldPath,
         changeType: diff.changeType,
+        updateSummary: diff.updateSummary
       },
     };
   }
@@ -272,6 +273,7 @@ function classifyDiff(input: {
         reviewDecisionId,
         fieldPath: diff.fieldPath,
         changeType: diff.changeType,
+        updateSummary: diff.updateSummary
       },
     };
   }
@@ -315,6 +317,7 @@ function classifyDiff(input: {
         reviewDecisionId,
         fieldPath: diff.fieldPath,
         changeType: diff.changeType,
+        updateSummary: diff.updateSummary
       },
     };
   }
