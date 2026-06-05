@@ -19,7 +19,7 @@ export const WEEK5_MEMORY_HISTORY_ROOT = path.join(
 
 export const WEEK5_MEMORY_OBSERVATIONS_PATH = path.join(
     WEEK5_MEMORY_HISTORY_ROOT,
-    "memory-observations-json",
+    "memory-observations.json",
 );
 
 export const WEEK5_MEMORY_SEED_PATH = path.join(

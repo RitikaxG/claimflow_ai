@@ -17,6 +17,38 @@ function toPrismaJson(value : unknown) : Prisma.InputJsonValue {
     return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
+function hasSourceObservationId(
+  evidenceJson: unknown,
+  observationId: string,
+): boolean {
+  if (!isRecord(evidenceJson)) {
+    return false;
+  }
+
+  const sourceObservationIds = evidenceJson.sourceObservationIds;
+
+  return (
+    Array.isArray(sourceObservationIds) &&
+    sourceObservationIds.some((item) => item === observationId)
+  );
+}
+
+function isSameDeterministicMemoryCandidate(input: {
+  memory: {
+    summary: string;
+    evidenceJson: unknown;
+  };
+  observation: MemoryObservation;
+}): boolean {
+  const { memory, observation } = input;
+
+  if (memory.summary === observation.summary) {
+    return true;
+  }
+
+  return hasSourceObservationId(memory.evidenceJson, observation.observationId);
+}
+
 export function defaultConfidenceForObservation(
   observation: MemoryObservation,
 ): number {
@@ -94,15 +126,22 @@ export async function createMemoryFromObservation(
   validateMemorySafetyFields(observation);
 
   return prisma.$transaction(async (tx) => {
-    const existingMemory = await tx.workflowMemory.findFirst({
+    const candidateExistingMemories = await tx.workflowMemory.findMany({
       where: {
         kind: observation.recommendedMemoryKind,
         entityType: observation.entityType ?? null,
         entityId: observation.entityId ?? null,
         fieldPath: observation.fieldPath ?? null,
-        summary: observation.summary,
       },
+      take: 25,
     });
+
+    const existingMemory = candidateExistingMemories.find((memory) =>
+      isSameDeterministicMemoryCandidate({
+        memory,
+        observation,
+      }),
+    );
 
     if (existingMemory) {
       return {
