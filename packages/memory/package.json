@@ -1,0 +1,27 @@
+{
+  "name": "@repo/memory",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.9.1",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@repo/db": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "seed:week5": "bun --env-file ../db/.env seed/load-week5-memory-seed.ts",
+    "smoke:write": "bun --env-file ../db/.env scripts/smoke-test-memory-write.ts"
+  }
+}
