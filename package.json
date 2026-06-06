@@ -22,7 +22,8 @@
     "agent:smoke:real-step": "bun --filter @repo/agent smoke:real-agent-step",
     "eval:week4:agent": "bun --filter @repo/evals eval:week4:agent",
     "memory:seed:week5": "bun --filter @repo/memory seed:week5",
-    "memory:smoke:write": "bun --filter @repo/memory smoke:write"
+    "memory:smoke:write": "bun --filter @repo/memory smoke:write",
+    "memory:smoke:retrieval": "bun --filter @repo/memory smoke:retrieval"
   },
   "devDependencies": {
     "prettier": "^3.6.0",

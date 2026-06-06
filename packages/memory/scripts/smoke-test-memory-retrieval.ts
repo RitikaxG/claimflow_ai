@@ -16,6 +16,20 @@ type ExpectedMemoryHits = {
   mustNotUseFor: string[];
 };
 
+type RelevantMemoryDebugRow = {
+  seedId: string;
+  memoryId: string;
+  score: number;
+  kind: string;
+  riskLevel: string;
+  status: string;
+  matchedOn: string;
+  retrievalReason: string;
+  summary: string;
+  safeUse: string;
+  mustNotDo: string;
+};
+
 async function readJsonFile<T>(filePath: string): Promise<T> {
   const raw = await readFile(filePath, "utf-8");
 
@@ -36,9 +50,27 @@ function getMemorySeedId(evidenceJson: unknown): string | null {
   return typeof memorySeedId === "string" ? memorySeedId : null;
 }
 
-async function getSeedIdsForRelevantMemories(
+function formatMatchedOn(memory: RelevantMemory): string {
+  if (memory.matchedOn.length === 0) {
+    return "none";
+  }
+
+  return memory.matchedOn
+    .map((signal) => `${signal.type}(+${signal.points}: ${signal.value})`)
+    .join(", ");
+}
+
+function formatMustNotDo(memory: RelevantMemory): string {
+  if (memory.mustNotDo.length === 0) {
+    return "none";
+  }
+
+  return memory.mustNotDo.join("; ");
+}
+
+async function getDebugRowsForRelevantMemories(
   memories: RelevantMemory[],
-): Promise<string[]> {
+): Promise<RelevantMemoryDebugRow[]> {
   if (memories.length === 0) {
     return [];
   }
@@ -62,9 +94,61 @@ async function getSeedIdsForRelevantMemories(
     ]),
   );
 
-  return memories
-    .map((memory) => seedIdByMemoryId.get(memory.memoryId) ?? null)
-    .filter((memorySeedId): memorySeedId is string => memorySeedId !== null);
+  return memories.map((memory) => {
+    return {
+      seedId: seedIdByMemoryId.get(memory.memoryId) ?? "UNKNOWN_SEED",
+      memoryId: memory.memoryId,
+      score: memory.score,
+      kind: memory.kind,
+      riskLevel: memory.riskLevel,
+      status: memory.status,
+      matchedOn: formatMatchedOn(memory),
+      retrievalReason: memory.retrievalReason,
+      summary: memory.summary,
+      safeUse: memory.safeUse,
+      mustNotDo: formatMustNotDo(memory),
+    };
+  });
+}
+
+function printRetrievalDebug(input: {
+  packetId: string;
+  expectedUse: string;
+  mustNotUseFor: string[];
+  totalCandidates: number;
+  writtenHitCount: number;
+  rows: RelevantMemoryDebugRow[];
+}) {
+  console.log(`Packet retrieval passed: ${input.packetId}`);
+  console.log(`expectedUse: ${input.expectedUse}`);
+  console.log(`mustNotUseFor: ${input.mustNotUseFor.join(", ")}`);
+  console.log(`totalCandidates: ${input.totalCandidates}`);
+  console.log(`writtenHitCount: ${input.writtenHitCount}`);
+
+  if (input.rows.length === 0) {
+    console.log("retrievedMemories: none");
+    console.log("");
+    return;
+  }
+
+  console.log("retrievedMemories:");
+
+  for (const [index, row] of input.rows.entries()) {
+    console.log(`  #${index + 1}`);
+    console.log(`    seedId: ${row.seedId}`);
+    console.log(`    memoryId: ${row.memoryId}`);
+    console.log(`    score: ${row.score}`);
+    console.log(`    kind: ${row.kind}`);
+    console.log(`    riskLevel: ${row.riskLevel}`);
+    console.log(`    status: ${row.status}`);
+    console.log(`    matchedOn: ${row.matchedOn}`);
+    console.log(`    retrievalReason: ${row.retrievalReason}`);
+    console.log(`    summary: ${row.summary}`);
+    console.log(`    safeUse: ${row.safeUse}`);
+    console.log(`    mustNotDo: ${row.mustNotDo}`);
+  }
+
+  console.log("");
 }
 
 async function assertPacketRetrieval(input: {
@@ -98,7 +182,8 @@ async function assertPacketRetrieval(input: {
     limit: 5,
   });
 
-  const retrievedSeedIds = await getSeedIdsForRelevantMemories(result.memories);
+  const debugRows = await getDebugRowsForRelevantMemories(result.memories);
+  const retrievedSeedIds = debugRows.map((row) => row.seedId);
 
   for (const expectedHitSeedId of input.expectedHitSeedIds) {
     assert(
@@ -126,9 +211,14 @@ async function assertPacketRetrieval(input: {
     );
   }
 
-  console.log(`Packet retrieval passed: ${input.packetId}`);
-  console.log(`retrievedSeedIds: ${retrievedSeedIds.join(", ") || "none"}`);
-  console.log("");
+  printRetrievalDebug({
+    packetId: input.packetId,
+    expectedUse: expected.expectedUse,
+    mustNotUseFor: expected.mustNotUseFor,
+    totalCandidates: result.totalCandidates,
+    writtenHitCount: result.writtenHitCount,
+    rows: debugRows,
+  });
 }
 
 async function runRealMemoryHitAuditSmoke() {
@@ -183,6 +273,8 @@ async function runRealMemoryHitAuditSmoke() {
       "Real run audit smoke expected at least one MemoryHit row.",
     );
 
+    const debugRows = await getDebugRowsForRelevantMemories(result.memories);
+
     const hit = await prisma.memoryHit.findFirst({
       where: {
         runId: run.id,
@@ -209,6 +301,18 @@ async function runRealMemoryHitAuditSmoke() {
     console.log("Real MemoryHit audit smoke passed");
     console.log(`runId: ${run.id}`);
     console.log(`memoryHitId: ${hit.id}`);
+    console.log(`writtenHitCount: ${result.writtenHitCount}`);
+    console.log("retrievedMemories:");
+
+    for (const [index, row] of debugRows.entries()) {
+      console.log(`  #${index + 1}`);
+      console.log(`    seedId: ${row.seedId}`);
+      console.log(`    score: ${row.score}`);
+      console.log(`    kind: ${row.kind}`);
+      console.log(`    matchedOn: ${row.matchedOn}`);
+      console.log(`    summary: ${row.summary}`);
+    }
+
     console.log("");
   } finally {
     if (documentId) {

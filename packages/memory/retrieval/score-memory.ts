@@ -21,15 +21,24 @@ export type WorkflowMemoryLike = {
 
 export const MEMORY_SCORE = {
   EXACT_POLICY: 35,
+
   SAME_FIELD: 30,
+  GENERIC_FIELD_BUCKET_MATCH: 5,
+
   MISSING_FIELD_MATCH: 30,
   REQUIRED_EVIDENCE_MATCH: 30,
+
+  PATTERN_FULL_MATCH: 45,
+  PATTERN_PARTIAL_MATCH: 10,
+
   EXACT_VENDOR: 25,
   EXACT_CLAIMANT: 20,
+
   SAME_LOSS_TYPE: 10,
   HIGH_RISK_MEMORY: 10,
   HUMAN_VERIFIED_MEMORY: 10,
   CONFIRMED_MEMORY: 10,
+
   CONTRADICTED_BEFORE: -20,
   NAME_ONLY_WEAK_MATCH: -30,
 } as const;
@@ -40,11 +49,20 @@ const ELIGIBLE_MEMORY_STATUSES = new Set([
   "WEAKENED",
 ]);
 
+const GENERIC_FIELD_BUCKETS = new Set([
+  "missingfields",
+  "requiredevidence",
+  "duplicatesignals",
+  "retrievalstatus",
+]);
+
 const WORKFLOW_MATCH_TYPES = new Set<MemoryMatchSignal["type"]>([
   "EXACT_POLICY",
   "SAME_FIELD",
   "MISSING_FIELD_MATCH",
   "REQUIRED_EVIDENCE_MATCH",
+  "PATTERN_FULL_MATCH",
+  "PATTERN_PARTIAL_MATCH",
 ]);
 
 const ENTITY_RISK_MEMORY_KINDS = new Set([
@@ -54,7 +72,7 @@ const ENTITY_RISK_MEMORY_KINDS = new Set([
 ]);
 
 function normalizeComparable(value: string): string {
-  return value.trim().toLowerCase();
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
 function normalizeTagToken(value: string): string {
@@ -63,6 +81,18 @@ function normalizeTagToken(value: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9:]+/g, "_")
     .replace(/^_+|_+$/g, "");
+}
+
+function normalizeFieldToken(value: string): string {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function isGenericFieldBucket(fieldPath: string): boolean {
+  return GENERIC_FIELD_BUCKETS.has(normalizeComparable(fieldPath));
 }
 
 function hasSameFieldPath(input: {
@@ -148,6 +178,65 @@ function buildRequiredEvidenceTags(requiredEvidence: string[]): string[] {
   });
 }
 
+function extractMissingFieldPatternFromTags(memoryTags: string[]): string[] {
+  return memoryTags
+    .map((tag) => normalizeTagToken(tag))
+    .filter((tag) => tag.endsWith("_missing"))
+    .map((tag) => tag.replace(/_missing$/, ""))
+    .filter((tag) => tag.length > 0);
+}
+
+function scoreRecurringMissingFieldPattern(input: {
+  memory: WorkflowMemoryLike;
+  memoryTags: string[];
+  query: BuildMemoryQuery;
+  matchedOn: MemoryMatchSignal[];
+}) {
+  if (input.memory.kind !== "RECURRING_ERROR_PATTERN") {
+    return;
+  }
+
+  const patternMissingFields = extractMissingFieldPatternFromTags(
+    input.memoryTags,
+  );
+
+  if (patternMissingFields.length === 0) {
+    return;
+  }
+
+  const currentMissingFields = new Set(
+    input.query.missingFields.map((field) => normalizeFieldToken(field)),
+  );
+
+  const matchedPatternFields = patternMissingFields.filter((field) =>
+    currentMissingFields.has(field),
+  );
+
+  if (matchedPatternFields.length === 0) {
+    return;
+  }
+
+  if (matchedPatternFields.length === patternMissingFields.length) {
+    pushSignal({
+      matchedOn: input.matchedOn,
+      type: "PATTERN_FULL_MATCH",
+      value: patternMissingFields.join("+"),
+      points: MEMORY_SCORE.PATTERN_FULL_MATCH,
+    });
+
+    return;
+  }
+
+  pushSignal({
+    matchedOn: input.matchedOn,
+    type: "PATTERN_PARTIAL_MATCH",
+    value: `${matchedPatternFields.join("+")} of ${patternMissingFields.join(
+      "+",
+    )}`,
+    points: MEMORY_SCORE.PATTERN_PARTIAL_MATCH,
+  });
+}
+
 function hasWorkflowMatch(matchedOn: MemoryMatchSignal[]): boolean {
   return matchedOn.some((signal) => WORKFLOW_MATCH_TYPES.has(signal.type));
 }
@@ -208,12 +297,21 @@ export function scoreMemory(input: {
       queryFieldPaths: query.fieldPaths,
     })
   ) {
-    pushSignal({
-      matchedOn,
-      type: "SAME_FIELD",
-      value: memory.fieldPath ?? "unknown",
-      points: MEMORY_SCORE.SAME_FIELD,
-    });
+    if (memory.fieldPath && isGenericFieldBucket(memory.fieldPath)) {
+      pushSignal({
+        matchedOn,
+        type: "GENERIC_FIELD_BUCKET_MATCH",
+        value: memory.fieldPath,
+        points: MEMORY_SCORE.GENERIC_FIELD_BUCKET_MATCH,
+      });
+    } else {
+      pushSignal({
+        matchedOn,
+        type: "SAME_FIELD",
+        value: memory.fieldPath ?? "unknown",
+        points: MEMORY_SCORE.SAME_FIELD,
+      });
+    }
   }
 
   const memoryTags = getStringArray(memory.tags);
@@ -245,6 +343,13 @@ export function scoreMemory(input: {
       points: MEMORY_SCORE.REQUIRED_EVIDENCE_MATCH,
     });
   }
+
+  scoreRecurringMissingFieldPattern({
+    memory,
+    memoryTags,
+    query,
+    matchedOn,
+  });
 
   if (
     memory.entityType === "VENDOR" &&
