@@ -110,8 +110,10 @@ function collectFieldPaths(input : {
 }) : string[] {
     return uniqueStrings([
         ...input.missingFields,
+        ...(input.missingFields.length > 0 ? ["missingFields"] : []),
         ...requiredEvidenceToFieldPaths(input.requiredEvidence),
-    ])
+        ...(input.requiredEvidence.length > 0 ? ["requiredEvidence"] : []),
+    ]);
 }
 
 function collectTags(input : {
