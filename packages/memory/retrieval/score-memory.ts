@@ -1,4 +1,4 @@
-import type { BuiltMemoryQuery } from "./build-memory-query";
+import type { BuildMemoryQuery } from "./build-memory-query";
 import type { MemoryMatchSignal } from "../types";
 import { getStringArray } from "../utils/json";
 
@@ -98,7 +98,7 @@ function hasAnyTag(memoryTags: string[], tags: string[]): string | null {
 
 function hasSameLossType(input: {
   memoryTags: string[];
-  query: BuiltMemoryQuery;
+  query: BuildMemoryQuery;
 }): boolean {
   if (!input.query.lossType) {
     return false;
@@ -170,7 +170,7 @@ function hasEntityRiskMatch(input: {
 
 export function scoreMemory(input: {
   memory: WorkflowMemoryLike;
-  query: BuiltMemoryQuery;
+  query: BuildMemoryQuery;
 }): {
   score: number;
   matchedOn: MemoryMatchSignal[];

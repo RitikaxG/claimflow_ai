@@ -205,7 +205,7 @@ function getDamageType(claimState : MemoryClaimState) : string | null {
     ]);
 }
 
-export function buildMemoryQuery(input : {
+export function builtMemoryQuery(input : {
     runId? : string | null,
     claimState? : MemoryClaimState | unknown,
     canWriteHits? : boolean,
