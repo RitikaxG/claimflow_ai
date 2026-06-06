@@ -126,7 +126,7 @@ function collectTags(input : {
     const missingFieldTags = input.missingFields.flatMap((field) => {
         const normalized = normalizeTagToken(field);
 
-        return [`missing_field${normalized}`, `${normalized}_missing`];
+        return [`missing_field:${normalized}`, `${normalized}_missing`];
     });
 
     const requiredEvidenceTags = input.requiredEvidence.flatMap((evidence) => {
@@ -205,7 +205,7 @@ function getDamageType(claimState : MemoryClaimState) : string | null {
     ]);
 }
 
-export function builtMemoryQuery(input : {
+export function buildMemoryQuery(input : {
     runId? : string | null,
     claimState? : MemoryClaimState | unknown,
     canWriteHits? : boolean,

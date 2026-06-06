@@ -1,6 +1,6 @@
 import { MemoryClaimStateSchema, RelevantMemorySchema, type MemoryClaimState, type RelevantMemory } from "../types"
 import { getStringArray } from "../utils/json";
-import { builtMemoryQuery, type BuildMemoryQuery } from "./build-memory-query";
+import { buildMemoryQuery, type BuildMemoryQuery } from "./build-memory-query";
 import { scoreMemory, type WorkflowMemoryLike } from "./score-memory"
 import { Prisma, prisma } from "@repo/db";
 
@@ -183,7 +183,7 @@ export async function retrieveRelevantMemories(input: {
     ? await loadClaimStateFromRun(input.runId)
     : MemoryClaimStateSchema.parse(input.claimState ?? {});
 
-  const query = builtMemoryQuery({
+  const query = buildMemoryQuery({
     runId: input.runId ?? claimState.runId ?? null,
     claimState,
     canWriteHits: Boolean(input.runId && input.writeHits),
