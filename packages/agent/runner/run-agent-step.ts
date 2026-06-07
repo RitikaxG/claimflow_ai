@@ -76,6 +76,128 @@ function formatList(values : string[]): string {
     return values.join(", ");
 }
 
+type AgentRelevantMemory = ClaimStateForAgent["relevantMemories"][number];
+
+const ENTITY_RISK_MEMORY_KINDS = new Set([
+  "PRIOR_REJECTION",
+  "CLAIMANT_PATTERN",
+  "VENDOR_PATTERN",
+]);
+
+const REVIEW_RELEVANT_MEMORY_KINDS = new Set([
+  "HUMAN_CORRECTION",
+  "PRIOR_REVIEW_DECISION",
+  "POLICY_HISTORY",
+  "RECURRING_ERROR_PATTERN",
+]);
+
+const FIELD_OR_EVIDENCE_MATCH_TYPES = new Set([
+  "SAME_FIELD",
+  "MISSING_FIELD_MATCH",
+  "REQUIRED_EVIDENCE_MATCH",
+  "PATTERN_FULL_MATCH",
+  "PATTERN_PARTIAL_MATCH",
+]);
+
+function hasFieldOrEvidenceMatch(memory: AgentRelevantMemory): boolean {
+  return memory.matchedOn.some((signal) =>
+    FIELD_OR_EVIDENCE_MATCH_TYPES.has(signal.type),
+  );
+}
+
+function shouldEscalateBecauseOfMemory(memory: AgentRelevantMemory): boolean {
+  if (memory.status === "RETIRED" || memory.status === "SUPERSEDED") {
+    return false;
+  }
+
+  if (memory.riskLevel === "HIGH") {
+    return true;
+  }
+
+  if (ENTITY_RISK_MEMORY_KINDS.has(memory.kind)) {
+    return true;
+  }
+
+  if (
+    REVIEW_RELEVANT_MEMORY_KINDS.has(memory.kind) &&
+    hasFieldOrEvidenceMatch(memory) &&
+    memory.score >= 30 &&
+    memory.confidence >= 0.6
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function getEscalationWorthyMemories(
+  context: ClaimStateForAgent,
+): AgentRelevantMemory[] {
+  return context.relevantMemories.filter(shouldEscalateBecauseOfMemory);
+}
+
+function getMemoryHitIds(context: ClaimStateForAgent): string[] {
+  return context.relevantMemories
+    .map((memory) => memory.memoryHitId)
+    .filter((memoryHitId): memoryHitId is string => {
+      return typeof memoryHitId === "string" && memoryHitId.trim().length > 0;
+    });
+}
+
+function getMemoryEscalationReason(
+  context: ClaimStateForAgent,
+): string | null {
+  const routingMemories = getEscalationWorthyMemories(context);
+
+  if (routingMemories.length === 0) {
+    return null;
+  }
+
+  const memorySummary = routingMemories
+    .slice(0, 3)
+    .map((memory) => {
+      const matchedOn = memory.matchedOn
+        .map((signal) => signal.type)
+        .join(",");
+
+      return `${memory.kind}/${memory.riskLevel}/score=${memory.score}/matchedOn=${matchedOn}: ${memory.summary}`;
+    })
+    .join(" | ");
+
+  return [
+    "Relevant workflow memory requires human review.",
+    memorySummary,
+    "Use memory only for routing and reviewer verification. Do not use memory as final claim evidence.",
+  ].join(" ");
+}
+
+async function markMemoryHitsUsedByAgent(input: {
+  runId: string;
+  agentActionLogId: string;
+  context: ClaimStateForAgent;
+}): Promise<string[]> {
+  const memoryHitIds = getMemoryHitIds(input.context);
+
+  if (memoryHitIds.length === 0) {
+    return [];
+  }
+
+  await prisma.memoryHit.updateMany({
+    where: {
+      id: {
+        in: memoryHitIds,
+      },
+      runId: input.runId,
+    },
+    data: {
+      usedByAgent: true,
+      agentActionLogId: input.agentActionLogId,
+    },
+  });
+
+  return memoryHitIds;
+}
+
 function getDeterministicProposedAction(
     context : ClaimStateForAgent,
 ) : ProposedAgentAction | null {
@@ -131,6 +253,22 @@ function getDeterministicProposedAction(
         };
     }
 
+    const memoryEscalationReason = getMemoryEscalationReason(context);
+
+    if (memoryEscalationReason) {
+    return {
+        runId: context.runId,
+        action: "ESCALATE_TO_HUMAN",
+        rationale: memoryEscalationReason,
+        toolName: "escalate_to_human",
+        toolInputJson: {
+        runId: context.runId,
+        reason: memoryEscalationReason,
+        priority: "HIGH",
+        },
+    };
+    }
+
     return null;
 }
 
@@ -176,6 +314,12 @@ export async function runAgentStep(runId : string){
         },
     });
 
+    const usedMemoryHitIds = await markMemoryHitsUsedByAgent({
+        runId,
+        agentActionLogId: proposedLog.id,
+        context,
+    });
+
     await prisma.extractionEvent.create({
         data : {
             runId,
@@ -185,6 +329,8 @@ export async function runAgentStep(runId : string){
                 agentActionLogId : proposedLog.id,
                 action : proposedAction.action,
                 toolName : proposedAction.toolName,
+                usedMemoryHitIds,
+                relevantMemoryCount: context.relevantMemories.length,
             }),
         },
     });
