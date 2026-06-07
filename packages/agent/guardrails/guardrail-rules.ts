@@ -88,6 +88,152 @@ function hasPolicyExclusionSignal(context: ClaimStateForAgent): boolean {
   );
 }
 
+type AgentRelevantMemory = ClaimStateForAgent["relevantMemories"][number];
+
+const ENTITY_RISK_MEMORY_KINDS = new Set([
+  "PRIOR_REJECTION",
+  "CLAIMANT_PATTERN",
+  "VENDOR_PATTERN"
+]);
+
+const FIELD_OR_EVIDENCE_MATCH_TYPES = new Set([
+  "SAME_FIELD",
+  "MISSING_FIELD_MATCH",
+  "REQUIRED_EVIDENCE_MATCH",
+  "PATTERN_FULL_MATCH",
+  "PATTERN_PARTIAL_MATCH",
+]);
+
+const REVIEW_RELEVANT_MEMORY_KINDS = new Set([
+  "HUMAN_CORRECTION",
+  "PRIOR_REVIEW_DECISION",
+  "POLICY_HISTORY",
+  "RECURRING_ERROR_PATTERN",
+]);
+
+function getRelevantMemories(context : ClaimStateForAgent): AgentRelevantMemory[] {
+  return context.relevantMemories ?? [];
+}
+
+function hasFieldOrEvidenceMatch(memory : AgentRelevantMemory) : boolean {
+  return memory.matchedOn.some((signal) =>
+  FIELD_OR_EVIDENCE_MATCH_TYPES.has(signal.type)
+  );
+}
+
+function shouldEscalateBecauseOfMemory(memory: AgentRelevantMemory): boolean {
+  if(memory.status === "RETIRED" || memory.status === "SUPERSEDED"){
+    return false;
+  };
+
+  // Any high risk relevant memory should route to human review
+  if(memory.riskLevel === "HIGH"){
+    return true;
+  }
+
+  // Field/evidence memories escalate only when the match is strong enough.
+  // Example:
+  // - prior human correction on policyNumber
+  // - recurring requiredEvidence missing pattern
+  // - prior review decision on claim form / repair invoice / FIR
+  if(
+    REVIEW_RELEVANT_MEMORY_KINDS.has(memory.kind) &&
+    hasFieldOrEvidenceMatch(memory) &&
+    memory.score >= 30 &&
+    memory.confidence >= 0.6
+  ){
+    return true;
+  }
+  return false;
+}
+
+function getEscalationWorthyMemories(
+  context : ClaimStateForAgent
+): AgentRelevantMemory[]{
+  return getRelevantMemories(context).filter(shouldEscalateBecauseOfMemory);
+};
+
+function hasHighRiskMemory(
+  context : ClaimStateForAgent
+) : boolean {
+  return getRelevantMemories(context).some(
+    (memory) => memory.kind === "PRIOR_REJECTION"
+  )
+}
+
+function hasPriorRejectionMemory(context: ClaimStateForAgent): boolean {
+  return getRelevantMemories(context).some(
+    (memory) => memory.kind === "PRIOR_REJECTION",
+  );
+}
+
+function hasMemoryEscalationSignal(context : ClaimStateForAgent): boolean {
+  return getEscalationWorthyMemories(context).length > 0;
+}
+
+function stringifyForGuardrail(value : unknown): string {
+  try{
+    return JSON.stringify(value ?? {}).toLowerCase()
+  }catch{
+    return "";
+  }
+}
+
+function proposedActionMentionsMemory(
+  proposedAction : ProposedAgentAction
+): boolean {
+  const rationale = proposedAction.rationale?.toLowerCase() ?? "";
+  const toolInput = stringifyForGuardrail(proposedAction.toolInputJson);
+
+  return (
+    rationale.includes("memory") ||
+    rationale.includes("prior rejection") ||
+    rationale.includes("prior correction") ||
+    rationale.includes("previous correction") ||
+    rationale.includes("past correction") ||
+    toolInput.includes("memory") ||
+    toolInput.includes("prior rejection") ||
+    toolInput.includes("prior correction") ||
+    toolInput.includes("previous correction") ||
+    toolInput.includes("past correction")
+  )
+};
+
+function isMemoryOverwriteAttempt(
+  proposedAction: ProposedAgentAction,
+): boolean {
+  const toolInput = stringifyForGuardrail(proposedAction.toolInputJson);
+
+  return (
+    toolInput.includes("overwrite") ||
+    toolInput.includes("auto_correct") ||
+    toolInput.includes("autocorrect") ||
+    toolInput.includes("correctedjson") ||
+    toolInput.includes("extractedjson") ||
+    toolInput.includes("replace_current_extraction")
+  );
+}
+
+function hasMemoryConflictWithCurrentEvidence(
+  context: ClaimStateForAgent,
+): boolean {
+  if (!context.hasPolicyEvidence) {
+    return false;
+  }
+
+  // Example:
+  // current RAG says COVERED, but memory says same claimant/vendor/pattern is risky.
+  // Do not let the agent draft approval. Route to human review.
+  if (
+    context.coverageDecision === "COVERED" &&
+    hasMemoryEscalationSignal(context)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 export function evaluateGuardrailRules(input: {
   context: ClaimStateForAgent;
   proposedAction: ProposedAgentAction;
@@ -101,6 +247,15 @@ export function evaluateGuardrailRules(input: {
       ruleId: "unsafe_final_tool_blocked",
       reason:
         "Unsafe final claim action blocked. The agent cannot approve, reject, send email, bypass review, delete claims, or create final decisions.",
+    };
+  }
+
+  if (isMemoryOverwriteAttempt(proposedAction)) {
+    return {
+      decision: "BLOCKED",
+      ruleId: "memory_overwrite_attempt_blocked",
+      reason:
+        "Memory cannot overwrite extractedJson, correctedJson, or current claim fields. Memory may only guide routing or reviewer verification.",
     };
   }
 
@@ -213,6 +368,49 @@ export function evaluateGuardrailRules(input: {
       decision: "BLOCKED",
       ruleId: "denial_requires_policy_evidence",
       reason: "Draft denial reason requires policy evidence.",
+    };
+  }
+
+  if (action === "DRAFT_APPROVAL_NOTE" && hasHighRiskMemory(context)) {
+  return {
+    decision: "BLOCKED",
+    ruleId: "high_risk_memory_blocks_approval",
+    reason:
+      "High-risk workflow memory cannot be used to approve a claim. Route to human review instead.",
+  };
+}
+
+  if (action === "DRAFT_APPROVAL_NOTE" && hasPriorRejectionMemory(context)) {
+    return {
+      decision: "BLOCKED",
+      ruleId: "prior_rejection_memory_blocks_approval",
+      reason:
+        "Prior rejection memory cannot be ignored during approval drafting. Route to human review instead.",
+    };
+  }
+
+  if (
+    isDecisionDraftAction(action) &&
+    hasMemoryConflictWithCurrentEvidence(context)
+  ) {
+    return {
+      decision: "BLOCKED",
+      ruleId: "memory_conflict_requires_human_review",
+      reason:
+        "Relevant workflow memory conflicts with current claim or policy evidence. Escalate to human review instead of drafting a decision note.",
+    };
+  }
+
+  if (
+    action === "DRAFT_DENIAL_REASON" &&
+    proposedActionMentionsMemory(proposedAction) &&
+    context.coverageDecision !== "NOT_COVERED"
+  ) {
+    return {
+      decision: "BLOCKED",
+      ruleId: "memory_only_denial_blocked",
+      reason:
+        "Memory cannot be the basis for denial reasoning. Denial drafting requires current policy evidence with a NOT_COVERED decision.",
     };
   }
 
