@@ -17,6 +17,7 @@
     "@repo/db": "workspace:*",
     "@repo/rag": "workspace:*",
     "@repo/shared": "workspace:*",
+    "@repo/memory":"workspace:*",
     "langchain": "^1.4.2",
     "zod": "^4.4.3"
   },

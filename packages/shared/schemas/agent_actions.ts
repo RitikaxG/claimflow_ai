@@ -27,6 +27,35 @@ export const GuardrailDecisionSchema = z.enum([
     "BLOCKED"
 ]);
 
+export const AgentMemoryMatchSignalSchema = z.object({
+    type : z.string(),
+    value: z.string(),
+    points : z.number()
+});
+
+export const AgentRelevantMemorySchema = z.object({
+    memoryId : z.string(),
+    memoryHitId : z.string().nullable().optional(),
+
+    kind : z.string(),
+    status : z.string(),
+    riskLevel : z.string(),
+
+    confidence : z.number(),
+    score : z.number(),
+
+    summary : z.string(),
+    safeUse : z.string(),
+    mustNotDo : z.array(z.string()),
+
+    entityType : z.string().nullable().optional(),
+    entityId : z.string().nullable().optional(),
+    fieldPath : z.string().nullable().optional(),
+
+    matchedOn : z.array(AgentMemoryMatchSignalSchema).default([]),
+    retrievalReason : z.string().default("")
+});
+
 export const ClaimStateForAgentSchema = z.object({
     runId : z.string(),
     runStatus : z.string(),
@@ -48,6 +77,11 @@ export const ClaimStateForAgentSchema = z.object({
     duplicateSignals: z.array(z.string()),
     documentMismatchSignals: z.array(z.string()),
 
+    relevantMemories : z.array(AgentRelevantMemorySchema).default([]),
+    workflowMemoryContext : z.string().default(
+        "No relevant workflow memories were retrieved"
+    ),
+
     previousAgentActions: z.array(z.unknown()).default([]),
 });
 
@@ -62,5 +96,7 @@ export const ProposedAgentActionSchema = z.object({
 export type AgentActionType = z.infer<typeof AgentActionTypeSchema>;
 export type AgentActionStatus = z.infer<typeof AgentActionStatusSchema>;
 export type GuardrailDecision = z.infer<typeof GuardrailDecisionSchema>;
+export type AgentMemoryMatchSignal = z.infer<typeof AgentMemoryMatchSignalSchema>;
+export type AgentRelevantMemory = z.infer<typeof AgentRelevantMemorySchema>;
 export type ClaimStateForAgent = z.infer<typeof ClaimStateForAgentSchema>;
 export type ProposedAgentAction = z.infer<typeof ProposedAgentActionSchema>;
