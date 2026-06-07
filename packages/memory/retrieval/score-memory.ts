@@ -257,6 +257,49 @@ function hasEntityRiskMatch(input: {
   );
 }
 
+function getQueryEntityIdForMemory(input: {
+  memory: WorkflowMemoryLike;
+  query: BuildMemoryQuery;
+}): string | null {
+  if (input.memory.entityType === "CLAIMANT") {
+    return input.query.claimantId;
+  }
+
+  if (input.memory.entityType === "VENDOR") {
+    return input.query.vendorId;
+  }
+
+  if (input.memory.entityType === "POLICY") {
+    return input.query.policyId;
+  }
+
+  return null;
+}
+
+function hasEntityScopeMismatch(input: {
+  memory: WorkflowMemoryLike;
+  query: BuildMemoryQuery;
+}): boolean {
+  const memoryEntityType = input.memory.entityType;
+  const memoryEntityId = input.memory.entityId;
+
+  if (!memoryEntityType || !memoryEntityId) {
+    return false;
+  }
+
+  if (!["CLAIMANT", "VENDOR", "POLICY"].includes(memoryEntityType)) {
+    return false;
+  }
+
+  const queryEntityId = getQueryEntityIdForMemory(input);
+
+  if (!queryEntityId) {
+    return false;
+  }
+
+  return queryEntityId !== memoryEntityId;
+}
+
 export function scoreMemory(input: {
   memory: WorkflowMemoryLike;
   query: BuildMemoryQuery;
@@ -274,6 +317,20 @@ export function scoreMemory(input: {
       score: 0,
       matchedOn,
       retrievalReason: `Memory status ${memory.status} is not eligible for retrieval.`,
+      isEligible: false,
+    };
+  }
+
+  if (
+    hasEntityScopeMismatch({
+      memory,
+      query,
+    })
+  ) {
+    return {
+      score: 0,
+      matchedOn,
+      retrievalReason: `Memory is scoped to ${memory.entityType}/${memory.entityId}, but current claim has a different entity.`,
       isEligible: false,
     };
   }
