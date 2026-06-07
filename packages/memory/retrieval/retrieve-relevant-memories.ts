@@ -179,9 +179,12 @@ export async function retrieveRelevantMemories(input: {
   limit?: number;
   writeHits?: boolean;
 }): Promise<RetrieveRelevantMemoriesResult> {
-  const claimState = input.runId
-    ? await loadClaimStateFromRun(input.runId)
-    : MemoryClaimStateSchema.parse(input.claimState ?? {});
+  const claimState = 
+    input.claimState !== undefined
+    ? MemoryClaimStateSchema.parse(input.claimState)
+    : input.runId
+        ? await loadClaimStateFromRun(input.runId)
+        : MemoryClaimStateSchema.parse(input.claimState ?? {});
 
   const query = buildMemoryQuery({
     runId: input.runId ?? claimState.runId ?? null,

@@ -1,5 +1,6 @@
 import { prisma } from "@repo/db";
 import { ClaimStateForAgentSchema, type ClaimStateForAgent } from "@repo/shared/schemas";
+import { formatMemoriesForAgentContext, formatRelevantMemoryForAgent, retrieveRelevantMemories, type RelevantMemory } from "@repo/memory";
 
 
 function isRecord(value : unknown): value is Record<string,unknown>{
@@ -186,6 +187,33 @@ function removeResolvedFields(input: {
   return input.missingFields.filter((item) => !resolvedKeys.has(item));
 }
 
+function toAgentRelevantMemory(
+    memory : RelevantMemory
+) : ClaimStateForAgent["relevantMemories"][number]{
+    return {
+        memoryId: memory.memoryId,
+        memoryHitId: memory.memoryHitId ?? null,
+
+        kind: memory.kind,
+        status: memory.status,
+        riskLevel: memory.riskLevel,
+
+        confidence: memory.confidence,
+        score: memory.score,
+
+        summary: memory.summary,
+        safeUse: memory.safeUse,
+        mustNotDo: memory.mustNotDo,
+
+        entityType: memory.entityType,
+        entityId: memory.entityId,
+        fieldPath: memory.fieldPath,
+
+        matchedOn: memory.matchedOn,
+        retrievalReason: memory.retrievalReason,
+    }
+}
+
 export async function buildAgentContext(
     runId: string
 ) : Promise<ClaimStateForAgent> {
@@ -269,6 +297,28 @@ export async function buildAgentContext(
     const duplicateSignals = getDuplicateSignals(run.events);
     const retryCount = getRetryCount(run.events);
 
+    const memoryRetrieval = await retrieveRelevantMemories({
+        runId : run.id,
+        claimState : {
+            runId : run.id,
+            runStatus : run.status,
+
+            extractedJson : run.extractedJson,
+            validationJson : effectiveValidationJson,
+
+            missingFields,
+            requiredEvidence,
+
+            reviewTaskStatus : run.reviewTask?.status ?? null,
+            retrievalStatus : latestCoverageQuestion?.retrievalStatus ?? null,
+            policyDecision : latestCoverageQuestion?.finalDecision ?? null
+        },
+        writeHits : true,
+        limit : 5,
+    });
+
+    const relevantMemories = memoryRetrieval.memories.map(toAgentRelevantMemory);
+
     return ClaimStateForAgentSchema.parse({
         runId : run.id,
         runStatus : run.status,
@@ -290,6 +340,10 @@ export async function buildAgentContext(
         duplicateSignals,
 
         documentMismatchSignals : [],
+
+        relevantMemories,
+        workflowMemoryContext : formatMemoriesForAgentContext(memoryRetrieval.memories),
+        
         previousAgentActions: run.agentActionLogs
     })
 }
