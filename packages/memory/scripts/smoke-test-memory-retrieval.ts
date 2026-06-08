@@ -327,6 +327,163 @@ async function runRealMemoryHitAuditSmoke() {
   }
 }
 
+async function runGenericRequiredEvidenceCrossEntityRetrievalSmoke() {
+  let memoryId: string | null = null;
+
+  try {
+    const memory = await prisma.workflowMemory.create({
+      data: {
+        kind: "PRIOR_REVIEW_DECISION",
+        status: "ACTIVE",
+        riskLevel: "MEDIUM",
+        confidence: 0.72,
+
+        // Important:
+        // This is not scoped to CLAIMANT or VENDOR.
+        // It is scoped to the reusable workflow problem.
+        entityType: "FIELD_PATH",
+        entityId: "requiredEvidence.policeReport",
+        fieldPath: "requiredEvidence.policeReport",
+
+        summary:
+          "Prior review required policeReport evidence before continuing similar third-party claims.",
+        safeUse:
+          "When current validation says policeReport is required, draft/request specific missing evidence. Do not assume it is missing without current validation.",
+        mustNotDo: [
+          "do not apply this only because claimant name is similar",
+          "do not reject the claim from memory",
+          "do not mark policeReport missing unless current validation requires it",
+        ],
+        tags: [
+          "required_evidence:police_report",
+          "police_report_required",
+          "third_party_claim",
+          "review_decision",
+        ],
+        evidenceJson: {
+          smokeTest: true,
+          memorySeedId: "SMOKE-GENERIC-REQUIRED-EVIDENCE",
+          reason:
+            "Generic required-evidence memory should retrieve across different claimant/vendor.",
+        },
+        confirmedCount: 0,
+        contradictedCount: 0,
+      },
+    });
+
+    memoryId = memory.id;
+
+    const claimState = {
+      runId: "SMOKE-RUN-GENERIC-REQUIRED-EVIDENCE",
+      customerId: "CUST-W5-DIFFERENT-CLAIMANT",
+      claimantId: "CUST-W5-DIFFERENT-CLAIMANT",
+      vendorId: "VEND-W5-DIFFERENT-VENDOR",
+      policyId: "POLICY-W5-DIFFERENT",
+
+      extractedJson: {
+        customerId: "CUST-W5-DIFFERENT-CLAIMANT",
+        vendorId: "VEND-W5-DIFFERENT-VENDOR",
+        policyId: "POLICY-W5-DIFFERENT",
+        claimNumber: "CLM-GENERIC-RETRIEVAL",
+        insuredName: "Rohan Verma",
+        policyNumber: "POL-GENERIC-RETRIEVAL",
+        lossType: "third_party",
+        damageType: "bumper_damage",
+      },
+
+      validationJson: {
+        isValid: false,
+        missingFields: [],
+        requiredEvidence: ["policeReport"],
+        conflicts: [],
+      },
+
+      missingFields: [],
+      requiredEvidence: ["policeReport"],
+
+      runStatus: "NEEDS_REVIEW",
+      reviewTaskStatus: null,
+      retrievalStatus: null,
+      policyDecision: null,
+    };
+
+    const result = await retrieveRelevantMemories({
+      claimState,
+      writeHits: false,
+      limit: 5,
+    });
+
+    const retrievedMemory = result.memories.find(
+      (item) => item.memoryId === memory.id,
+    );
+
+    assert(
+      retrievedMemory,
+      `Expected generic required-evidence memory ${memory.id} to be retrieved for different claimant/vendor.`,
+    );
+
+    const matchedTypes = retrievedMemory.matchedOn.map((item) => item.type);
+
+    assert(
+      matchedTypes.includes("SAME_FIELD") ||
+        matchedTypes.includes("REQUIRED_EVIDENCE_MATCH"),
+      `Expected SAME_FIELD or REQUIRED_EVIDENCE_MATCH, got [${matchedTypes.join(
+        ", ",
+      )}]`,
+    );
+
+    assert.equal(
+      retrievedMemory.entityType,
+      "FIELD_PATH",
+      "Expected retrieved memory to be FIELD_PATH scoped.",
+    );
+
+    console.log("Generic required-evidence cross-entity retrieval smoke passed");
+    console.log(
+      JSON.stringify(
+        {
+          currentClaim: {
+            customerId: claimState.customerId,
+            vendorId: claimState.vendorId,
+            requiredEvidence: claimState.requiredEvidence,
+            lossType: claimState.extractedJson.lossType,
+          },
+          retrievedMemory: {
+            memoryId: retrievedMemory.memoryId,
+            kind: retrievedMemory.kind,
+            entityType: retrievedMemory.entityType,
+            entityId: retrievedMemory.entityId,
+            fieldPath: retrievedMemory.fieldPath,
+            score: retrievedMemory.score,
+            matchedOn: retrievedMemory.matchedOn.map((item) => ({
+              type: item.type,
+              value: item.value,
+              points: item.points,
+            })),
+            summary: retrievedMemory.summary,
+            safeUse: retrievedMemory.safeUse,
+          },
+          expectedBehavior:
+            "Memory is retrieved even though claimant/vendor are different because it is FIELD_PATH-scoped to requiredEvidence.policeReport.",
+        },
+        null,
+        2,
+      ),
+    );
+    console.log("");
+  } finally {
+    if (memoryId) {
+      await prisma.workflowMemory
+        .delete({
+          where: {
+            id: memoryId,
+          },
+        })
+        .catch(() => undefined);
+    }
+  }
+}
+
 async function main() {
   console.log("Memory retrieval smoke test started");
   console.log("");
@@ -363,6 +520,7 @@ async function main() {
     ],
   });
 
+  await runGenericRequiredEvidenceCrossEntityRetrievalSmoke();
   await runRealMemoryHitAuditSmoke();
 
   console.log("Memory retrieval smoke test passed");
