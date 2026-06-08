@@ -108,6 +108,15 @@ function buildEvidenceJson(observation: MemoryObservation): Record<string, unkno
     beforeValue: toJsonSafeValue(observation.beforeValue) ?? null,
     afterValue: toJsonSafeValue(observation.afterValue) ?? null,
   };
+};
+
+function buildSourceLinks(observation : MemoryObservation){
+  return {
+    sourceRunId : observation.sourceType === "EXTRACTION_RUN" ? observation.sourceId : null,
+    sourceReviewDecisionId : observation.sourceType === "REVIEW_DECISION" ? observation.sourceId : null,
+    sourceCoverageQuestionId : observation.sourceType === "COVERAGE_QUESTION" ? observation.sourceId : null,
+    sourceAgentActionLogId : observation.sourceType === "AGENT_ACTION_LOG" ? observation.sourceId : null,
+  }
 }
 
 export async function createMemoryFromObservation(
@@ -153,6 +162,7 @@ export async function createMemoryFromObservation(
 
     const memory = await tx.workflowMemory.create({
       data: {
+        ...buildSourceLinks(observation),
         kind: observation.recommendedMemoryKind,
         status: "ACTIVE",
         riskLevel: observation.riskLevel,
