@@ -153,12 +153,13 @@ function getEscalationWorthyMemories(
   return getRelevantMemories(context).filter(shouldEscalateBecauseOfMemory);
 };
 
-function hasHighRiskMemory(
-  context : ClaimStateForAgent
-) : boolean {
+function hasHighRiskMemory(context: ClaimStateForAgent): boolean {
   return getRelevantMemories(context).some(
-    (memory) => memory.kind === "PRIOR_REJECTION"
-  )
+    (memory) =>
+      memory.riskLevel === "HIGH" &&
+      memory.status !== "RETIRED" &&
+      memory.status !== "SUPERSEDED",
+  );
 }
 
 function hasPriorRejectionMemory(context: ClaimStateForAgent): boolean {

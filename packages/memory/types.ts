@@ -150,3 +150,19 @@ export const RelevantMemorySchema = z.object({
 });
 
 export type RelevantMemory = z.infer<typeof RelevantMemorySchema>;
+
+export const ReviewerMemoryRelevanceSchema = z.enum([
+  "CONFIRMED_RELEVANT",
+  "IRRELEVANT"
+]);
+
+export type ReviewerMemoryRelevance = z.infer<typeof ReviewerMemoryRelevanceSchema>;
+
+export const MemoryReviewFeedbackSchema = z.object({
+  memoryId : z.string().nullable().optional(),
+  memoryHitId : z.string().nullable().optional(),
+  relevance : ReviewerMemoryRelevanceSchema,
+  note : z.string().optional(),
+});
+
+export type MemoryReviewFeedback = z.infer<typeof MemoryReviewFeedbackSchema>;
