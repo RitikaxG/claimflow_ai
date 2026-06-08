@@ -131,4 +131,64 @@ async function loadUsedMemoryHitsForDecision(reviewDecisionId : string){
 }
 
 type UsedMemoryHit = Awaited<
-    ReturnType<typeof loadUsedMemoryHitsForDecision>>[number]
+    ReturnType<typeof loadUsedMemoryHitsForDecision>>[number];
+
+async function supersedeOlderSameScopeMemories(input : {
+    reviewDecisionId : string;
+    createMemoryIds : string[]
+}) : Promise<string[]> {
+    if(input.createMemoryIds.length === 0){
+        return [];
+    }
+
+    const newMemories = await prisma.workflowMemory.findMany({
+        where : {
+            id : {
+                in : input.createMemoryIds
+            }
+        }
+    });
+
+    const supersededMemoryIds : string[] = [];
+    for(const newMemory of newMemories){
+        const olderMemories = await prisma.workflowMemory.findMany({
+            where : {
+                id : {
+                    not : newMemory.id
+                },
+                kind : newMemory.kind,
+                entityType : newMemory.entityType,
+                entityId : newMemory.entityId,
+                fieldPath : newMemory.fieldPath,
+                status : {
+                    in : ["ACTIVE","STRENGTHENED","WEAKENED"]
+                }
+            },
+            take : 25,
+        });
+
+        for(const oldMemory of olderMemories){
+            const result = await applyMemoryConfidenceUpdate({
+                memoryId: oldMemory.id,
+                updateType: "SUPERSEDED",
+                reviewDecisionId: input.reviewDecisionId,
+                supersededByMemoryId: newMemory.id,
+                note:
+                "Newer reviewer correction created a replacement memory for the same kind/entity/field scope.",
+                metadata: {
+                newMemoryId: newMemory.id,
+                oldMemoryId: oldMemory.id,
+                kind: newMemory.kind,
+                entityType: newMemory.entityType,
+                entityId: newMemory.entityId,
+                fieldPath: newMemory.fieldPath,
+                },
+            });
+
+            if(result.changed){
+                supersededMemoryIds.push(oldMemory.id)
+            }
+        }
+    }
+    return supersededMemoryIds;
+}
