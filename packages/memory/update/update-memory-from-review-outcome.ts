@@ -4,7 +4,7 @@ import { applyMemoryConfidenceUpdate } from "./apply-memory-confidence-update";
 
 export type UpdateMemoryFromReviewOutcomeInput = {
     reviewDecisionId : string,
-    memoryFeedback? : MemoryReviewFeedback,
+    memoryFeedback? : MemoryReviewFeedback[],
     createdMemoryIds? : string[]
 };
 
@@ -16,7 +16,7 @@ export type UpdateMemoryFromReviewOutcomeResult = {
     retired : number,
     superseded : number,
     feedbackRecorded : number,
-    updateMemoryIds : string[],
+    updatedMemoryIds : string[],
 };
 
 
@@ -135,16 +135,16 @@ type UsedMemoryHit = Awaited<
 
 async function supersedeOlderSameScopeMemories(input : {
     reviewDecisionId : string;
-    createMemoryIds : string[]
+    createdMemoryIds : string[]
 }) : Promise<string[]> {
-    if(input.createMemoryIds.length === 0){
+    if(input.createdMemoryIds.length === 0){
         return [];
     }
 
     const newMemories = await prisma.workflowMemory.findMany({
         where : {
             id : {
-                in : input.createMemoryIds
+                in : input.createdMemoryIds
             }
         }
     });
@@ -191,4 +191,109 @@ async function supersedeOlderSameScopeMemories(input : {
         }
     }
     return supersededMemoryIds;
+}
+
+export async function updateMemoryFromReviewOutcome(
+    input : UpdateMemoryFromReviewOutcomeInput, 
+) : Promise<UpdateMemoryFromReviewOutcomeResult> {
+    const hits = await loadUsedMemoryHitsForDecision(input.reviewDecisionId);
+
+    let runId : string;
+    if(hits.length === 0){
+        const decision = await prisma.reviewDecision.findUniqueOrThrow({
+            where : { id : input.reviewDecisionId },
+            include : { task : true }
+        });
+
+        runId = decision.task.runId;
+    } else {
+        runId = hits[0]!.runId
+    }
+
+    const explicitFeedbackByMemoryId = new Map(
+        (input.memoryFeedback ?? [])
+            .filter((feedback) => feedback.memoryId)
+            .map((feedback) => [feedback.memoryId!, feedback]),
+    );
+
+    const explicitFeedbackByHitId = new Map(
+        (input.memoryFeedback ?? [])
+        .filter((feedback) => feedback.memoryHitId)
+        .map((feedback) => [feedback.memoryHitId!, feedback]),
+    );
+
+    const counters = {
+        strengthened : 0,
+        weakened : 0,
+        retired : 0,
+        superseded : 0,
+        feedbackRecorded : 0,
+    };
+
+    const updatedMemoryIds : string[] = [];
+
+    for(const hit of hits){
+        const explicit = 
+            explicitFeedbackByHitId.get(hit.id) ??
+            explicitFeedbackByMemoryId.get(hit.memoryId);
+
+        const inferred = explicit 
+        ? {
+            updateType : 
+            explicit.relevance === "CONFIRMED_RELEVANT"
+            ? ("STRENGTHENED" as const)
+            : ("WEAKENED" as const),
+            note : 
+                explicit.note ??
+                `Reviewer marked memory as ${explicit.relevance}.`,
+        }
+        : inferUpdateFromReviewDecision({
+            decision : hit.reviewDecision.decision,
+            hit,
+        });
+
+        const result = await applyMemoryConfidenceUpdate({
+            memoryId: hit.memoryId,
+            updateType: inferred.updateType,
+            runId,
+            reviewDecisionId: input.reviewDecisionId,
+            note: inferred.note,
+            metadata: {
+                memoryHitId: hit.id,
+                score: hit.score,
+                matchedOn: hit.matchedOn,
+                usedByAgent: hit.usedByAgent,
+                decision: hit.reviewDecision.decision,
+                inferenceSource: explicit ? "reviewer_feedback" : "deterministic_rule",
+            },
+        });
+
+        if(!result.changed){
+            continue;
+        }
+
+        updatedMemoryIds.push(hit.memoryId);
+
+        if (result.updateType === "STRENGTHENED") counters.strengthened += 1;
+        if (result.updateType === "WEAKENED") counters.weakened += 1;
+        if (result.updateType === "RETIRED") counters.retired += 1;
+        if (result.updateType === "FEEDBACK_RECORDED") {
+            counters.feedbackRecorded += 1;
+        }
+    }
+
+     const superseded = await supersedeOlderSameScopeMemories({
+        reviewDecisionId: input.reviewDecisionId,
+        createdMemoryIds: input.createdMemoryIds ?? [],
+    });
+
+    counters.superseded += superseded.length;
+    updatedMemoryIds.push(...superseded);
+
+    return {
+        reviewDecisionId: input.reviewDecisionId,
+        runId,
+        ...counters,
+        updatedMemoryIds: Array.from(new Set(updatedMemoryIds)),
+    };
 }
