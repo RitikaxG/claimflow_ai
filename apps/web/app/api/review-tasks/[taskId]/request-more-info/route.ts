@@ -1,5 +1,6 @@
 import { prisma, ReviewDecisionType, ReviewEventType, ReviewTaskStatus, Prisma } from "@repo/db";
 import { NextResponse } from "next/server";
+import { learnFromReviewDecision } from "../../../../../lib/memory/learn-from-review-decision";
 
 type RequestMoreInfoRequestBody = {
     reviewerName? : string,
@@ -144,5 +145,17 @@ export async function POST(request : Request, { params } : Params){
             { status : 409 },
         )
     }
-    return NextResponse.json({ reviewTask : updatedTask });
+    
+    const latestDecisionId = updatedTask.decisions[0]?.id;
+
+    let memoryLearning = null;
+
+    if (latestDecisionId) {
+        memoryLearning = await learnFromReviewDecision(latestDecisionId);
+    }
+
+    return NextResponse.json({
+        reviewTask: updatedTask,
+        memoryLearning,
+    });
 }

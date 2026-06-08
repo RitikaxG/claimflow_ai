@@ -2,6 +2,7 @@ import { prisma, ReviewDecisionType, ReviewEventType, ReviewTaskStatus, Prisma }
 import { NextResponse } from "next/server";
 import { ClaimExtractionSchema } from "@repo/shared/schemas";
 import { buildHumanReviewedClaim } from "../../../../../lib/review/build-human-reviewed-claim";
+import { learnFromReviewDecision } from "../../../../../lib/memory/learn-from-review-decision";
 
 type Params = {
     params : Promise<{
@@ -201,6 +202,17 @@ export async function POST(request : Request, { params } : Params) {
         )
     }
 
-    return NextResponse.json({ reviewTask : updatedTask });
+    const latestDecisionId = updatedTask.decisions[0]?.id;
+
+    let memoryLearning = null;
+
+    if (latestDecisionId) {
+        memoryLearning = await learnFromReviewDecision(latestDecisionId);
+    }
+
+    return NextResponse.json({ 
+        reviewTask : updatedTask,
+        memoryLearning,
+     });
 
 }

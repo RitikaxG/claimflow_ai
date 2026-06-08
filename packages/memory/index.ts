@@ -10,3 +10,7 @@ export * from "./retrieval/build-memory-query";
 export * from "./retrieval/score-memory";
 export * from "./retrieval/retrieve-relevant-memories";
 export * from "./retrieval/format-memories-for-agent-context";
+
+export * from "./update/apply-memory-confidence-update";
+export * from "./update/update-memory-from-agent-outcome";
+export * from "./update/update-memory-from-review-outcome";
