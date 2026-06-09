@@ -24,6 +24,7 @@
     "seed:week5": "bun --env-file ../db/.env seed/load-week5-memory-seed.ts",
     "smoke:write": "bun --env-file ../db/.env scripts/smoke-test-memory-write.ts",
     "smoke:retrieval": "bun --env-file ../db/.env scripts/smoke-test-memory-retrieval.ts",
-    "smoke:update": "bun --env-file ../db/.env scripts/smoke-test-memory-update.ts"
+    "smoke:update": "bun --env-file ../db/.env scripts/smoke-test-memory-update.ts",
+    "smoke:patterns": "bun --env-file ../db/.env scripts/smoke-test-memory-patterns.ts"
   }
 }

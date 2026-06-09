@@ -25,7 +25,8 @@
     "memory:smoke:write": "bun --filter @repo/memory smoke:write",
     "memory:smoke:retrieval": "bun --filter @repo/memory smoke:retrieval",
     "agent:smoke:memory": "bun --filter @repo/agent smoke:memory",
-    "memory:smoke:update": "bun --filter @repo/memory smoke:update"
+    "memory:smoke:update": "bun --filter @repo/memory smoke:update",
+    "memory:smoke:patterns": "bun --filter @repo/memory smoke:patterns"
   },
   "devDependencies": {
     "prettier": "^3.6.0",
