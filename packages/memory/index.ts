@@ -14,3 +14,7 @@ export * from "./retrieval/format-memories-for-agent-context";
 export * from "./update/apply-memory-confidence-update";
 export * from "./update/update-memory-from-agent-outcome";
 export * from "./update/update-memory-from-review-outcome";
+
+export * from "./patterns/find-repeated-memory-patterns";
+export * from "./patterns/consolidate-pattern-memory";
+export * from "./patterns/maybe-create-pattern-memory";
