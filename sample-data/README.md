@@ -9,12 +9,13 @@ Week 1 → extraction + validation failures
 Week 2 → human review workflow failures
 Week 3 → policy RAG + citation failures
 Week 4 → agent action routing + guardrail failures
-Future weeks → memory, gateway, repo assistant, tuning-decision failures
+Week 5 → workflow memory from past corrections/review outcomes
+Future weeks → gateway, observability, repo assistant, tuning-decision failures
 ```
 
 The goal is not to collect random sample files.
 
-The goal is to grow a repeatable failure dataset that proves ClaimFlow AI behaves safely when model output is incomplete, uncertain, unsupported, or wrong.
+The goal is to grow a repeatable failure dataset that proves ClaimFlow AI behaves safely when model output is incomplete, uncertain, unsupported, stale, memory-influenced, or wrong.
 
 ---
 
@@ -26,6 +27,7 @@ The goal is to grow a repeatable failure dataset that proves ClaimFlow AI behave
 | Week 2 | [`week-02-review-failures`](./week-02-review-failures) | Low-confidence extraction, duplicate uploads, unreadable files, missing evidence, bad workflow states, reviewer decisions | Unsafe or incomplete AI output is routed into human review instead of silently completing | `bun run eval:week2:review` | [`week-2-review-workflow-eval.md`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.md), [`week-2-review-workflow-eval.json`](./week-02-review-failures/eval-results/week-2-review-workflow-eval.json) |
 | Week 3 | [`week-03-policy-rag`](./week-03-policy-rag) | Wrong policy retrieval, missing citations, unsupported coverage answers, false approvals, weak retrieval evidence | Coverage answers are grounded in retrieved policy clauses and refuse or route to review when evidence is insufficient | `bun run rag:load-policies`, `bun run rag:embed-policies`, `bun run rag:smoke:retrieval-cases`, `bun run eval:week3:rag` | [`week-3-policy-rag-eval.md`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.md), [`week-3-policy-rag-eval.json`](./week-03-policy-rag/eval-results/week-3-policy-rag-eval.json) |
 | Week 4 | [`week-04-agent-actions`](./week-04-agent-actions) | Wrong tool choice, unsafe final actions, missing-information routing failures, policy-lookup ordering errors, duplicate/conflict/mismatch routing | The agent can choose the next safe workflow action while guardrails block approval/rejection/email/final-decision tools | `bun run eval:week4:agent` | [`week-4-agent-actions-eval.md`](./week-04-agent-actions/eval-results/week-4-agent-actions-eval.md), [`week-4-agent-actions-eval.json`](./week-04-agent-actions/eval-results/week-4-agent-actions-eval.json) |
+| Week 5 | [`week-05-memory`](./week-05-memory) | Memory write/retrieval errors, irrelevant memory matches, unsafe memory-based approval/rejection, stale memory conflicts, memory update mistakes, pattern generalization mistakes | Workflow memory can use past corrections/review outcomes safely without overwriting current evidence or replacing source-of-truth policy/document data | `bun run memory:seed:week5`, `bun run eval:week5:memory` | [`week-5-memory-eval.md`](./week-05-memory/eval-results/week-5-memory-eval.md), [`week-5-memory-eval.json`](./week-05-memory/eval-results/week-5-memory-eval.json) |
 
 ---
 
@@ -49,10 +51,10 @@ Week 4:
 When an agent chooses an action, can the system select the safest workflow tool and block unsafe final actions?
 
 Week 5:
-When memory is introduced, can the system reuse past corrections safely without overwriting source-of-truth evidence?
+When workflow memory is introduced, can the system reuse past corrections, review outcomes, and patterns safely without overwriting source-of-truth evidence?
 
 Week 6:
-When gateway + observability are introduced, can the system track prompt, model, version, cost, and error behavior?
+When gateway + observability are introduced, can the system track prompt, model, version, cost, latency, and error behavior?
 
 Week 7:
 When repo-assistant behavior is introduced, can the system retrieve repo context and avoid unsafe terminal actions?
@@ -71,6 +73,7 @@ When fine-tuning is considered, can the system decide based on evidence whether 
 | Review workflow eval | `week-02-review-failures` | review task creation, review status transitions, review decisions, review events, duplicate/failure handling |
 | Policy RAG eval | `week-03-policy-rag` | required clause retrieval, decision correctness, citation presence, citation support, unsupported-answer refusal, false approval rate |
 | Agent action eval | `week-04-agent-actions` | tool selection, guardrail blocking, unsafe action rate, false approval rate, final workflow state match, information-request post-action behavior |
+| Workflow memory eval | `week-05-memory` | memory writing, memory retrieval recall/precision, top-k hits, MemoryHit audit logging, safe memory-supported review routing, memory conflict blocking, confidence update behavior, semantic pattern creation |
 
 ---
 
@@ -118,6 +121,10 @@ Markdown reports are for human review.
 
 JSON reports are for future regression checks, dashboards, CI gates, and observability.
 
+For reader-facing Markdown reports, avoid exposing meaningless local runtime IDs when possible.
+
+Raw JSON reports may keep full debug detail.
+
 ---
 
 ## Current eval commands
@@ -136,6 +143,16 @@ bun run rag:smoke:retrieval-cases
 bun run eval:week3:rag
 
 bun run eval:week4:agent
+
+bun run memory:seed:week5
+bun run memory:smoke:write
+bun run memory:smoke:retrieval
+bun run agent:smoke:memory
+bun run memory:smoke:update
+bun run memory:smoke:patterns
+bun run eval:week5:memory
+
+bun run check-types
 ```
 
 ---
@@ -234,6 +251,74 @@ missing evidence / missing fields
 
 ---
 
+### Week 5 — Workflow memory
+
+Proved:
+
+```txt
+past workflow event
+→ memory observation
+→ WorkflowMemory card
+→ relevant memory retrieval
+→ safe agent/reviewer context
+→ memory update or pattern creation
+```
+
+Week 5 memory is not generic chat memory.
+
+It is workflow memory from:
+
+```txt
+human corrections
+prior review decisions
+agent action history
+claimant patterns
+vendor patterns
+policy-history signals
+recurring field/workflow mistakes
+```
+
+Main safety property:
+
+```txt
+Memory can warn, route, verify, update, and generalize.
+Memory cannot approve, reject, overwrite current extracted JSON, replace current document evidence, or replace current policy/RAG evidence.
+```
+
+The Week 5 eval covers:
+
+```txt
+memory_writer      → observations become safe WorkflowMemory cards
+memory_retrieval   → relevant memories are retrieved and irrelevant matches are ignored
+memory_safety      → unsafe memory-based actions are blocked
+memory_conflict    → current evidence beats old memory
+memory_update      → memory strengthens, weakens, or retires from feedback
+semantic_pattern   → repeated episodic memories become reusable pattern memory
+```
+
+Current Week 5 eval result:
+
+```txt
+totalPackets = 15
+passed = 15
+failed = 0
+
+memory_write_accuracy = 100%
+memory_recall_rate = 100%
+memory_precision_rate = 100%
+memory_top_k_hit_rate = 100%
+memory_hit_logging_rate = 100%
+memory_supported_review_rate = 100%
+memory_update_accuracy = 100%
+semantic_pattern_creation_accuracy = 100%
+
+unsafe_memory_overwrite_rate = 0%
+false_approval_rate = 0%
+source_of_truth_violation_rate = 0%
+```
+
+---
+
 ## Most important regression metrics
 
 Across weeks, the most important safety metrics are:
@@ -243,10 +328,15 @@ false_completion_rate = 0
 false_approval_rate = 0
 unsupported_answer_rate = 0
 unsafe_action_rate = 0
+unsafe_memory_overwrite_rate = 0
+source_of_truth_violation_rate = 0
 blocked_invalid_action_rate should stay high
 citation_support_rate should stay high once RAG is introduced
 review_routing_accuracy should stay high after Week 2
 post_action_accuracy should stay high after Week 4
+memory_precision_rate should stay high after Week 5
+memory_supported_review_rate should stay high after Week 5
+memory_update_accuracy should stay high after Week 5
 ```
 
 For this project, a flashy demo is not enough.
