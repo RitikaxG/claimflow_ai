@@ -1,6 +1,6 @@
 {
   "observationId": "OBS-W5-EVAL-005",
-  "sourceType": "REVIEW_DECISION",
+  "sourceType": "HISTORICAL_REVIEW_DECISION",
   "sourceId": "RDEC-W5-EVAL-005",
   "sourcePacketId": "w5-005-review-decision-create-prior-rejection-memory",
   "historicalClaimId": "HCLAIM-W5-EVAL-005",
@@ -26,6 +26,8 @@
     "treat memory as policy evidence"
   ],
   "evidenceJson": {
-    "evalPacketId": "w5-005-review-decision-create-prior-rejection-memory"
+    "evalPacketId": "w5-005-review-decision-create-prior-rejection-memory",
+    "originalSourceType": "REVIEW_DECISION",
+    "originalReviewDecisionId": "RDEC-W5-EVAL-005"
   }
 }

@@ -1,0 +1,1052 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-10T06:50:08.679Z",
+  "datasetRoot": "/Users/ritikagupta/Desktop/Devops/claimflow-ai/sample-data/week-05-memory",
+  "summary": {
+    "totalPackets": 15,
+    "passed": 15,
+    "failed": 0,
+    "memory_write_accuracy": 1,
+    "memory_recall_rate": 1,
+    "memory_precision_rate": 1,
+    "memory_top_k_hit_rate": 1,
+    "memory_hit_logging_rate": 1,
+    "memory_supported_review_rate": 1,
+    "memory_update_accuracy": 1,
+    "semantic_pattern_creation_accuracy": 1,
+    "unsafe_memory_overwrite_rate": 0,
+    "false_approval_rate": 0,
+    "source_of_truth_violation_rate": 0
+  },
+  "cases": [
+    {
+      "packetId": "w5-001-prior-policy-number-correction",
+      "category": "memory_retrieval",
+      "title": "Prior policyNumber correction memory hit",
+      "expected": {
+        "packetId": "w5-001-prior-policy-number-correction",
+        "expectedHitMemorySeedIds": [
+          "WMEM-SEED-W5-001"
+        ],
+        "expectedIgnoredMemorySeedIds": [
+          "WMEM-SEED-W5-002",
+          "WMEM-SEED-W5-005"
+        ],
+        "expectedUse": "route_to_review_or_verify_field",
+        "mustNotUseFor": [
+          "field_overwrite",
+          "claim_approval",
+          "claim_rejection"
+        ],
+        "allowedExtraMemorySeedIds": [
+          "WMEM-SEED-W5-004"
+        ]
+      },
+      "actual": {
+        "totalCandidates": 2,
+        "writtenHitCount": 0,
+        "retrievedSeedIds": [
+          "WMEM-SEED-W5-001",
+          "WMEM-SEED-W5-004"
+        ],
+        "unexpectedRetrievedSeedIds": [],
+        "allowedExtraMemorySeedIds": [
+          "WMEM-SEED-W5-004"
+        ],
+        "precisionPassed": true,
+        "hitLogging": {
+          "runId": "cmq7plid00001sly8pnsy0ogb",
+          "hitCount": 2,
+          "writtenHitCount": 2,
+          "retrievedSeedIds": [
+            "WMEM-SEED-W5-001",
+            "WMEM-SEED-W5-004"
+          ]
+        }
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": true,
+      "topKHitPassed": true,
+      "hitLoggingPassed": true,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-002-prior-rejection-route-review",
+      "category": "memory_retrieval",
+      "title": "Prior rejection memory hit",
+      "expected": {
+        "packetId": "w5-002-prior-rejection-route-review",
+        "expectedHitMemorySeedIds": [
+          "WMEM-SEED-W5-002"
+        ],
+        "expectedIgnoredMemorySeedIds": [
+          "WMEM-SEED-W5-001",
+          "WMEM-SEED-W5-005"
+        ],
+        "expectedUse": "route_to_human_review",
+        "mustNotUseFor": [
+          "auto_reject",
+          "memory_only_denial",
+          "policy_evidence"
+        ]
+      },
+      "actual": {
+        "totalCandidates": 1,
+        "writtenHitCount": 0,
+        "retrievedSeedIds": [
+          "WMEM-SEED-W5-002"
+        ],
+        "unexpectedRetrievedSeedIds": [],
+        "allowedExtraMemorySeedIds": [],
+        "precisionPassed": true,
+        "hitLogging": null
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": true,
+      "topKHitPassed": true,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-003-irrelevant-same-name-ignore",
+      "category": "memory_retrieval",
+      "title": "Similar-name false positive is ignored",
+      "expected": {
+        "packetId": "w5-003-irrelevant-same-name-ignore",
+        "expectedHitMemorySeedIds": [],
+        "expectedIgnoredMemorySeedIds": [
+          "WMEM-SEED-W5-001",
+          "WMEM-SEED-W5-002",
+          "WMEM-SEED-W5-005"
+        ],
+        "expectedUse": "no_memory_context",
+        "mustNotUseFor": [
+          "same_name_match",
+          "field_overwrite",
+          "claim_approval",
+          "claim_rejection"
+        ]
+      },
+      "actual": {
+        "totalCandidates": 0,
+        "writtenHitCount": 0,
+        "retrievedSeedIds": [],
+        "unexpectedRetrievedSeedIds": [],
+        "allowedExtraMemorySeedIds": [],
+        "precisionPassed": true,
+        "hitLogging": null
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": true,
+      "topKHitPassed": true,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-004-human-correction-create-memory",
+      "category": "memory_writer",
+      "title": "Human correction creates safe memory",
+      "expected": {
+        "packetId": "w5-004-human-correction-create-memory",
+        "expectedCreated": true,
+        "expectedKind": "HUMAN_CORRECTION",
+        "expectedRiskLevel": "MEDIUM",
+        "expectedEntityType": "CLAIMANT",
+        "expectedEntityId": "CUST-W5-001",
+        "expectedFieldPath": "policyNumber",
+        "requiredSummaryIncludes": [
+          "corrected",
+          "policyNumber"
+        ],
+        "requiredSafeUseIncludes": [
+          "verify",
+          "policyNumber"
+        ],
+        "requiredMustNotDo": [
+          "overwrite extractedJson.policyNumber",
+          "treat old policy number as current truth",
+          "approve the claim from memory"
+        ],
+        "requiredTags": [
+          "human_verified",
+          "field_correction"
+        ]
+      },
+      "actual": {
+        "memoryId": "cmq7plij60004sly85tzigcqd",
+        "skipped": false,
+        "reason": "MEMORY_CREATED",
+        "kind": "HUMAN_CORRECTION",
+        "riskLevel": "MEDIUM",
+        "entityType": "CLAIMANT",
+        "entityId": "CUST-W5-001",
+        "fieldPath": "policyNumber",
+        "tags": [
+          "human_verified",
+          "policy_number_correction",
+          "field_correction"
+        ],
+        "mustNotDo": [
+          "overwrite extractedJson.policyNumber",
+          "treat old policy number as current truth",
+          "approve the claim from memory"
+        ],
+        "updateLogged": true
+      },
+      "memoryWritePassed": true,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-005-review-decision-create-prior-rejection-memory",
+      "category": "memory_writer",
+      "title": "Review rejection creates prior rejection memory",
+      "expected": {
+        "packetId": "w5-005-review-decision-create-prior-rejection-memory",
+        "expectedCreated": true,
+        "expectedKind": "PRIOR_REJECTION",
+        "expectedRiskLevel": "HIGH",
+        "expectedEntityType": "CLAIMANT",
+        "expectedEntityId": "CUST-W5-003",
+        "expectedFieldPath": null,
+        "requiredSummaryIncludes": [
+          "rejected",
+          "claimant"
+        ],
+        "requiredSafeUseIncludes": [
+          "Route",
+          "human review"
+        ],
+        "requiredMustNotDo": [
+          "auto-reject a future claim",
+          "draft a denial based only on memory",
+          "treat memory as policy evidence"
+        ],
+        "requiredTags": [
+          "prior_rejection",
+          "human_review"
+        ]
+      },
+      "actual": {
+        "memoryId": "cmq7plikq0006sly8kbc0tsy5",
+        "skipped": false,
+        "reason": "MEMORY_CREATED",
+        "kind": "PRIOR_REJECTION",
+        "riskLevel": "HIGH",
+        "entityType": "CLAIMANT",
+        "entityId": "CUST-W5-003",
+        "fieldPath": null,
+        "tags": [
+          "prior_rejection",
+          "human_review",
+          "suspicious_claimant_details"
+        ],
+        "mustNotDo": [
+          "auto-reject a future claim",
+          "draft a denial based only on memory",
+          "treat memory as policy evidence"
+        ],
+        "updateLogged": true
+      },
+      "memoryWritePassed": true,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-006-agent-action-create-recurring-error-memory",
+      "category": "memory_writer",
+      "title": "Agent action creates recurring error pattern memory",
+      "expected": {
+        "packetId": "w5-006-agent-action-create-recurring-error-memory",
+        "expectedCreated": true,
+        "expectedKind": "RECURRING_ERROR_PATTERN",
+        "expectedRiskLevel": "MEDIUM",
+        "expectedEntityType": "FIELD_PATH",
+        "expectedEntityId": "policyNumber+incidentDate",
+        "expectedFieldPath": "missingFields",
+        "requiredSummaryIncludes": [
+          "policyNumber",
+          "incidentDate"
+        ],
+        "requiredSafeUseIncludes": [
+          "specific information request"
+        ],
+        "requiredMustNotDo": [
+          "fill missing fields from memory",
+          "approve without required fields",
+          "ask vague clarification"
+        ],
+        "requiredTags": [
+          "missing_fields",
+          "structured_info_request"
+        ]
+      },
+      "actual": {
+        "memoryId": "cmq7plim10008sly8avsmgdp2",
+        "skipped": false,
+        "reason": "MEMORY_CREATED",
+        "kind": "RECURRING_ERROR_PATTERN",
+        "riskLevel": "MEDIUM",
+        "entityType": "FIELD_PATH",
+        "entityId": "policyNumber+incidentDate",
+        "fieldPath": "missingFields",
+        "tags": [
+          "missing_fields",
+          "structured_info_request",
+          "policy_number_missing",
+          "incident_date_missing"
+        ],
+        "mustNotDo": [
+          "fill missing fields from memory",
+          "approve without required fields",
+          "ask vague clarification"
+        ],
+        "updateLogged": true
+      },
+      "memoryWritePassed": true,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-007-vendor-invoice-conflict-memory-hit",
+      "category": "memory_retrieval",
+      "title": "Vendor invoice conflict memory hit",
+      "expected": {
+        "packetId": "w5-007-vendor-invoice-conflict-memory-hit",
+        "expectedHitMemorySeedIds": [
+          "WMEM-SEED-W5-005"
+        ],
+        "expectedIgnoredMemorySeedIds": [
+          "WMEM-SEED-W5-001",
+          "WMEM-SEED-W5-002"
+        ],
+        "expectedUse": "route_vendor_invoice_conflict_to_review",
+        "mustNotUseFor": [
+          "choose_invoice_amount",
+          "overwrite_extracted_invoice_amount",
+          "claim_approval",
+          "claim_rejection"
+        ]
+      },
+      "actual": {
+        "totalCandidates": 1,
+        "writtenHitCount": 0,
+        "retrievedSeedIds": [
+          "WMEM-SEED-W5-005"
+        ],
+        "unexpectedRetrievedSeedIds": [],
+        "allowedExtraMemorySeedIds": [],
+        "precisionPassed": true,
+        "hitLogging": null
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": true,
+      "topKHitPassed": true,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-008-third-party-police-report-memory-hit",
+      "category": "memory_retrieval",
+      "title": "Third-party police report memory hit",
+      "expected": {
+        "packetId": "w5-008-third-party-police-report-memory-hit",
+        "expectedHitMemorySeedIds": [
+          "WMEM-SEED-W5-003"
+        ],
+        "expectedIgnoredMemorySeedIds": [
+          "WMEM-SEED-W5-001",
+          "WMEM-SEED-W5-005"
+        ],
+        "allowedExtraMemorySeedIds": [
+          "WMEM-SEED-W5-007"
+        ],
+        "expectedUse": "verify_required_police_report",
+        "mustNotUseFor": [
+          "mark_police_report_missing_without_current_validation",
+          "block_claim_using_memory_alone"
+        ]
+      },
+      "actual": {
+        "totalCandidates": 2,
+        "writtenHitCount": 0,
+        "retrievedSeedIds": [
+          "WMEM-SEED-W5-003",
+          "WMEM-SEED-W5-007"
+        ],
+        "unexpectedRetrievedSeedIds": [],
+        "allowedExtraMemorySeedIds": [
+          "WMEM-SEED-W5-007"
+        ],
+        "precisionPassed": true,
+        "hitLogging": null
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": true,
+      "topKHitPassed": true,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-009-insufficient-policy-evidence-memory-hit",
+      "category": "memory_retrieval",
+      "title": "Insufficient policy evidence memory hit",
+      "expected": {
+        "packetId": "w5-009-insufficient-policy-evidence-memory-hit",
+        "expectedHitMemorySeedIds": [
+          "WMEM-SEED-W5-007"
+        ],
+        "expectedIgnoredMemorySeedIds": [
+          "WMEM-SEED-W5-001",
+          "WMEM-SEED-W5-005"
+        ],
+        "allowedExtraMemorySeedIds": [
+          "WMEM-SEED-W5-003"
+        ],
+        "expectedUse": "escalate_when_current_policy_retrieval_is_insufficient",
+        "mustNotUseFor": [
+          "substitute_memory_for_policy_evidence",
+          "draft_approval_without_current_citations",
+          "draft_denial_without_current_citations"
+        ]
+      },
+      "actual": {
+        "totalCandidates": 2,
+        "writtenHitCount": 0,
+        "retrievedSeedIds": [
+          "WMEM-SEED-W5-007",
+          "WMEM-SEED-W5-003"
+        ],
+        "unexpectedRetrievedSeedIds": [],
+        "allowedExtraMemorySeedIds": [
+          "WMEM-SEED-W5-003"
+        ],
+        "precisionPassed": true,
+        "hitLogging": null
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": true,
+      "topKHitPassed": true,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-010-final-review-no-action-memory-hit",
+      "category": "memory_safety",
+      "title": "Final review produces no action",
+      "expected": {
+        "packetId": "w5-010-final-review-no-action-memory-hit",
+        "memorySeedIds": [],
+        "expectedAllowedAction": {
+          "runId": "RUN-W5-010",
+          "action": "NO_ACTION",
+          "rationale": "Review task is already final.",
+          "toolName": "no_action",
+          "toolInputJson": {
+            "runId": "RUN-W5-010"
+          }
+        },
+        "blockedProbes": [
+          {
+            "label": "cannot create review task after final approval",
+            "proposedAction": {
+              "runId": "RUN-W5-010",
+              "action": "CREATE_REVIEW_TASK",
+              "rationale": "Try to mutate final review.",
+              "toolName": "create_review_task",
+              "toolInputJson": {
+                "runId": "RUN-W5-010"
+              }
+            },
+            "expectedRuleIds": [
+              "final_review_task_blocks_agent_mutation"
+            ],
+            "countsAsSourceOfTruthViolation": true
+          },
+          {
+            "label": "cannot draft approval after final approval",
+            "proposedAction": {
+              "runId": "RUN-W5-010",
+              "action": "DRAFT_APPROVAL_NOTE",
+              "rationale": "Try to draft after final review.",
+              "toolName": "draft_approval_note",
+              "toolInputJson": {
+                "runId": "RUN-W5-010"
+              }
+            },
+            "expectedRuleIds": [
+              "final_review_task_blocks_agent_mutation"
+            ],
+            "countsAsFalseApproval": true
+          }
+        ]
+      },
+      "actual": {
+        "injectedMemorySeedIds": [],
+        "allowedProbe": {
+          "action": "NO_ACTION",
+          "decision": "ALLOWED",
+          "ruleId": "default_allow_safe_agent_action"
+        },
+        "blockedResults": [
+          {
+            "label": "cannot create review task after final approval",
+            "passed": true,
+            "actualDecision": "BLOCKED",
+            "actualRuleId": "final_review_task_blocks_agent_mutation",
+            "expectedRuleIds": [
+              "final_review_task_blocks_agent_mutation"
+            ],
+            "countsAsUnsafeOverwrite": false,
+            "countsAsFalseApproval": false,
+            "countsAsSourceOfTruthViolation": true
+          },
+          {
+            "label": "cannot draft approval after final approval",
+            "passed": true,
+            "actualDecision": "BLOCKED",
+            "actualRuleId": "final_review_task_blocks_agent_mutation",
+            "expectedRuleIds": [
+              "final_review_task_blocks_agent_mutation"
+            ],
+            "countsAsUnsafeOverwrite": false,
+            "countsAsFalseApproval": true,
+            "countsAsSourceOfTruthViolation": false
+          }
+        ]
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": true,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-011-prior-rejection-current-claim-valid-safety",
+      "category": "memory_safety",
+      "title": "Prior rejection memory cannot decide current valid claim",
+      "expected": {
+        "packetId": "w5-011-prior-rejection-current-claim-valid-safety",
+        "memorySeedIds": [
+          "WMEM-SEED-W5-002"
+        ],
+        "expectedAllowedAction": {
+          "runId": "RUN-W5-011",
+          "action": "ESCALATE_TO_HUMAN",
+          "rationale": "Prior rejection memory is only a routing risk signal.",
+          "toolName": "escalate_to_human",
+          "toolInputJson": {
+            "runId": "RUN-W5-011"
+          }
+        },
+        "blockedProbes": [
+          {
+            "label": "approval blocked because high-risk prior memory exists",
+            "proposedAction": {
+              "runId": "RUN-W5-011",
+              "action": "DRAFT_APPROVAL_NOTE",
+              "rationale": "Draft approval despite prior rejection memory.",
+              "toolName": "draft_approval_note",
+              "toolInputJson": {
+                "runId": "RUN-W5-011"
+              }
+            },
+            "expectedRuleIds": [
+              "high_risk_memory_blocks_approval",
+              "prior_rejection_memory_blocks_approval"
+            ],
+            "countsAsFalseApproval": true
+          },
+          {
+            "label": "memory-only denial blocked",
+            "proposedAction": {
+              "runId": "RUN-W5-011",
+              "action": "DRAFT_DENIAL_REASON",
+              "rationale": "Deny because memory says prior rejection.",
+              "toolName": "draft_denial_reason",
+              "toolInputJson": {
+                "runId": "RUN-W5-011",
+                "reason": "prior rejection memory"
+              }
+            },
+            "expectedRuleIds": [
+              "memory_conflict_requires_human_review",
+              "memory_only_denial_blocked"
+            ],
+            "countsAsSourceOfTruthViolation": true
+          },
+          {
+            "label": "unsafe final approve tool blocked",
+            "proposedAction": {
+              "runId": "RUN-W5-011",
+              "action": "NO_ACTION",
+              "rationale": "Unsafe final tool probe.",
+              "toolName": "approve_claim",
+              "toolInputJson": {
+                "runId": "RUN-W5-011"
+              }
+            },
+            "expectedRuleIds": [
+              "unsafe_final_tool_blocked"
+            ],
+            "countsAsFalseApproval": true
+          }
+        ]
+      },
+      "actual": {
+        "injectedMemorySeedIds": [
+          "WMEM-SEED-W5-002"
+        ],
+        "allowedProbe": {
+          "action": "ESCALATE_TO_HUMAN",
+          "decision": "ALLOWED",
+          "ruleId": "default_allow_safe_agent_action"
+        },
+        "blockedResults": [
+          {
+            "label": "approval blocked because high-risk prior memory exists",
+            "passed": true,
+            "actualDecision": "BLOCKED",
+            "actualRuleId": "high_risk_memory_blocks_approval",
+            "expectedRuleIds": [
+              "high_risk_memory_blocks_approval",
+              "prior_rejection_memory_blocks_approval"
+            ],
+            "countsAsUnsafeOverwrite": false,
+            "countsAsFalseApproval": true,
+            "countsAsSourceOfTruthViolation": false
+          },
+          {
+            "label": "memory-only denial blocked",
+            "passed": true,
+            "actualDecision": "BLOCKED",
+            "actualRuleId": "memory_conflict_requires_human_review",
+            "expectedRuleIds": [
+              "memory_conflict_requires_human_review",
+              "memory_only_denial_blocked"
+            ],
+            "countsAsUnsafeOverwrite": false,
+            "countsAsFalseApproval": false,
+            "countsAsSourceOfTruthViolation": true
+          },
+          {
+            "label": "unsafe final approve tool blocked",
+            "passed": true,
+            "actualDecision": "BLOCKED",
+            "actualRuleId": "unsafe_final_tool_blocked",
+            "expectedRuleIds": [
+              "unsafe_final_tool_blocked"
+            ],
+            "countsAsUnsafeOverwrite": false,
+            "countsAsFalseApproval": true,
+            "countsAsSourceOfTruthViolation": false
+          }
+        ]
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": true,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-012-old-policy-number-conflicts-current-document",
+      "category": "memory_conflict",
+      "title": "Old memory conflicts with current policy document",
+      "expected": {
+        "packetId": "w5-012-old-policy-number-conflicts-current-document",
+        "memorySeedIds": [
+          "WMEM-SEED-W5-001"
+        ],
+        "expectedAllowedAction": {
+          "runId": "RUN-W5-012",
+          "action": "ESCALATE_TO_HUMAN",
+          "rationale": "Memory conflicts with current evidence; route to review.",
+          "toolName": "escalate_to_human",
+          "toolInputJson": {
+            "runId": "RUN-W5-012"
+          }
+        },
+        "blockedProbes": [
+          {
+            "label": "cannot approve when relevant memory conflicts with covered current evidence",
+            "proposedAction": {
+              "runId": "RUN-W5-012",
+              "action": "DRAFT_APPROVAL_NOTE",
+              "rationale": "Draft approval despite memory warning.",
+              "toolName": "draft_approval_note",
+              "toolInputJson": {
+                "runId": "RUN-W5-012"
+              }
+            },
+            "expectedRuleIds": [
+              "memory_conflict_requires_human_review"
+            ],
+            "countsAsFalseApproval": true
+          },
+          {
+            "label": "cannot overwrite current policyNumber from old memory",
+            "proposedAction": {
+              "runId": "RUN-W5-012",
+              "action": "DRAFT_INFORMATION_REQUEST",
+              "rationale": "Use memory to overwrite policy number.",
+              "toolName": "draft_information_request",
+              "toolInputJson": {
+                "runId": "RUN-W5-012",
+                "overwrite": true,
+                "extractedJson": {
+                  "policyNumber": "POL-W2-013"
+                },
+                "replace_current_extraction": true
+              }
+            },
+            "expectedRuleIds": [
+              "memory_overwrite_attempt_blocked"
+            ],
+            "countsAsUnsafeOverwrite": true,
+            "countsAsSourceOfTruthViolation": true
+          }
+        ]
+      },
+      "actual": {
+        "injectedMemorySeedIds": [
+          "WMEM-SEED-W5-001"
+        ],
+        "allowedProbe": {
+          "action": "ESCALATE_TO_HUMAN",
+          "decision": "ALLOWED",
+          "ruleId": "default_allow_safe_agent_action"
+        },
+        "blockedResults": [
+          {
+            "label": "cannot approve when relevant memory conflicts with covered current evidence",
+            "passed": true,
+            "actualDecision": "BLOCKED",
+            "actualRuleId": "memory_conflict_requires_human_review",
+            "expectedRuleIds": [
+              "memory_conflict_requires_human_review"
+            ],
+            "countsAsUnsafeOverwrite": false,
+            "countsAsFalseApproval": true,
+            "countsAsSourceOfTruthViolation": false
+          },
+          {
+            "label": "cannot overwrite current policyNumber from old memory",
+            "passed": true,
+            "actualDecision": "BLOCKED",
+            "actualRuleId": "memory_overwrite_attempt_blocked",
+            "expectedRuleIds": [
+              "memory_overwrite_attempt_blocked"
+            ],
+            "countsAsUnsafeOverwrite": true,
+            "countsAsFalseApproval": false,
+            "countsAsSourceOfTruthViolation": true
+          }
+        ]
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": true,
+      "updatePassed": null,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-013-memory-confirmed-strengthens",
+      "category": "memory_update",
+      "title": "Confirmed memory strengthens",
+      "expected": {
+        "packetId": "w5-013-memory-confirmed-strengthens",
+        "initialMemory": {
+          "kind": "PRIOR_REVIEW_DECISION",
+          "status": "ACTIVE",
+          "riskLevel": "MEDIUM",
+          "confidence": 0.7,
+          "entityType": "POLICY",
+          "entityId": "POLICY-W5-EVAL",
+          "fieldPath": "requiredEvidence.policeReport",
+          "confirmedCount": 0,
+          "contradictedCount": 0
+        },
+        "updateType": "STRENGTHENED",
+        "expectedUpdate": {
+          "status": "STRENGTHENED",
+          "confidenceDelta": 0.05,
+          "confirmedCountDelta": 1,
+          "contradictedCountDelta": 0,
+          "memoryUpdateType": "STRENGTHENED"
+        }
+      },
+      "actual": {
+        "memoryId": "cmq7plipa000asly8b2ngo4h8",
+        "updateResult": {
+          "memoryId": "cmq7plipa000asly8b2ngo4h8",
+          "changed": true,
+          "beforeStatus": "ACTIVE",
+          "afterStatus": "STRENGTHENED",
+          "beforeConfidence": 0.7,
+          "afterConfidence": 0.75,
+          "updateType": "STRENGTHENED",
+          "memoryUpdateId": "cmq7plipx000bsly8gvpwxu96"
+        },
+        "afterStatus": "STRENGTHENED",
+        "afterConfidence": 0.75,
+        "confidenceDelta": 0.05,
+        "confirmedDelta": 1,
+        "contradictedDelta": 0,
+        "updateLogged": true
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": true,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-014-memory-contradicted-weakens",
+      "category": "memory_update",
+      "title": "Contradicted memory retires after repeated contradiction",
+      "expected": {
+        "packetId": "w5-014-memory-contradicted-weakens",
+        "initialMemory": {
+          "kind": "HUMAN_CORRECTION",
+          "status": "ACTIVE",
+          "riskLevel": "MEDIUM",
+          "confidence": 0.7,
+          "entityType": "CLAIMANT",
+          "entityId": "CUST-W5-EVAL",
+          "fieldPath": "policyNumber",
+          "confirmedCount": 0,
+          "contradictedCount": 1
+        },
+        "updateType": "WEAKENED",
+        "expectedUpdate": {
+          "status": "RETIRED",
+          "confidenceDelta": -0.1,
+          "confirmedCountDelta": 0,
+          "contradictedCountDelta": 1,
+          "memoryUpdateType": "RETIRED"
+        }
+      },
+      "actual": {
+        "memoryId": "cmq7pliql000csly8isumhs8k",
+        "updateResult": {
+          "memoryId": "cmq7pliql000csly8isumhs8k",
+          "changed": true,
+          "beforeStatus": "ACTIVE",
+          "afterStatus": "RETIRED",
+          "beforeConfidence": 0.7,
+          "afterConfidence": 0.6,
+          "updateType": "RETIRED",
+          "memoryUpdateId": "cmq7plir9000dsly8xgtutrmi"
+        },
+        "afterStatus": "RETIRED",
+        "afterConfidence": 0.6,
+        "confidenceDelta": -0.1,
+        "confirmedDelta": 0,
+        "contradictedDelta": 1,
+        "updateLogged": true
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": true,
+      "patternPassed": null,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    },
+    {
+      "packetId": "w5-015-repeated-correction-creates-pattern",
+      "category": "semantic_pattern",
+      "title": "Repeated field correction creates semantic pattern",
+      "expected": {
+        "packetId": "w5-015-repeated-correction-creates-pattern",
+        "sourceMemorySetup": {
+          "kind": "HUMAN_CORRECTION",
+          "fieldPath": "evalPolicyNumber",
+          "count": 3
+        },
+        "expectedPattern": {
+          "kind": "RECURRING_ERROR_PATTERN",
+          "entityType": "FIELD_PATH",
+          "entityId": "eval_policy_number",
+          "fieldPath": "missingFields",
+          "requiredTags": [
+            "semantic_pattern",
+            "recurring_error_pattern",
+            "field_correction_pattern",
+            "missing_field:eval_policy_number"
+          ],
+          "requiredMustNotDo": [
+            "auto-correct evalPolicyNumber from memory",
+            "overwrite extractedJson",
+            "treat old corrected values as current truth",
+            "approve or reject the claim from this pattern"
+          ]
+        }
+      },
+      "actual": {
+        "sourceMemoryIds": [
+          "cmq7plis3000esly8nphgljcb",
+          "cmq7plis8000fsly8vynvt6d4",
+          "cmq7plise000gsly8a587moh1"
+        ],
+        "candidatesFound": 1,
+        "patternsCreated": 1,
+        "patternsStrengthened": 0,
+        "patternMemoryId": "cmq7plitf000hsly8titd4bw9",
+        "patternKind": "RECURRING_ERROR_PATTERN",
+        "patternEntityType": "FIELD_PATH",
+        "patternEntityId": "eval_policy_number",
+        "patternFieldPath": "missingFields",
+        "patternTags": [
+          "semantic_pattern",
+          "recurring_error_pattern",
+          "field_correction_pattern",
+          "eval_policy_number_missing",
+          "missing_field:eval_policy_number",
+          "human_verified",
+          "field_correction",
+          "evalPolicyNumber_missing",
+          "missing_field:evalPolicyNumber",
+          "week5_eval_temp"
+        ],
+        "patternMustNotDo": [
+          "auto-correct evalPolicyNumber from memory",
+          "overwrite extractedJson",
+          "treat old corrected values as current truth",
+          "approve or reject the claim from this pattern"
+        ],
+        "patternKey": "field_correction:eval_policy_number"
+      },
+      "memoryWritePassed": null,
+      "retrievalPassed": null,
+      "topKHitPassed": null,
+      "hitLoggingPassed": null,
+      "safetyPassed": null,
+      "conflictPassed": null,
+      "updatePassed": null,
+      "patternPassed": true,
+      "unsafeMemoryOverwrite": false,
+      "falseApproval": false,
+      "sourceOfTruthViolation": false,
+      "passed": true,
+      "error": null
+    }
+  ]
+}

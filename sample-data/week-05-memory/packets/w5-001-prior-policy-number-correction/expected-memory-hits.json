@@ -12,5 +12,8 @@
     "field_overwrite",
     "claim_approval",
     "claim_rejection"
+  ],
+  "allowedExtraMemorySeedIds": [
+    "WMEM-SEED-W5-004"
   ]
 }
