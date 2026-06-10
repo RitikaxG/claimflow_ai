@@ -18,6 +18,26 @@ const FieldRequestSchema = z.object({
     .default("unknown"),
 });
 
+const MemoryGuidanceItemSchema = z.object({
+  memoryId: z.string().min(1),
+  memoryHitId: z.string().nullable().optional(),
+  kind: z.string().min(1),
+  riskLevel: z.string().min(1),
+  confidence: z.number(),
+  score: z.number(),
+  summary: z.string().min(1),
+  safeUse: z.string().min(1),
+  mustNotDo: z.array(z.string()).default([]),
+  matchedOn: z.array(z.unknown()).default([]),
+});
+
+const MemoryGuidanceSchema = z.object({
+  memoryHitIds: z.array(z.string().min(1)).default([]),
+  items: z.array(MemoryGuidanceItemSchema).default([]),
+  reviewerNote: z.string().min(1),
+  mustNotDo: z.array(z.string()).default([]),
+});
+
 const DraftInformationRequestInputSchema = z
   .object({
     runId: z.string().min(1),
@@ -26,6 +46,7 @@ const DraftInformationRequestInputSchema = z
     fieldRequests: z.array(FieldRequestSchema).default([]),
     claimNumber: z.string().nullable().optional(),
     recipientLabel: z.string().nullable().optional(),
+    memoryGuidance: MemoryGuidanceSchema.nullable().optional(),
   })
   .refine(
     (value) =>
@@ -136,6 +157,7 @@ export const draftInformationRequestTool = tool(
     fieldRequests,
     claimNumber,
     recipientLabel,
+    memoryGuidance,
   }) => {
     try {
       const cleanEvidence = uniqueStrings(requestedEvidence);
@@ -218,6 +240,7 @@ export const draftInformationRequestTool = tool(
               requestType,
               requestedEvidence: cleanEvidence,
               requestedFields: cleanFields,
+              memoryGuidance: memoryGuidance ?? null,
               sourceToolName: "draft_information_request",
             }),
           },

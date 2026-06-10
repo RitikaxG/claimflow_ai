@@ -69,6 +69,27 @@ export async function POST(_request: Request, { params }: Params) {
     );
   }
 
+    const existingHitCount = await prisma.memoryHit.count({
+      where: {
+        runId,
+      },
+    });
+
+  if (existingHitCount > 0) {
+    const audit = await getRunMemoryAudit(runId);
+
+    return NextResponse.json({
+      runId,
+      alreadyRetrieved: true,
+      retrieval: {
+        memories: [],
+        totalCandidates: 0,
+        writtenHitCount: 0,
+      },
+      audit,
+    });
+  }
+
   const retrieval = await retrieveRelevantMemories({
     runId,
     writeHits: true,

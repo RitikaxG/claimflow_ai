@@ -144,6 +144,157 @@ function getMemoryHitIds(context: ClaimStateForAgent): string[] {
     });
 }
 
+type AgentMemoryGuidanceItem = {
+  memoryId: string;
+  memoryHitId: string | null;
+  kind: string;
+  riskLevel: string;
+  confidence: number;
+  score: number;
+  summary: string;
+  safeUse: string;
+  mustNotDo: string[];
+  matchedOn: AgentRelevantMemory["matchedOn"];
+};
+
+type AgentMemoryGuidance = {
+  memoryHitIds: string[];
+  items: AgentMemoryGuidanceItem[];
+  reviewerNote: string;
+  mustNotDo: string[];
+};
+
+function isActiveMemory(memory: AgentRelevantMemory): boolean {
+  return memory.status !== "RETIRED" && memory.status !== "SUPERSEDED";
+}
+
+function memoryRiskRank(memory: AgentRelevantMemory): number {
+  if (memory.riskLevel === "HIGH") return 3;
+  if (memory.riskLevel === "MEDIUM") return 2;
+  return 1;
+}
+
+function shouldHardEscalateBecauseOfMemory(memory: AgentRelevantMemory): boolean {
+  if (!isActiveMemory(memory)) {
+    return false;
+  }
+
+  if (memory.riskLevel === "HIGH") {
+    return true;
+  }
+
+  return ENTITY_RISK_MEMORY_KINDS.has(memory.kind);
+}
+
+function getHardEscalationMemories(
+  context: ClaimStateForAgent,
+): AgentRelevantMemory[] {
+  return context.relevantMemories.filter(shouldHardEscalateBecauseOfMemory);
+}
+
+function buildMemoryGuidanceForAgent(
+  context: ClaimStateForAgent,
+): AgentMemoryGuidance | null {
+  const usableMemories = context.relevantMemories
+    .filter(isActiveMemory)
+    .filter((memory) => {
+      return (
+        memory.riskLevel === "HIGH" ||
+        hasFieldOrEvidenceMatch(memory) ||
+        REVIEW_RELEVANT_MEMORY_KINDS.has(memory.kind) ||
+        ENTITY_RISK_MEMORY_KINDS.has(memory.kind)
+      );
+    })
+    .sort((left, right) => {
+      const riskDiff = memoryRiskRank(right) - memoryRiskRank(left);
+
+      if (riskDiff !== 0) {
+        return riskDiff;
+      }
+
+      return right.score - left.score;
+    })
+    .slice(0, 3);
+
+  if (usableMemories.length === 0) {
+    return null;
+  }
+
+  const memoryHitIds = usableMemories
+    .map((memory) => memory.memoryHitId)
+    .filter((memoryHitId): memoryHitId is string => {
+      return typeof memoryHitId === "string" && memoryHitId.trim().length > 0;
+    });
+
+  const items = usableMemories.map((memory) => ({
+    memoryId: memory.memoryId,
+    memoryHitId: memory.memoryHitId ?? null,
+    kind: memory.kind,
+    riskLevel: memory.riskLevel,
+    confidence: memory.confidence,
+    score: memory.score,
+    summary: memory.summary,
+    safeUse: memory.safeUse,
+    mustNotDo: memory.mustNotDo,
+    matchedOn: memory.matchedOn,
+  }));
+
+  const mustNotDo = Array.from(
+    new Set(items.flatMap((item) => item.mustNotDo)),
+  );
+
+  return {
+    memoryHitIds,
+    items,
+    reviewerNote: [
+      "Relevant workflow memory was retrieved for this agent step.",
+      "Use it only for routing, reviewer verification, and request specificity.",
+      "Do not use memory as claim evidence or to fill missing fields.",
+    ].join(" "),
+    mustNotDo,
+  };
+}
+
+function summarizeMemoryGuidance(
+  memoryGuidance: AgentMemoryGuidance | null,
+): string | null {
+  if (!memoryGuidance) {
+    return null;
+  }
+
+  const summaries = memoryGuidance.items
+    .map((item) => `${item.kind}/${item.riskLevel}: ${item.summary}`)
+    .join(" | ");
+
+  return `Workflow memory guidance: ${summaries}. ${memoryGuidance.reviewerNote}`;
+}
+
+function getMemoryHitIdsFromProposedAction(
+  proposedAction: ProposedAgentAction,
+): string[] {
+  const toolInput = proposedAction.toolInputJson;
+
+  if (!isRecord(toolInput)) {
+    return [];
+  }
+
+  const memoryGuidance = toolInput.memoryGuidance;
+
+  if (!isRecord(memoryGuidance)) {
+    return [];
+  }
+
+  const memoryHitIds = memoryGuidance.memoryHitIds;
+
+  if (!Array.isArray(memoryHitIds)) {
+    return [];
+  }
+
+  return memoryHitIds.filter((item): item is string => {
+    return typeof item === "string" && item.trim().length > 0;
+  });
+}
+
 function getMemoryEscalationReason(
   context: ClaimStateForAgent,
 ): string | null {
@@ -174,9 +325,9 @@ function getMemoryEscalationReason(
 async function markMemoryHitsUsedByAgent(input: {
   runId: string;
   agentActionLogId: string;
-  context: ClaimStateForAgent;
+  memoryHitIds: string[];
 }): Promise<string[]> {
-  const memoryHitIds = getMemoryHitIds(input.context);
+  const memoryHitIds = Array.from(new Set(input.memoryHitIds));
 
   if (memoryHitIds.length === 0) {
     return [];
@@ -199,77 +350,114 @@ async function markMemoryHitsUsedByAgent(input: {
 }
 
 function getDeterministicProposedAction(
-    context : ClaimStateForAgent,
-) : ProposedAgentAction | null {
-    if(
-        context.reviewTaskStatus !== null &&
-        FINAL_REVIEW_TASK_STATUSES.has(context.reviewTaskStatus)
-    ){
-        return {
-            runId : context.runId,
-            action : "NO_ACTION",
-            rationale : `Review task is already final with status ${context.reviewTaskStatus}.`,
-            toolName : "no_action",
-            toolInputJson : {
-                runId : context.runId,
-                reason : `Review task is already final with status ${context.reviewTaskStatus}. No agent mutation is needed.`,
-            },
-        };
-    }
-
-    
-
-   if (context.requiredEvidence.length > 0 || context.missingFields.length > 0) {
-        const claimNumber = getStringField(context.extractedJson, "claimNumber");
-        const recipientLabel =
-            getStringField(context.extractedJson, "claimantName") ??
-            getStringField(context.extractedJson, "insuredName");
-
-        const fieldRequests = buildFieldRequests(context.missingFields);
-
-        const parts: string[] = [];
-
-        if (context.requiredEvidence.length > 0) {
-            parts.push(`required evidence is missing: ${formatList(context.requiredEvidence)}`);
-        }
-
-        if (context.missingFields.length > 0) {
-            parts.push(`required extracted fields are missing: ${formatList(context.missingFields)}`);
-        }
-
-        return {
-            runId: context.runId,
-            action: "DRAFT_INFORMATION_REQUEST",
-            rationale: parts.join("; "),
-            toolName: "draft_information_request",
-            toolInputJson: {
-            runId: context.runId,
-            requestedEvidence: context.requiredEvidence,
-            requestedFields: context.missingFields,
-            fieldRequests,
-            claimNumber,
-            recipientLabel,
-            },
-        };
-    }
-
-    const memoryEscalationReason = getMemoryEscalationReason(context);
-
-    if (memoryEscalationReason) {
+  context: ClaimStateForAgent,
+): ProposedAgentAction | null {
+  if (
+    context.reviewTaskStatus !== null &&
+    FINAL_REVIEW_TASK_STATUSES.has(context.reviewTaskStatus)
+  ) {
     return {
+      runId: context.runId,
+      action: "NO_ACTION",
+      rationale: `Review task is already final with status ${context.reviewTaskStatus}.`,
+      toolName: "no_action",
+      toolInputJson: {
         runId: context.runId,
-        action: "ESCALATE_TO_HUMAN",
-        rationale: memoryEscalationReason,
-        toolName: "escalate_to_human",
-        toolInputJson: {
+        reason: `Review task is already final with status ${context.reviewTaskStatus}. No agent mutation is needed.`,
+      },
+    };
+  }
+
+  const memoryGuidance = buildMemoryGuidanceForAgent(context);
+  const memoryGuidanceSummary = summarizeMemoryGuidance(memoryGuidance);
+
+  const hardEscalationMemories = getHardEscalationMemories(context);
+
+  if (hardEscalationMemories.length > 0) {
+    const memoryEscalationReason = getMemoryEscalationReason({
+      ...context,
+      relevantMemories: hardEscalationMemories,
+    });
+
+    return {
+      runId: context.runId,
+      action: "ESCALATE_TO_HUMAN",
+      rationale:
+        memoryEscalationReason ??
+        "Relevant high-risk workflow memory requires human review.",
+      toolName: "escalate_to_human",
+      toolInputJson: {
+        runId: context.runId,
+        reason:
+          memoryEscalationReason ??
+          "Relevant high-risk workflow memory requires human review.",
+        priority: "HIGH",
+        memoryGuidance,
+      },
+    };
+  }
+
+  if (context.requiredEvidence.length > 0 || context.missingFields.length > 0) {
+    const claimNumber = getStringField(context.extractedJson, "claimNumber");
+    const recipientLabel =
+      getStringField(context.extractedJson, "claimantName") ??
+      getStringField(context.extractedJson, "insuredName");
+
+    const fieldRequests = buildFieldRequests(context.missingFields);
+
+    const parts: string[] = [];
+
+    if (context.requiredEvidence.length > 0) {
+      parts.push(
+        `required evidence is missing: ${formatList(context.requiredEvidence)}`,
+      );
+    }
+
+    if (context.missingFields.length > 0) {
+      parts.push(
+        `required extracted fields are missing: ${formatList(context.missingFields)}`,
+      );
+    }
+
+    if (memoryGuidanceSummary) {
+      parts.push(memoryGuidanceSummary);
+    }
+
+    return {
+      runId: context.runId,
+      action: "DRAFT_INFORMATION_REQUEST",
+      rationale: parts.join("; "),
+      toolName: "draft_information_request",
+      toolInputJson: {
+        runId: context.runId,
+        requestedEvidence: context.requiredEvidence,
+        requestedFields: context.missingFields,
+        fieldRequests,
+        claimNumber,
+        recipientLabel,
+        memoryGuidance,
+      },
+    };
+  }
+
+  const memoryEscalationReason = getMemoryEscalationReason(context);
+
+  if (memoryEscalationReason) {
+    return {
+      runId: context.runId,
+      action: "ESCALATE_TO_HUMAN",
+      rationale: memoryEscalationReason,
+      toolName: "escalate_to_human",
+      toolInputJson: {
         runId: context.runId,
         reason: memoryEscalationReason,
         priority: "HIGH",
-        },
+        memoryGuidance,
+      },
     };
-    }
+  }
 
-    return null;
+  return null;
 }
 
 export async function runAgentStep(runId : string){
@@ -317,7 +505,7 @@ export async function runAgentStep(runId : string){
     const usedMemoryHitIds = await markMemoryHitsUsedByAgent({
         runId,
         agentActionLogId: proposedLog.id,
-        context,
+        memoryHitIds: getMemoryHitIdsFromProposedAction(proposedAction),
     });
 
     await prisma.extractionEvent.create({

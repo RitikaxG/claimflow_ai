@@ -499,7 +499,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
         try {
             const res = await axios.post<{
-            audit: RunMemoryAuditResponse;
+                alreadyRetrieved?: boolean;
+                audit: RunMemoryAuditResponse;
             }>(`/api/extraction-runs/${runId}/memories/retrieve`);
 
             set((state) => ({
@@ -508,7 +509,9 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
                 [runId]: res.data.audit,
             },
             isRetrievingRunMemories: false,
-            successMessage: "Workflow memory retrieved for this run.",
+            successMessage: res.data.alreadyRetrieved
+                ? "Workflow memory was already retrieved for this run."
+                : "Workflow memory retrieved for this run.",
             }));
 
             await get().fetchRun(runId);
