@@ -11,6 +11,7 @@ import { RunStatusBadge } from "../dashboard/run-status-badge";
 import { HumanCorrectionForm } from "./human-correction-form";
 import { AdditionalInformationPanel } from "./additional-information-panel";
 import { ReceivedInformationSummaryCard } from "./received-information-summary-card";
+import { ReviewMemoryPanel } from "./review-memory-panel";
 
 type ReviewTaskDetailScreenProps = {
   taskId: string;
@@ -594,6 +595,8 @@ function ReviewWorkspace({ task }: { task: ReviewTaskRecord }) {
     ) : null}
 
     <ReceivedInformationSummaryCard task={task} />
+
+    <ReviewMemoryPanel runId={task.run.id} taskStatus={task.status} />
 
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-6">

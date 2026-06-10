@@ -232,6 +232,75 @@ export type FollowupRequestType =
   | "FIELD_CLARIFICATION"
   | "MIXED_INFO_REQUEST";
 
+export type MemoryMatchSignalRecord = {
+  type: string;
+  value: string;
+  points: number;
+};
+
+export type MemoryUpdateRecord = {
+  id: string;
+  updateType: string;
+  beforeStatus: string | null;
+  afterStatus: string | null;
+  confidenceDelta: number | null;
+  note: string | null;
+  createdAt: string;
+};
+
+export type RunMemoryAuditItemRecord = {
+  memoryId: string;
+  memoryHitId: string;
+
+  kind: string;
+  status: string;
+  riskLevel: string;
+  confidence: number;
+
+  summary: string;
+  safeUse: string;
+  mustNotDo: string[];
+
+  score: number;
+  matchedOn: MemoryMatchSignalRecord[];
+  retrievalReason: string | null;
+
+  usedByAgent: boolean;
+  agentActionLogId: string | null;
+  agentAction: string | null;
+  agentActionStatus: string | null;
+
+  entityType: string | null;
+  entityId: string | null;
+  fieldPath: string | null;
+
+  sourceRunId: string | null;
+  sourceReviewDecisionId: string | null;
+  sourceCoverageQuestionId: string | null;
+  sourceAgentActionLogId: string | null;
+
+  createdAt: string;
+
+  updates: MemoryUpdateRecord[];
+};
+
+export type RunMemoryAuditResponse = {
+  runId: string;
+  memories: RunMemoryAuditItemRecord[];
+  summary: {
+    totalHits: number;
+    usedByAgentCount: number;
+    highRiskCount: number;
+    latestRetrievedAt: string | null;
+  };
+};
+
+type MemoryFeedbackInput = {
+  memoryId: string;
+  memoryHitId?: string;
+  relevance: "CONFIRMED_RELEVANT" | "IRRELEVANT";
+  note?: string;
+};
 
 type DashboardStore = {
     runs : ExtractionRunRecord[],
@@ -264,6 +333,11 @@ type DashboardStore = {
 
     reviewTaskActionInFlight : ReviewTaskAction | null,
 
+    runMemoriesByRunId: Record<string, RunMemoryAuditResponse>;
+    isFetchingRunMemories: boolean;
+    isRetrievingRunMemories: boolean;
+    memoryFeedbackInFlightId: string | null;
+
     fetchRuns : () => Promise<void>;
     fetchRun : (runId : string) => Promise<void>;
 
@@ -290,6 +364,13 @@ type DashboardStore = {
     ) => Promise<boolean>;
     reopenReviewTask : (taskId : string) => Promise<boolean>;
     deleteDocument : (documentId : string, deletedReason? : string) => Promise<void>;
+
+    fetchRunMemories: (runId: string) => Promise<void>;
+    retrieveRunMemories: (runId: string) => Promise<void>;
+    submitMemoryFeedback: (
+    runId: string,
+    input: MemoryFeedbackInput,
+    ) => Promise<void>;
 };
 
 type ApiErrorResponse = {
@@ -332,6 +413,11 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     isReopeningReviewTask : false,
 
     deletingDocumentId : null,
+
+    runMemoriesByRunId: {},
+    isFetchingRunMemories: false,
+    isRetrievingRunMemories: false,
+    memoryFeedbackInFlightId: null,
 
     error: null,
     successMessage: null,
@@ -378,6 +464,98 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         }
     },
 
+    fetchRunMemories: async (runId: string) => {
+        set({
+            isFetchingRunMemories: true,
+            error: null,
+        });
+
+        try {
+            const res = await axios.get<RunMemoryAuditResponse>(
+            `/api/extraction-runs/${runId}/memories`,
+            );
+
+            set((state) => ({
+            runMemoriesByRunId: {
+                ...state.runMemoriesByRunId,
+                [runId]: res.data,
+            },
+            isFetchingRunMemories: false,
+            }));
+        } catch (error) {
+            set({
+            error: getErrorMessage(error, "Failed to fetch workflow memories."),
+            isFetchingRunMemories: false,
+            });
+        }
+        },
+
+        retrieveRunMemories: async (runId: string) => {
+        set({
+            isRetrievingRunMemories: true,
+            error: null,
+            successMessage: null,
+        });
+
+        try {
+            const res = await axios.post<{
+            audit: RunMemoryAuditResponse;
+            }>(`/api/extraction-runs/${runId}/memories/retrieve`);
+
+            set((state) => ({
+            runMemoriesByRunId: {
+                ...state.runMemoriesByRunId,
+                [runId]: res.data.audit,
+            },
+            isRetrievingRunMemories: false,
+            successMessage: "Workflow memory retrieved for this run.",
+            }));
+
+            await get().fetchRun(runId);
+        } catch (error) {
+            set({
+            error: getErrorMessage(error, "Failed to retrieve workflow memories."),
+            isRetrievingRunMemories: false,
+            });
+        }
+        },
+
+        submitMemoryFeedback: async (runId: string, input: MemoryFeedbackInput) => {
+        set({
+            memoryFeedbackInFlightId: input.memoryId,
+            error: null,
+            successMessage: null,
+        });
+
+        try {
+            const res = await axios.post<{
+            audit: RunMemoryAuditResponse | null;
+            }>(`/api/memories/${input.memoryId}/feedback`, {
+            runId,
+            memoryHitId: input.memoryHitId,
+            relevance: input.relevance,
+            note: input.note,
+            });
+
+            set((state) => ({
+            runMemoriesByRunId: res.data.audit
+                ? {
+                    ...state.runMemoriesByRunId,
+                    [runId]: res.data.audit,
+                }
+                : state.runMemoriesByRunId,
+            memoryFeedbackInFlightId: null,
+            successMessage: "Memory feedback recorded.",
+            }));
+
+            await get().fetchRun(runId);
+        } catch (error) {
+            set({
+            error: getErrorMessage(error, "Failed to record memory feedback."),
+            memoryFeedbackInFlightId: null,
+            });
+        }
+        },
     uploadPdf : async(file : File) => {
         set({ isUploadingPdf : true, error : null });
 
@@ -613,6 +791,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             })
 
             await get().fetchReviewTasks();
+            await get().fetchRunMemories(res.data.reviewTask.run.id);
         } catch(error){
             set({
                 error : getErrorMessage(error, "Failed to approve review task."),
@@ -644,6 +823,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             })
 
             await get().fetchReviewTasks();
+            await get().fetchRunMemories(res.data.reviewTask.run.id);
         } catch(error){
             set({
                 error : getErrorMessage(error, "Failed to reject review task."),
@@ -705,6 +885,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             });
 
             await get().fetchReviewTasks();
+            await get().fetchRunMemories(res.data.reviewTask.run.id);
         }catch(error){
             set({
                 error : getErrorMessage(error, "Failed to edit and approve review task."),
@@ -731,6 +912,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             await get().fetchRun(runId);
             await get().fetchRuns();
             await get().fetchReviewTasks();
+            await get().fetchRunMemories(runId);
         }catch(error){
             set({
                 error : getErrorMessage(error, "Failed to run agent step."),

@@ -16,6 +16,7 @@ import { SourceDocumentCard } from "./source-document-card";
 import { RunCoverageCtaCard } from "./run-coverage-cta-card";
 import { RunAgentStepCtaCard } from "./run-agent-step-cta-card";
 import { NextRecommendedActionCard } from "./next-recommended-action-card";
+import { RunMemoryPanel } from "./run-memory-panel";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -57,6 +58,8 @@ export function RunDetailScreen() {
       </div>
 
       <NextRecommendedActionCard run={selectedRun} />
+
+      <RunMemoryPanel runId={selectedRun.id} status={selectedRun.status} />
 
       <SourceDocumentCard document={selectedRun.document} />
 
