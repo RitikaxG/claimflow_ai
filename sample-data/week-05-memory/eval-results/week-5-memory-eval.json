@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-10T06:50:08.679Z",
+  "generatedAt": "2026-06-10T06:58:53.989Z",
   "datasetRoot": "/Users/ritikagupta/Desktop/Devops/claimflow-ai/sample-data/week-05-memory",
   "summary": {
     "totalPackets": 15,
@@ -55,7 +55,7 @@
         ],
         "precisionPassed": true,
         "hitLogging": {
-          "runId": "cmq7plid00001sly8pnsy0ogb",
+          "runId": "cmq7pwrox0001mny806haxkhz",
           "hitCount": 2,
           "writtenHitCount": 2,
           "retrievedSeedIds": [
@@ -197,7 +197,7 @@
         ]
       },
       "actual": {
-        "memoryId": "cmq7plij60004sly85tzigcqd",
+        "memoryId": "cmq7pwrun0004mny893f9mfed",
         "skipped": false,
         "reason": "MEMORY_CREATED",
         "kind": "HUMAN_CORRECTION",
@@ -262,7 +262,7 @@
         ]
       },
       "actual": {
-        "memoryId": "cmq7plikq0006sly8kbc0tsy5",
+        "memoryId": "cmq7pwrvw0006mny8xwslwvex",
         "skipped": false,
         "reason": "MEMORY_CREATED",
         "kind": "PRIOR_REJECTION",
@@ -326,7 +326,7 @@
         ]
       },
       "actual": {
-        "memoryId": "cmq7plim10008sly8avsmgdp2",
+        "memoryId": "cmq7pwrxc0008mny8q82faee8",
         "skipped": false,
         "reason": "MEMORY_CREATED",
         "kind": "RECURRING_ERROR_PATTERN",
@@ -879,16 +879,16 @@
         }
       },
       "actual": {
-        "memoryId": "cmq7plipa000asly8b2ngo4h8",
+        "memoryId": "cmq7pws0s000amny8lidu0bf8",
         "updateResult": {
-          "memoryId": "cmq7plipa000asly8b2ngo4h8",
+          "memoryId": "cmq7pws0s000amny8lidu0bf8",
           "changed": true,
           "beforeStatus": "ACTIVE",
           "afterStatus": "STRENGTHENED",
           "beforeConfidence": 0.7,
           "afterConfidence": 0.75,
           "updateType": "STRENGTHENED",
-          "memoryUpdateId": "cmq7plipx000bsly8gvpwxu96"
+          "memoryUpdateId": "cmq7pws1l000bmny89egy8n8e"
         },
         "afterStatus": "STRENGTHENED",
         "afterConfidence": 0.75,
@@ -938,16 +938,16 @@
         }
       },
       "actual": {
-        "memoryId": "cmq7pliql000csly8isumhs8k",
+        "memoryId": "cmq7pws29000cmny8sj4h9kdm",
         "updateResult": {
-          "memoryId": "cmq7pliql000csly8isumhs8k",
+          "memoryId": "cmq7pws29000cmny8sj4h9kdm",
           "changed": true,
           "beforeStatus": "ACTIVE",
           "afterStatus": "RETIRED",
           "beforeConfidence": 0.7,
           "afterConfidence": 0.6,
           "updateType": "RETIRED",
-          "memoryUpdateId": "cmq7plir9000dsly8xgtutrmi"
+          "memoryUpdateId": "cmq7pws2r000dmny83udj7onz"
         },
         "afterStatus": "RETIRED",
         "afterConfidence": 0.6,
@@ -1002,14 +1002,14 @@
       },
       "actual": {
         "sourceMemoryIds": [
-          "cmq7plis3000esly8nphgljcb",
-          "cmq7plis8000fsly8vynvt6d4",
-          "cmq7plise000gsly8a587moh1"
+          "cmq7pws3v000emny8xqbow7wz",
+          "cmq7pws43000fmny8suq02col",
+          "cmq7pws4e000gmny8knkp7z58"
         ],
         "candidatesFound": 1,
         "patternsCreated": 1,
         "patternsStrengthened": 0,
-        "patternMemoryId": "cmq7plitf000hsly8titd4bw9",
+        "patternMemoryId": "cmq7pws55000hmny8szqgvk3m",
         "patternKind": "RECURRING_ERROR_PATTERN",
         "patternEntityType": "FIELD_PATH",
         "patternEntityId": "eval_policy_number",
