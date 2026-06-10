@@ -85,7 +85,7 @@ export function RunMemoryDetailScreen() {
 
           <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-              Memory hits
+              Retrieved Memories
             </p>
             <p className="mt-1 text-lg font-semibold text-gray-950">
               {audit?.summary.totalHits ?? 0}

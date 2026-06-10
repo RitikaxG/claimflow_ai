@@ -36,6 +36,7 @@ export type RunMemoryAuditItem = {
   sourceAgentActionLogId: string | null;
 
   createdAt: Date;
+  retrievalCount: number;
 
   updates: {
     id: string;
@@ -53,6 +54,7 @@ export type RunMemoryAudit = {
   memories: RunMemoryAuditItem[];
   summary: {
     totalHits: number;
+    totalRetrievalEvents: number;
     usedByAgentCount: number;
     highRiskCount: number;
     latestRetrievedAt: Date | null;
@@ -117,6 +119,46 @@ function getMatchedOn(
   });
 }
 
+function riskRank(riskLevel: string) {
+  if (riskLevel === "HIGH") {
+    return 3;
+  }
+
+  if (riskLevel === "MEDIUM") {
+    return 2;
+  }
+
+  return 1;
+}
+
+function chooseDisplayHit<
+  THit extends {
+    score: number;
+    usedByAgent: boolean;
+    createdAt: Date;
+  },
+>(hits: THit[]): THit {
+  const sortedHits = [...hits].sort((left, right) => {
+    if (left.usedByAgent !== right.usedByAgent) {
+      return left.usedByAgent ? -1 : 1;
+    }
+
+    if (right.score !== left.score) {
+      return right.score - left.score;
+    }
+
+    return right.createdAt.getTime() - left.createdAt.getTime();
+  });
+
+  const displayHit = sortedHits[0];
+
+  if (!displayHit) {
+    throw new Error("Cannot choose display memory hit from an empty hit list.");
+  }
+
+  return displayHit;
+}
+
 export async function getRunMemoryAudit(
   runId: string,
 ): Promise<RunMemoryAudit> {
@@ -142,50 +184,87 @@ export async function getRunMemoryAudit(
     },
   });
 
-  const memories = hits.map((hit): RunMemoryAuditItem => {
-    return {
-      memoryId: hit.memory.id,
-      memoryHitId: hit.id,
+  const hitsByMemoryId = new Map<string, typeof hits>();
 
-      kind: hit.memory.kind,
-      status: hit.memory.status,
-      riskLevel: hit.memory.riskLevel,
-      confidence: hit.memory.confidence,
+  hits.forEach((hit) => {
+    const currentHits = hitsByMemoryId.get(hit.memoryId) ?? [];
+    currentHits.push(hit);
+    hitsByMemoryId.set(hit.memoryId, currentHits);
+  });
 
-      summary: hit.memory.summary,
-      safeUse: hit.memory.safeUse,
-      mustNotDo: getStringArray(hit.memory.mustNotDo),
+  const memories = Array.from(hitsByMemoryId.values()).map(
+    (memoryHits): RunMemoryAuditItem => {
+      const displayHit = chooseDisplayHit(memoryHits);
 
-      score: hit.score,
-      matchedOn: getMatchedOn(hit.matchedOn),
-      retrievalReason: hit.retrievalReason,
+      const usedHit =
+        memoryHits.find((hit) => hit.usedByAgent && hit.agentActionLog) ?? null;
 
-      usedByAgent: hit.usedByAgent,
-      agentActionLogId: hit.agentActionLogId,
-      agentAction: hit.agentActionLog?.action ?? null,
-      agentActionStatus: hit.agentActionLog?.status ?? null,
+      const usedByAgent = memoryHits.some((hit) => hit.usedByAgent);
+      const agentActionLog = usedHit?.agentActionLog ?? displayHit.agentActionLog;
 
-      entityType: hit.memory.entityType,
-      entityId: hit.memory.entityId,
-      fieldPath: hit.memory.fieldPath,
+      return {
+        memoryId: displayHit.memory.id,
+        memoryHitId: displayHit.id,
 
-      sourceRunId: hit.memory.sourceRunId,
-      sourceReviewDecisionId: hit.memory.sourceReviewDecisionId,
-      sourceCoverageQuestionId: hit.memory.sourceCoverageQuestionId,
-      sourceAgentActionLogId: hit.memory.sourceAgentActionLogId,
+        kind: displayHit.memory.kind,
+        status: displayHit.memory.status,
+        riskLevel: displayHit.memory.riskLevel,
+        confidence: displayHit.memory.confidence,
 
-      createdAt: hit.createdAt,
+        summary: displayHit.memory.summary,
+        safeUse: displayHit.memory.safeUse,
+        mustNotDo: getStringArray(displayHit.memory.mustNotDo),
 
-      updates: hit.memory.updates.map((update) => ({
-        id: update.id,
-        updateType: update.updateType,
-        beforeStatus: update.beforeStatus,
-        afterStatus: update.afterStatus,
-        confidenceDelta: update.confidenceDelta,
-        note: update.note,
-        createdAt: update.createdAt,
-      })),
-    };
+        score: displayHit.score,
+        matchedOn: getMatchedOn(displayHit.matchedOn),
+        retrievalReason: displayHit.retrievalReason,
+
+        usedByAgent,
+        agentActionLogId: usedHit?.agentActionLogId ?? displayHit.agentActionLogId,
+        agentAction: agentActionLog?.action ?? null,
+        agentActionStatus: agentActionLog?.status ?? null,
+
+        entityType: displayHit.memory.entityType,
+        entityId: displayHit.memory.entityId,
+        fieldPath: displayHit.memory.fieldPath,
+
+        sourceRunId: displayHit.memory.sourceRunId,
+        sourceReviewDecisionId: displayHit.memory.sourceReviewDecisionId,
+        sourceCoverageQuestionId: displayHit.memory.sourceCoverageQuestionId,
+        sourceAgentActionLogId: displayHit.memory.sourceAgentActionLogId,
+
+        createdAt: displayHit.createdAt,
+        retrievalCount: memoryHits.length,
+
+        updates: displayHit.memory.updates.map((update) => ({
+          id: update.id,
+          updateType: update.updateType,
+          beforeStatus: update.beforeStatus,
+          afterStatus: update.afterStatus,
+          confidenceDelta: update.confidenceDelta,
+          note: update.note,
+          createdAt: update.createdAt,
+        })),
+      };
+    },
+  );
+
+  memories.sort((left, right) => {
+    if (left.usedByAgent !== right.usedByAgent) {
+      return left.usedByAgent ? -1 : 1;
+    }
+
+    const riskDiff = riskRank(right.riskLevel) - riskRank(left.riskLevel);
+
+    if (riskDiff !== 0) {
+      return riskDiff;
+    }
+
+    if (right.score !== left.score) {
+      return right.score - left.score;
+    }
+
+    return right.createdAt.getTime() - left.createdAt.getTime();
   });
 
   return {
@@ -193,9 +272,10 @@ export async function getRunMemoryAudit(
     memories,
     summary: {
       totalHits: memories.length,
+      totalRetrievalEvents: hits.length,
       usedByAgentCount: memories.filter((item) => item.usedByAgent).length,
       highRiskCount: memories.filter((item) => item.riskLevel === "HIGH").length,
-      latestRetrievedAt: memories[0]?.createdAt ?? null,
+      latestRetrievedAt: hits[0]?.createdAt ?? null,
     },
   };
 }

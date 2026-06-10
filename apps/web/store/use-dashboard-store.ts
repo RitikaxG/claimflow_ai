@@ -280,6 +280,7 @@ export type RunMemoryAuditItemRecord = {
   sourceAgentActionLogId: string | null;
 
   createdAt: string;
+  retrievalCount: number;
 
   updates: MemoryUpdateRecord[];
 };
@@ -289,6 +290,7 @@ export type RunMemoryAuditResponse = {
   memories: RunMemoryAuditItemRecord[];
   summary: {
     totalHits: number;
+    totalRetrievalEvents: number;
     usedByAgentCount: number;
     highRiskCount: number;
     latestRetrievedAt: string | null;
