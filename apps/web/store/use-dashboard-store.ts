@@ -534,13 +534,15 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
         try {
             const res = await axios.post<{
-            audit: RunMemoryAuditResponse | null;
-            }>(`/api/memories/${input.memoryId}/feedback`, {
-            runId,
-            memoryHitId: input.memoryHitId,
-            relevance: input.relevance,
-            note: input.note,
-            });
+               audit: RunMemoryAuditResponse | null;
+               }>(
+               `/api/extraction-runs/${runId}/memories/${input.memoryId}/feedback`,
+               {
+                   memoryHitId: input.memoryHitId,
+                   relevance: input.relevance,
+                   note: input.note,
+               },
+            );
 
             set((state) => ({
             runMemoriesByRunId: res.data.audit

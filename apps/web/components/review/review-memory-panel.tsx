@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   useDashboardStore,
   type RunMemoryAuditItemRecord,
@@ -53,6 +53,10 @@ export function ReviewMemoryPanel({
     (state) => state.submitMemoryFeedback,
   );
 
+  const [feedbackByMemoryId, setFeedbackByMemoryId] = useState<
+    Record<string, "CONFIRMED_RELEVANT" | "IRRELEVANT">
+  >({});
+
   useEffect(() => {
     void fetchRunMemories(runId);
   }, [fetchRunMemories, runId]);
@@ -61,15 +65,20 @@ export function ReviewMemoryPanel({
   const reviewMemories = getReviewMemories(memories);
   const canSubmitFeedback = taskStatus === "IN_REVIEW";
 
-  const handleFeedback = (
+  const handleFeedback = async (
     memory: RunMemoryAuditItemRecord,
     relevance: "CONFIRMED_RELEVANT" | "IRRELEVANT",
   ) => {
-    void submitMemoryFeedback(runId, {
+    await submitMemoryFeedback(runId, {
       memoryId: memory.memoryId,
       memoryHitId: memory.memoryHitId,
       relevance,
     });
+
+    setFeedbackByMemoryId((current) => ({
+      ...current,
+      [memory.memoryId]: relevance,
+    }));
   };
 
   return (
