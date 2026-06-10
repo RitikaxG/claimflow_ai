@@ -267,6 +267,7 @@ export const draftInformationRequestTool = tool(
           requestedEvidence: result.draft.requestedEvidence,
           requestedFields: result.draft.requestedFields,
           fieldRequests: result.draft.fieldRequests,
+          memoryGuidance: memoryGuidance ?? null,
           status: result.draft.status,
           createdAt: result.draft.createdAt.toISOString(),
         },

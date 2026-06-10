@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useDashboardStore,
   type RunMemoryAuditItemRecord,
@@ -12,15 +12,24 @@ type ReviewMemoryPanelProps = {
   taskStatus: string;
 };
 
+type MemoryFeedback = "CONFIRMED_RELEVANT" | "IRRELEVANT";
+
+type LocalFeedbackByMemoryId = Record<string, MemoryFeedback>;
+
 function riskRank(riskLevel: string) {
-  if (riskLevel === "HIGH") return 3;
-  if (riskLevel === "MEDIUM") return 2;
+  if (riskLevel === "HIGH") {
+    return 3;
+  }
+
+  if (riskLevel === "MEDIUM") {
+    return 2;
+  }
+
   return 1;
 }
 
 function getReviewMemories(memories: RunMemoryAuditItemRecord[]) {
   const usedByAgent = memories.filter((memory) => memory.usedByAgent);
-
   const source = usedByAgent.length > 0 ? usedByAgent : memories;
 
   return [...source]
@@ -36,38 +45,102 @@ function getReviewMemories(memories: RunMemoryAuditItemRecord[]) {
     .slice(0, 3);
 }
 
+function getSavedFeedbackFromUpdates(
+  memory: RunMemoryAuditItemRecord,
+): MemoryFeedback | null {
+  const feedbackUpdate = memory.updates.find((update) => {
+    const note = update.note?.toLowerCase() ?? "";
+
+    return (
+      note.includes("confirmed_relevant") ||
+      note.includes("irrelevant") ||
+      update.updateType === "STRENGTHENED" ||
+      update.updateType === "WEAKENED"
+    );
+  });
+
+  if (!feedbackUpdate) {
+    return null;
+  }
+
+  const note = feedbackUpdate.note?.toLowerCase() ?? "";
+
+  if (
+    note.includes("confirmed_relevant") ||
+    feedbackUpdate.updateType === "STRENGTHENED"
+  ) {
+    return "CONFIRMED_RELEVANT";
+  }
+
+  if (note.includes("irrelevant") || feedbackUpdate.updateType === "WEAKENED") {
+    return "IRRELEVANT";
+  }
+
+  return null;
+}
+
+function getFeedbackLabel(feedback: MemoryFeedback | null) {
+  if (feedback === "CONFIRMED_RELEVANT") {
+    return "Marked relevant";
+  }
+
+  if (feedback === "IRRELEVANT") {
+    return "Marked irrelevant";
+  }
+
+  return null;
+}
+
+function getFeedbackHelpText(feedback: MemoryFeedback | null) {
+  if (feedback === "CONFIRMED_RELEVANT") {
+    return "Marked relevant. Memory will be strengthened.";
+  }
+
+  if (feedback === "IRRELEVANT") {
+    return "Marked irrelevant. Memory will be weakened.";
+  }
+
+  return null;
+}
+
 export function ReviewMemoryPanel({
   runId,
   taskStatus,
 }: ReviewMemoryPanelProps) {
+  const [feedbackByMemoryId, setFeedbackByMemoryId] =
+    useState<LocalFeedbackByMemoryId>({});
+
   const audit = useDashboardStore((state) => state.runMemoriesByRunId[runId]);
+
   const isFetchingRunMemories = useDashboardStore(
     (state) => state.isFetchingRunMemories,
   );
+
   const memoryFeedbackInFlightId = useDashboardStore(
     (state) => state.memoryFeedbackInFlightId,
   );
 
   const fetchRunMemories = useDashboardStore((state) => state.fetchRunMemories);
+
   const submitMemoryFeedback = useDashboardStore(
     (state) => state.submitMemoryFeedback,
   );
-
-  const [feedbackByMemoryId, setFeedbackByMemoryId] = useState<
-    Record<string, "CONFIRMED_RELEVANT" | "IRRELEVANT">
-  >({});
 
   useEffect(() => {
     void fetchRunMemories(runId);
   }, [fetchRunMemories, runId]);
 
   const memories = audit?.memories ?? [];
-  const reviewMemories = getReviewMemories(memories);
+
+  const reviewMemories = useMemo(() => {
+    return getReviewMemories(memories);
+  }, [memories]);
+
   const canSubmitFeedback = taskStatus === "IN_REVIEW";
 
   const handleFeedback = async (
     memory: RunMemoryAuditItemRecord,
-    relevance: "CONFIRMED_RELEVANT" | "IRRELEVANT",
+    relevance: MemoryFeedback,
   ) => {
     await submitMemoryFeedback(runId, {
       memoryId: memory.memoryId,
@@ -119,81 +192,131 @@ export function ReviewMemoryPanel({
 
       {reviewMemories.length > 0 ? (
         <div className="mt-5 space-y-3">
-          {reviewMemories.map((memory) => (
-            <div
-              key={memory.memoryId}
-              className="rounded-xl border border-gray-200 bg-gray-50 p-4"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-700">
-                  {memory.kind.replaceAll("_", " ")}
-                </span>
+          {reviewMemories.map((memory) => {
+            const selectedFeedback =
+              feedbackByMemoryId[memory.memoryId] ??
+              getSavedFeedbackFromUpdates(memory);
 
-                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-700">
-                  {memory.riskLevel} risk
-                </span>
+            const feedbackLabel = getFeedbackLabel(selectedFeedback);
+            const feedbackHelpText = getFeedbackHelpText(selectedFeedback);
+            const isBusy = memoryFeedbackInFlightId === memory.memoryId;
 
-                {memory.usedByAgent ? (
-                  <span className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">
-                    Used by agent
+            return (
+              <div
+                key={memory.memoryId}
+                className={`rounded-xl border p-4 ${
+                  selectedFeedback === "CONFIRMED_RELEVANT"
+                    ? "border-green-200 bg-green-50"
+                    : selectedFeedback === "IRRELEVANT"
+                      ? "border-gray-300 bg-gray-100"
+                      : "border-gray-200 bg-gray-50"
+                }`}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-700">
+                    {memory.kind.replaceAll("_", " ")}
                   </span>
-                ) : (
-                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-600">
-                    Retrieved only
+
+                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-700">
+                    {memory.riskLevel} risk
                   </span>
-                )}
-              </div>
 
-              <p className="mt-3 text-sm font-semibold text-gray-950">
-                {memory.summary}
-              </p>
+                  {memory.usedByAgent ? (
+                    <span className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">
+                      Used by agent
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-600">
+                      Retrieved only
+                    </span>
+                  )}
 
-              <div className="mt-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
-                <p className="text-sm text-blue-900">
-                  <span className="font-semibold">Safe use:</span>{" "}
-                  {memory.safeUse}
+                  {feedbackLabel ? (
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        selectedFeedback === "CONFIRMED_RELEVANT"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {feedbackLabel}
+                    </span>
+                  ) : null}
+                </div>
+
+                <p className="mt-3 text-sm font-semibold text-gray-950">
+                  {memory.summary}
                 </p>
-              </div>
 
-              {memory.mustNotDo.length > 0 ? (
-                <div className="mt-3 rounded-lg border border-red-100 bg-red-50 p-3">
-                  <p className="text-sm font-semibold text-red-900">
-                    Must not do
+                <div className="mt-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
+                  <p className="text-sm text-blue-900">
+                    <span className="font-semibold">Safe use:</span>{" "}
+                    {memory.safeUse}
                   </p>
-
-                  <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-red-800">
-                    {memory.mustNotDo.slice(0, 3).map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
                 </div>
-              ) : null}
 
-              {canSubmitFeedback ? (
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    disabled={memoryFeedbackInFlightId === memory.memoryId}
-                    onClick={() =>
-                      handleFeedback(memory, "CONFIRMED_RELEVANT")
-                    }
-                    className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-                  >
-                    Relevant
-                  </button>
+                {memory.mustNotDo.length > 0 ? (
+                  <div className="mt-3 rounded-lg border border-red-100 bg-red-50 p-3">
+                    <p className="text-sm font-semibold text-red-900">
+                      Must not do
+                    </p>
 
-                  <button
-                    type="button"
-                    disabled={memoryFeedbackInFlightId === memory.memoryId}
-                    onClick={() => handleFeedback(memory, "IRRELEVANT")}
-                    className="rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-                  >
-                    Irrelevant
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          ))}
+                    <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-red-800">
+                      {memory.mustNotDo.slice(0, 3).map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
+                {canSubmitFeedback ? (
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() =>
+                        void handleFeedback(memory, "CONFIRMED_RELEVANT")
+                      }
+                      className={`rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400 ${
+                        selectedFeedback === "CONFIRMED_RELEVANT"
+                          ? "bg-green-900 ring-2 ring-green-300"
+                          : "bg-green-700"
+                      }`}
+                    >
+                      {isBusy && selectedFeedback !== "CONFIRMED_RELEVANT"
+                        ? "Saving..."
+                        : "Relevant"}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() => void handleFeedback(memory, "IRRELEVANT")}
+                      className={`rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:bg-gray-400 ${
+                        selectedFeedback === "IRRELEVANT"
+                          ? "bg-gray-950 ring-2 ring-gray-300"
+                          : "bg-gray-800"
+                      }`}
+                    >
+                      {isBusy && selectedFeedback !== "IRRELEVANT"
+                        ? "Saving..."
+                        : "Irrelevant"}
+                    </button>
+
+                    {feedbackHelpText ? (
+                      <p className="text-sm font-medium text-gray-700">
+                        {feedbackHelpText}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : feedbackHelpText ? (
+                  <p className="mt-4 text-sm font-medium text-gray-700">
+                    {feedbackHelpText}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       ) : null}
 

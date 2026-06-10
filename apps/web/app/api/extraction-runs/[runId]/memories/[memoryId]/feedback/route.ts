@@ -11,6 +11,7 @@ export const runtime = "nodejs";
 
 type Params = {
   params: Promise<{
+    runId: string;
     memoryId: string;
   }>;
 };
@@ -37,7 +38,7 @@ function getOptionalString(value: unknown): string | undefined {
 }
 
 export async function POST(request: Request, { params }: Params) {
-  const { memoryId } = await params;
+  const { runId, memoryId } = await params;
 
   let body: MemoryFeedbackRequestBody = {};
 
@@ -59,7 +60,6 @@ export async function POST(request: Request, { params }: Params) {
     );
   }
 
-  const runId = getOptionalString(body.runId);
   const memoryHitId = getOptionalString(body.memoryHitId);
   const reviewDecisionId = getOptionalString(body.reviewDecisionId);
   const note = getOptionalString(body.note);
@@ -100,7 +100,7 @@ export async function POST(request: Request, { params }: Params) {
       );
     }
 
-    if (runId && hit.runId !== runId) {
+    if (hit.runId !== runId) {
       return NextResponse.json(
         { error: "Memory hit does not belong to this run." },
         { status: 400 },

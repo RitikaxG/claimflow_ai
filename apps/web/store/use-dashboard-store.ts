@@ -467,31 +467,28 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     },
 
     fetchRunMemories: async (runId: string) => {
-        set({
-            isFetchingRunMemories: true,
-            error: null,
-        });
+    set({
+        isFetchingRunMemories: true,
+    });
 
-        try {
-            const res = await axios.get<RunMemoryAuditResponse>(
-            `/api/extraction-runs/${runId}/memories`,
-            );
+    try {
+        const res = await axios.get<RunMemoryAuditResponse>(
+        `/api/extraction-runs/${runId}/memories`,
+        );
 
-            set((state) => ({
-            runMemoriesByRunId: {
-                ...state.runMemoriesByRunId,
-                [runId]: res.data,
-            },
-            isFetchingRunMemories: false,
-            }));
-        } catch (error) {
-            set({
-            error: getErrorMessage(error, "Failed to fetch workflow memories."),
-            isFetchingRunMemories: false,
-            });
-        }
+        set((state) => ({
+        runMemoriesByRunId: {
+            ...state.runMemoriesByRunId,
+            [runId]: res.data,
         },
-
+        isFetchingRunMemories: false,
+        }));
+    } catch {
+        set({
+        isFetchingRunMemories: false,
+        });
+    }
+    },
         retrieveRunMemories: async (runId: string) => {
         set({
             isRetrievingRunMemories: true,
