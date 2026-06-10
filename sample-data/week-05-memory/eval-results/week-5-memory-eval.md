@@ -1,6 +1,6 @@
 # Week 5 Memory Eval Report
 
-Generated at: 2026-06-10T06:58:53.989Z
+Generated at: 2026-06-10T07:14:02.965Z
 
 ## Executive Summary
 
@@ -94,7 +94,7 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 - Retrieved seed IDs: `WMEM-SEED-W5-001`, `WMEM-SEED-W5-004`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`
-- Hit logging: `{"runId":"cmq7pwrox0001mny806haxkhz","hitCount":2,"writtenHitCount":2,"retrievedSeedIds":["WMEM-SEED-W5-001","WMEM-SEED-W5-004"]}`
+- Hit logging: `{"runId":"<runtime-id>","hitCount":2,"writtenHitCount":2,"retrievedSeedIds":["WMEM-SEED-W5-001","WMEM-SEED-W5-004"]}`
 
 **Check results**
 
@@ -207,7 +207,7 @@ Checks whether a normalized workflow observation becomes a safe WorkflowMemory c
 
 **Actual writer result**
 
-- Memory ID: `cmq7pwrun0004mny893f9mfed`
+- Memory ID: `<runtime-id>`
 - Skipped: `false`
 - Reason: `MEMORY_CREATED`
 - Actual kind: `HUMAN_CORRECTION`
@@ -251,7 +251,7 @@ Checks whether a normalized workflow observation becomes a safe WorkflowMemory c
 
 **Actual writer result**
 
-- Memory ID: `cmq7pwrvw0006mny8xwslwvex`
+- Memory ID: `<runtime-id>`
 - Skipped: `false`
 - Reason: `MEMORY_CREATED`
 - Actual kind: `PRIOR_REJECTION`
@@ -295,7 +295,7 @@ Checks whether a normalized workflow observation becomes a safe WorkflowMemory c
 
 **Actual writer result**
 
-- Memory ID: `cmq7pwrxc0008mny8q82faee8`
+- Memory ID: `<runtime-id>`
 - Skipped: `false`
 - Reason: `MEMORY_CREATED`
 - Actual kind: `RECURRING_ERROR_PATTERN`
@@ -555,7 +555,7 @@ Checks whether reviewer/outcome feedback updates memory confidence, counts, stat
 
 **Actual update result**
 
-- Memory ID: `cmq7pws0s000amny8lidu0bf8`
+- Memory ID: `<runtime-id>`
 - After status: `STRENGTHENED`
 - After confidence: `0.75`
 - Confidence delta: `0.05`
@@ -592,7 +592,7 @@ Checks whether reviewer/outcome feedback updates memory confidence, counts, stat
 
 **Actual update result**
 
-- Memory ID: `cmq7pws29000cmny8sj4h9kdm`
+- Memory ID: `<runtime-id>`
 - After status: `RETIRED`
 - After confidence: `0.6`
 - Confidence delta: `-0.1`
@@ -628,11 +628,11 @@ Checks whether repeated episodic memories generalize into a reusable semantic pa
 
 **Actual pattern result**
 
-- Source memory IDs: `cmq7pws3v000emny8xqbow7wz`, `cmq7pws43000fmny8suq02col`, `cmq7pws4e000gmny8knkp7z58`
+- Source memory IDs: `<runtime-id>`, `<runtime-id>`, `<runtime-id>`
 - Candidates found: `1`
 - Patterns created: `1`
 - Patterns strengthened: `0`
-- Pattern memory ID: `cmq7pws55000hmny8szqgvk3m`
+- Pattern memory ID: `<runtime-id>`
 - Pattern kind: `RECURRING_ERROR_PATTERN`
 - Pattern entity: `FIELD_PATH` / `eval_policy_number`
 - Pattern fieldPath: `missingFields`

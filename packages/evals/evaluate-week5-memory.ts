@@ -1138,35 +1138,94 @@ function summarize(cases: Week5CaseResult[]): Week5MemoryEvalReport["summary"] {
 }
 
 
-function markdownCell(value: unknown): string {
-  const raw =
-    value === null || value === undefined
-      ? "none"
-      : Array.isArray(value)
-        ? value.length > 0
-          ? value.join(", ")
-          : "none"
-        : typeof value === "object"
-          ? JSON.stringify(value)
-          : String(value);
 
-  return raw.replace(/\|/g, "\\|").replace(/\n/g, "<br/>");
+function isRuntimeIdString(value: string): boolean {
+  // Prisma cuid/cuid2-style local DB ids generated during eval runs.
+  // Examples from reports: cmq7pws0s000amny8lidu0bf8
+  // Domain ids like WMEM-SEED-W5-001, CUST-W5-001, RUN-W5-001 remain visible.
+  return /^c[a-z0-9]{20,}$/i.test(value);
+}
+
+function sanitizeReportValue(value: unknown): unknown {
+  if (typeof value === "string") {
+    return isRuntimeIdString(value) ? "<runtime-id>" : value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeReportValue(item));
+  }
+
+  if (isRecord(value)) {
+    const sanitized: Record<string, unknown> = {};
+
+    for (const [key, child] of Object.entries(value)) {
+      sanitized[key] = sanitizeReportValue(child);
+    }
+
+    return sanitized;
+  }
+
+  return value;
+}
+
+function valueToMarkdownText(value: unknown): string {
+  const sanitized = sanitizeReportValue(value);
+
+  if (sanitized === null || sanitized === undefined) {
+    return "none";
+  }
+
+  if (Array.isArray(sanitized)) {
+    return sanitized.length > 0
+      ? sanitized
+          .map((item) =>
+            typeof item === "object" && item !== null
+              ? JSON.stringify(item)
+              : String(item),
+          )
+          .join(", ")
+      : "none";
+  }
+
+  if (typeof sanitized === "object") {
+    return JSON.stringify(sanitized);
+  }
+
+  return String(sanitized);
+}
+
+function markdownCell(value: unknown): string {
+  return valueToMarkdownText(value)
+    .replace(/\|/g, "\\|")
+    .replace(/\n/g, "<br/>");
 }
 
 function inlineCode(value: unknown): string {
-  if (value === null || value === undefined) return "`none`";
+  const sanitized = sanitizeReportValue(value);
 
-  if (Array.isArray(value)) {
-    return value.length > 0
-      ? value.map((item) => "`" + String(item) + "`").join(", ")
+  if (sanitized === null || sanitized === undefined) {
+    return "`none`";
+  }
+
+  if (Array.isArray(sanitized)) {
+    return sanitized.length > 0
+      ? sanitized
+          .map((item) =>
+            "`" +
+            (typeof item === "object" && item !== null
+              ? JSON.stringify(item)
+              : String(item)) +
+            "`",
+          )
+          .join(", ")
       : "`none`";
   }
 
-  if (typeof value === "object") {
-    return "`" + JSON.stringify(value) + "`";
+  if (typeof sanitized === "object") {
+    return "`" + JSON.stringify(sanitized) + "`";
   }
 
-  return "`" + String(value) + "`";
+  return "`" + String(sanitized) + "`";
 }
 
 function boolStatus(value: boolean | null): string {
