@@ -245,6 +245,7 @@ export type MemoryUpdateRecord = {
   afterStatus: string | null;
   confidenceDelta: number | null;
   note: string | null;
+  metadata: unknown | null;
   createdAt: string;
 };
 

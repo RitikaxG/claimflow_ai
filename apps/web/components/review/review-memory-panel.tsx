@@ -45,34 +45,32 @@ function getReviewMemories(memories: RunMemoryAuditItemRecord[]) {
     .slice(0, 3);
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function getSavedFeedbackFromUpdates(
   memory: RunMemoryAuditItemRecord,
 ): MemoryFeedback | null {
-  const feedbackUpdate = memory.updates.find((update) => {
-    const note = update.note?.toLowerCase() ?? "";
+  const reviewerFeedbackUpdate = memory.updates.find((update) => {
+    if (!isRecord(update.metadata)) {
+      return false;
+    }
 
-    return (
-      note.includes("confirmed_relevant") ||
-      note.includes("irrelevant") ||
-      update.updateType === "STRENGTHENED" ||
-      update.updateType === "WEAKENED"
-    );
+    return update.metadata.source === "reviewer_memory_feedback_ui";
   });
 
-  if (!feedbackUpdate) {
+  if (!reviewerFeedbackUpdate || !isRecord(reviewerFeedbackUpdate.metadata)) {
     return null;
   }
 
-  const note = feedbackUpdate.note?.toLowerCase() ?? "";
+  const relevance = reviewerFeedbackUpdate.metadata.relevance;
 
-  if (
-    note.includes("confirmed_relevant") ||
-    feedbackUpdate.updateType === "STRENGTHENED"
-  ) {
+  if (relevance === "CONFIRMED_RELEVANT") {
     return "CONFIRMED_RELEVANT";
   }
 
-  if (note.includes("irrelevant") || feedbackUpdate.updateType === "WEAKENED") {
+  if (relevance === "IRRELEVANT") {
     return "IRRELEVANT";
   }
 

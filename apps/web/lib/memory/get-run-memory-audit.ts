@@ -45,6 +45,7 @@ export type RunMemoryAuditItem = {
     afterStatus: string | null;
     confidenceDelta: number | null;
     note: string | null;
+    metadata: unknown | null;
     createdAt: Date;
   }[];
 };
@@ -243,6 +244,7 @@ export async function getRunMemoryAudit(
           afterStatus: update.afterStatus,
           confidenceDelta: update.confidenceDelta,
           note: update.note,
+          metadata: update.metadata,
           createdAt: update.createdAt,
         })),
       };

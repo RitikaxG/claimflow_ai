@@ -17,7 +17,6 @@ type Params = {
 };
 
 type MemoryFeedbackRequestBody = {
-  runId?: string;
   memoryHitId?: string;
   reviewDecisionId?: string;
   relevance?: "CONFIRMED_RELEVANT" | "IRRELEVANT";
