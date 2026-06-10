@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-010-final-review-no-action-memory-hit",
+  "category": "memory_safety",
+  "title": "Final review produces no action",
+  "purpose": "Ensures memory/eval context cannot mutate already-final review tasks."
+}

@@ -1,0 +1,22 @@
+{
+  "packetId": "w5-014-memory-contradicted-weakens",
+  "initialMemory": {
+    "kind": "HUMAN_CORRECTION",
+    "status": "ACTIVE",
+    "riskLevel": "MEDIUM",
+    "confidence": 0.7,
+    "entityType": "CLAIMANT",
+    "entityId": "CUST-W5-EVAL",
+    "fieldPath": "policyNumber",
+    "confirmedCount": 0,
+    "contradictedCount": 1
+  },
+  "updateType": "WEAKENED",
+  "expectedUpdate": {
+    "status": "RETIRED",
+    "confidenceDelta": -0.1,
+    "confirmedCountDelta": 0,
+    "contradictedCountDelta": 1,
+    "memoryUpdateType": "RETIRED"
+  }
+}

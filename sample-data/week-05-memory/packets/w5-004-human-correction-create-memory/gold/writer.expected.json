@@ -1,0 +1,26 @@
+{
+  "packetId": "w5-004-human-correction-create-memory",
+  "expectedCreated": true,
+  "expectedKind": "HUMAN_CORRECTION",
+  "expectedRiskLevel": "MEDIUM",
+  "expectedEntityType": "CLAIMANT",
+  "expectedEntityId": "CUST-W5-001",
+  "expectedFieldPath": "policyNumber",
+  "requiredSummaryIncludes": [
+    "corrected",
+    "policyNumber"
+  ],
+  "requiredSafeUseIncludes": [
+    "verify",
+    "policyNumber"
+  ],
+  "requiredMustNotDo": [
+    "overwrite extractedJson.policyNumber",
+    "treat old policy number as current truth",
+    "approve the claim from memory"
+  ],
+  "requiredTags": [
+    "human_verified",
+    "field_correction"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "packetId": "w5-013-memory-confirmed-strengthens",
+  "initialMemory": {
+    "kind": "PRIOR_REVIEW_DECISION",
+    "status": "ACTIVE",
+    "riskLevel": "MEDIUM",
+    "confidence": 0.7,
+    "entityType": "POLICY",
+    "entityId": "POLICY-W5-EVAL",
+    "fieldPath": "requiredEvidence.policeReport",
+    "confirmedCount": 0,
+    "contradictedCount": 0
+  },
+  "updateType": "STRENGTHENED",
+  "expectedUpdate": {
+    "status": "STRENGTHENED",
+    "confidenceDelta": 0.05,
+    "confirmedCountDelta": 1,
+    "contradictedCountDelta": 0,
+    "memoryUpdateType": "STRENGTHENED"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "packetId": "w5-007-vendor-invoice-conflict-memory-hit",
+  "expectedHitMemorySeedIds": [
+    "WMEM-SEED-W5-005"
+  ],
+  "expectedIgnoredMemorySeedIds": [
+    "WMEM-SEED-W5-001",
+    "WMEM-SEED-W5-002"
+  ],
+  "expectedUse": "route_vendor_invoice_conflict_to_review",
+  "mustNotUseFor": [
+    "choose_invoice_amount",
+    "overwrite_extracted_invoice_amount",
+    "claim_approval",
+    "claim_rejection"
+  ]
+}

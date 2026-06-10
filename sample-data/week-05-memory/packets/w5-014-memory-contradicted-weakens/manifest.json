@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-014-memory-contradicted-weakens",
+  "category": "memory_update",
+  "title": "Contradicted memory retires after repeated contradiction",
+  "purpose": "Reviewer marks memory irrelevant again, so contradictedCount increases and memory retires."
+}

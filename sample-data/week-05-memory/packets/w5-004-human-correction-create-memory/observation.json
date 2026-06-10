@@ -1,0 +1,31 @@
+{
+  "observationId": "OBS-W5-EVAL-004",
+  "sourceType": "HUMAN_CORRECTION",
+  "sourceId": "HCORR-W5-EVAL-004",
+  "sourcePacketId": "w5-004-human-correction-create-memory",
+  "historicalClaimId": "HCLAIM-W5-EVAL-004",
+  "observationType": "HUMAN_CORRECTION",
+  "entityType": "CLAIMANT",
+  "entityId": "CUST-W5-001",
+  "fieldPath": "policyNumber",
+  "beforeValue": null,
+  "afterValue": "POL-W5-EVAL-004",
+  "tags": [
+    "human_verified",
+    "policy_number_correction",
+    "field_correction"
+  ],
+  "riskLevel": "MEDIUM",
+  "shouldCreateMemory": true,
+  "recommendedMemoryKind": "HUMAN_CORRECTION",
+  "summary": "Reviewer corrected policyNumber for this claimant during Week 5 eval.",
+  "safeUse": "Ask reviewer to verify policyNumber when a future claim from this claimant has missing or low-confidence policyNumber.",
+  "mustNotDo": [
+    "overwrite extractedJson.policyNumber",
+    "treat old policy number as current truth",
+    "approve the claim from memory"
+  ],
+  "evidenceJson": {
+    "evalPacketId": "w5-004-human-correction-create-memory"
+  }
+}

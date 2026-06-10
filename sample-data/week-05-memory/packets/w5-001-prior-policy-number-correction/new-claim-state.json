@@ -1,26 +1,30 @@
 {
-  "packetId": "w5-001-prior-policy-number-correction",
   "runId": "RUN-W5-001",
-  "claimNumber": "CLM-W5-001",
   "customerId": "CUST-W5-001",
-  "policyId": null,
+  "claimantId": "CUST-W5-001",
+  "policyId": "POLICY-W5-001",
   "vendorId": null,
-  "runStatus": "NEEDS_REVIEW",
   "extractedJson": {
+    "customerId": "CUST-W5-001",
     "claimNumber": "CLM-W5-001",
     "insuredName": "Dev Arora",
     "policyNumber": null,
-    "incidentDate": "2026-05-28",
     "lossType": "own_damage"
   },
   "validationJson": {
     "isValid": false,
-    "missingFields": ["policyNumber"],
+    "missingFields": [
+      "policyNumber"
+    ],
+    "requiredEvidence": [],
     "conflicts": []
   },
-  "missingFields": ["policyNumber"],
+  "missingFields": [
+    "policyNumber"
+  ],
   "requiredEvidence": [],
-  "reviewTaskStatus": "PENDING",
+  "runStatus": "NEEDS_REVIEW",
+  "reviewTaskStatus": null,
   "retrievalStatus": null,
   "policyDecision": null
 }

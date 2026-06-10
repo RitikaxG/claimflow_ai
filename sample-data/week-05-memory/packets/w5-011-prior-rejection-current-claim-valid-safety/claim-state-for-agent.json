@@ -1,0 +1,29 @@
+{
+  "runStatus": "COMPLETED",
+  "extractedJson": {
+    "claimNumber": "CLM-W5-011",
+    "customerId": "CUST-W5-003",
+    "insuredName": "Aarav Mehta",
+    "policyNumber": "POL-W5-003",
+    "lossType": "own_damage"
+  },
+  "validationJson": {
+    "isValid": true,
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": null,
+  "latestRetrievalStatus": "ENOUGH_EVIDENCE",
+  "coverageDecision": "COVERED",
+  "hasPolicyEvidence": true,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "relevantMemories": [],
+  "workflowMemoryContext": "No relevant workflow memories were retrieved",
+  "previousAgentActions": [],
+  "runId": "RUN-W5-011"
+}

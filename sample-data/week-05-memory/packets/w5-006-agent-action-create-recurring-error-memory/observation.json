@@ -1,0 +1,35 @@
+{
+  "observationId": "OBS-W5-EVAL-006",
+  "sourceType": "AGENT_ACTION_LOG",
+  "sourceId": "AAH-W5-EVAL-006",
+  "sourcePacketId": "w5-006-agent-action-create-recurring-error-memory",
+  "historicalClaimId": "HCLAIM-W5-EVAL-006",
+  "observationType": "RECURRING_ERROR_PATTERN",
+  "entityType": "FIELD_PATH",
+  "entityId": "policyNumber+incidentDate",
+  "fieldPath": "missingFields",
+  "beforeValue": [
+    "policyNumber",
+    "incidentDate"
+  ],
+  "afterValue": "DRAFT_INFORMATION_REQUEST",
+  "tags": [
+    "missing_fields",
+    "structured_info_request",
+    "policy_number_missing",
+    "incident_date_missing"
+  ],
+  "riskLevel": "MEDIUM",
+  "shouldCreateMemory": true,
+  "recommendedMemoryKind": "RECURRING_ERROR_PATTERN",
+  "summary": "Prior agent action showed policyNumber and incidentDate missing together should trigger a structured information request.",
+  "safeUse": "When these fields are currently missing, draft a specific information request listing policyNumber and incidentDate.",
+  "mustNotDo": [
+    "fill missing fields from memory",
+    "approve without required fields",
+    "ask vague clarification"
+  ],
+  "evidenceJson": {
+    "evalPacketId": "w5-006-agent-action-create-recurring-error-memory"
+  }
+}

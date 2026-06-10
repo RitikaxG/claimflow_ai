@@ -1,0 +1,31 @@
+{
+  "runId": "RUN-W5-008",
+  "customerId": "CUST-W5-002",
+  "claimantId": "CUST-W5-002",
+  "policyId": "POLICY-W5-002",
+  "vendorId": null,
+  "extractedJson": {
+    "customerId": "CUST-W5-002",
+    "policyId": "POLICY-W5-002",
+    "claimNumber": "CLM-W5-008",
+    "insuredName": "Nisha Rao",
+    "policyNumber": "POL-W5-002",
+    "lossType": "third_party"
+  },
+  "validationJson": {
+    "isValid": false,
+    "missingFields": [],
+    "requiredEvidence": [
+      "policeReport"
+    ],
+    "conflicts": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [
+    "policeReport"
+  ],
+  "runStatus": "NEEDS_REVIEW",
+  "reviewTaskStatus": null,
+  "retrievalStatus": null,
+  "policyDecision": null
+}

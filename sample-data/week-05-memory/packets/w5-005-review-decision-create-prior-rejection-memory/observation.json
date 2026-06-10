@@ -1,0 +1,31 @@
+{
+  "observationId": "OBS-W5-EVAL-005",
+  "sourceType": "REVIEW_DECISION",
+  "sourceId": "RDEC-W5-EVAL-005",
+  "sourcePacketId": "w5-005-review-decision-create-prior-rejection-memory",
+  "historicalClaimId": "HCLAIM-W5-EVAL-005",
+  "observationType": "PRIOR_REJECTION",
+  "entityType": "CLAIMANT",
+  "entityId": "CUST-W5-003",
+  "fieldPath": null,
+  "beforeValue": null,
+  "afterValue": "REJECT",
+  "tags": [
+    "prior_rejection",
+    "human_review",
+    "suspicious_claimant_details"
+  ],
+  "riskLevel": "HIGH",
+  "shouldCreateMemory": true,
+  "recommendedMemoryKind": "PRIOR_REJECTION",
+  "summary": "Reviewer previously rejected a claim for this claimant due to suspicious claimant details.",
+  "safeUse": "Route similar future claims with current risk signals to human review.",
+  "mustNotDo": [
+    "auto-reject a future claim",
+    "draft a denial based only on memory",
+    "treat memory as policy evidence"
+  ],
+  "evidenceJson": {
+    "evalPacketId": "w5-005-review-decision-create-prior-rejection-memory"
+  }
+}

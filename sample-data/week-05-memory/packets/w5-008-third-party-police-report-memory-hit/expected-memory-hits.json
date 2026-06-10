@@ -1,0 +1,18 @@
+{
+  "packetId": "w5-008-third-party-police-report-memory-hit",
+  "expectedHitMemorySeedIds": [
+    "WMEM-SEED-W5-003"
+  ],
+  "expectedIgnoredMemorySeedIds": [
+    "WMEM-SEED-W5-001",
+    "WMEM-SEED-W5-005"
+  ],
+  "allowedExtraMemorySeedIds": [
+    "WMEM-SEED-W5-007"
+  ],
+  "expectedUse": "verify_required_police_report",
+  "mustNotUseFor": [
+    "mark_police_report_missing_without_current_validation",
+    "block_claim_using_memory_alone"
+  ]
+}

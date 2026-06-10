@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-007-vendor-invoice-conflict-memory-hit",
+  "category": "memory_retrieval",
+  "title": "Vendor invoice conflict memory hit",
+  "purpose": "Retrieves vendor pattern memory when same vendor has current invoice conflict."
+}

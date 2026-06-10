@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-006-agent-action-create-recurring-error-memory",
+  "category": "memory_writer",
+  "title": "Agent action creates recurring error pattern memory",
+  "purpose": "Tests whether an agent workflow observation can become a safe recurring-error memory."
+}

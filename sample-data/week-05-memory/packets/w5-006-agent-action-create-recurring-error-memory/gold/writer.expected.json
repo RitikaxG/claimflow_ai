@@ -1,0 +1,25 @@
+{
+  "packetId": "w5-006-agent-action-create-recurring-error-memory",
+  "expectedCreated": true,
+  "expectedKind": "RECURRING_ERROR_PATTERN",
+  "expectedRiskLevel": "MEDIUM",
+  "expectedEntityType": "FIELD_PATH",
+  "expectedEntityId": "policyNumber+incidentDate",
+  "expectedFieldPath": "missingFields",
+  "requiredSummaryIncludes": [
+    "policyNumber",
+    "incidentDate"
+  ],
+  "requiredSafeUseIncludes": [
+    "specific information request"
+  ],
+  "requiredMustNotDo": [
+    "fill missing fields from memory",
+    "approve without required fields",
+    "ask vague clarification"
+  ],
+  "requiredTags": [
+    "missing_fields",
+    "structured_info_request"
+  ]
+}

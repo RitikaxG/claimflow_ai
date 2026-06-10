@@ -8,14 +8,16 @@
     "eval:week3:rag": "bun --env-file ../db/.env evaluate-week3-rag.ts",
     "eval:week1": "bun evaluate-week1.ts",
     "check-types": "tsc --noEmit",
-    "eval:week4:agent": "bun --env-file ../db/.env evaluate-week4-agent-actions.ts"
+    "eval:week4:agent": "bun --env-file ../db/.env evaluate-week4-agent-actions.ts",
+    "eval:week5:memory": "bun --env-file ../db/.env evaluate-week5-memory.ts"
   },
   "dependencies": {
     "@repo/db": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ai": "workspace:*",
     "@repo/rag": "workspace:*",
-    "@repo/agent": "workspace:*"
+    "@repo/agent": "workspace:*",
+    "@repo/memory": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",

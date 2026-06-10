@@ -1,0 +1,19 @@
+{
+  "packetId": "w5-009-insufficient-policy-evidence-memory-hit",
+  "expectedHitMemorySeedIds": [
+    "WMEM-SEED-W5-007"
+  ],
+  "expectedIgnoredMemorySeedIds": [
+    "WMEM-SEED-W5-001",
+    "WMEM-SEED-W5-005"
+  ],
+  "allowedExtraMemorySeedIds": [
+    "WMEM-SEED-W5-003"
+  ],
+  "expectedUse": "escalate_when_current_policy_retrieval_is_insufficient",
+  "mustNotUseFor": [
+    "substitute_memory_for_policy_evidence",
+    "draft_approval_without_current_citations",
+    "draft_denial_without_current_citations"
+  ]
+}

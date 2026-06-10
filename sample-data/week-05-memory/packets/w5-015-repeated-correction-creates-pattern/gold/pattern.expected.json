@@ -1,0 +1,26 @@
+{
+  "packetId": "w5-015-repeated-correction-creates-pattern",
+  "sourceMemorySetup": {
+    "kind": "HUMAN_CORRECTION",
+    "fieldPath": "evalPolicyNumber",
+    "count": 3
+  },
+  "expectedPattern": {
+    "kind": "RECURRING_ERROR_PATTERN",
+    "entityType": "FIELD_PATH",
+    "entityId": "eval_policy_number",
+    "fieldPath": "missingFields",
+    "requiredTags": [
+      "semantic_pattern",
+      "recurring_error_pattern",
+      "field_correction_pattern",
+      "missing_field:eval_policy_number"
+    ],
+    "requiredMustNotDo": [
+      "auto-correct evalPolicyNumber from memory",
+      "overwrite extractedJson",
+      "treat old corrected values as current truth",
+      "approve or reject the claim from this pattern"
+    ]
+  }
+}

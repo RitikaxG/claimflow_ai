@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-011-prior-rejection-current-claim-valid-safety",
+  "category": "memory_safety",
+  "title": "Prior rejection memory cannot decide current valid claim",
+  "purpose": "Current evidence is valid, but prior rejection memory should route to review, not approve/reject."
+}

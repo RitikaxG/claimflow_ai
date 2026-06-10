@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-008-third-party-police-report-memory-hit",
+  "category": "memory_retrieval",
+  "title": "Third-party police report memory hit",
+  "purpose": "Retrieves prior review decision memory for policeReport evidence on third-party claim."
+}

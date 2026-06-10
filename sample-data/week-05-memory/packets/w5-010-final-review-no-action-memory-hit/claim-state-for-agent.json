@@ -1,0 +1,28 @@
+{
+  "runStatus": "COMPLETED",
+  "extractedJson": {
+    "claimNumber": "CLM-W5-010",
+    "customerId": "CUST-W5-010",
+    "insuredName": "Final Review User",
+    "policyNumber": "POL-W5-010"
+  },
+  "validationJson": {
+    "isValid": true,
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": []
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "reviewTaskStatus": "APPROVED",
+  "latestRetrievalStatus": "ENOUGH_EVIDENCE",
+  "coverageDecision": "COVERED",
+  "hasPolicyEvidence": true,
+  "retryCount": 0,
+  "duplicateSignals": [],
+  "documentMismatchSignals": [],
+  "relevantMemories": [],
+  "workflowMemoryContext": "No relevant workflow memories were retrieved",
+  "previousAgentActions": [],
+  "runId": "RUN-W5-010"
+}

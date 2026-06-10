@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-012-old-policy-number-conflicts-current-document",
+  "category": "memory_conflict",
+  "title": "Old memory conflicts with current policy document",
+  "purpose": "Current extracted policyNumber must beat old memory; memory can only warn."
+}

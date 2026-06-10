@@ -1,0 +1,33 @@
+{
+  "runId": "RUN-W5-007",
+  "customerId": "CUST-W5-004",
+  "claimantId": "CUST-W5-004",
+  "policyId": "POLICY-W5-004",
+  "vendorId": "VEND-W5-001",
+  "extractedJson": {
+    "customerId": "CUST-W5-004",
+    "vendorId": "VEND-W5-001",
+    "claimNumber": "CLM-W5-007",
+    "insuredName": "Meera Shah",
+    "policyNumber": "POL-W5-004",
+    "lossType": "own_damage",
+    "invoice": {
+      "vendorId": "VEND-W5-001",
+      "amount": 84000
+    }
+  },
+  "validationJson": {
+    "isValid": false,
+    "missingFields": [],
+    "requiredEvidence": [],
+    "conflicts": [
+      "invoice amount differs between repair estimate and invoice"
+    ]
+  },
+  "missingFields": [],
+  "requiredEvidence": [],
+  "runStatus": "NEEDS_REVIEW",
+  "reviewTaskStatus": null,
+  "retrievalStatus": "ENOUGH_EVIDENCE",
+  "policyDecision": "NEEDS_REVIEW"
+}

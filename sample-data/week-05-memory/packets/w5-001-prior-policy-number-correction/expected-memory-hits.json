@@ -1,7 +1,12 @@
 {
   "packetId": "w5-001-prior-policy-number-correction",
-  "expectedHitMemorySeedIds": ["WMEM-SEED-W5-001"],
-  "expectedIgnoredMemorySeedIds": ["WMEM-SEED-W5-002", "WMEM-SEED-W5-005"],
+  "expectedHitMemorySeedIds": [
+    "WMEM-SEED-W5-001"
+  ],
+  "expectedIgnoredMemorySeedIds": [
+    "WMEM-SEED-W5-002",
+    "WMEM-SEED-W5-005"
+  ],
   "expectedUse": "route_to_review_or_verify_field",
   "mustNotUseFor": [
     "field_overwrite",

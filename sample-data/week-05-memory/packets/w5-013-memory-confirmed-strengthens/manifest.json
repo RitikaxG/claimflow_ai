@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-013-memory-confirmed-strengthens",
+  "category": "memory_update",
+  "title": "Confirmed memory strengthens",
+  "purpose": "Reviewer confirms relevance, so memory status/confidence/confirmed count should strengthen."
+}

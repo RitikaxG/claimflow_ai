@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-004-human-correction-create-memory",
+  "category": "memory_writer",
+  "title": "Human correction creates safe memory",
+  "purpose": "Tests whether normalized human correction observation becomes a safe WorkflowMemory card."
+}

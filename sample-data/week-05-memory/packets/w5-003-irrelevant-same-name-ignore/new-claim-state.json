@@ -1,26 +1,26 @@
 {
-  "packetId": "w5-003-irrelevant-same-name-ignore",
   "runId": "RUN-W5-003",
-  "claimNumber": "CLM-W5-003",
   "customerId": "CUST-W5-006",
+  "claimantId": "CUST-W5-006",
   "policyId": "POLICY-W5-006",
-  "vendorId": "VEND-W5-002",
-  "runStatus": "VALIDATING",
+  "vendorId": null,
   "extractedJson": {
+    "customerId": "CUST-W5-006",
     "claimNumber": "CLM-W5-003",
     "insuredName": "Dev Aroora",
     "policyNumber": "POL-W5-006",
-    "incidentDate": "2026-05-30",
-    "lossType": "towing"
+    "lossType": "own_damage"
   },
   "validationJson": {
     "isValid": true,
     "missingFields": [],
+    "requiredEvidence": [],
     "conflicts": []
   },
   "missingFields": [],
   "requiredEvidence": [],
-  "reviewTaskStatus": "PENDING",
-  "retrievalStatus": null,
-  "policyDecision": null
+  "runStatus": "COMPLETED",
+  "reviewTaskStatus": null,
+  "retrievalStatus": "ENOUGH_EVIDENCE",
+  "policyDecision": "COVERED"
 }

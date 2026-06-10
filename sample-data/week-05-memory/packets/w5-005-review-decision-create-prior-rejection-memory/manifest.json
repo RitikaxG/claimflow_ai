@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-005-review-decision-create-prior-rejection-memory",
+  "category": "memory_writer",
+  "title": "Review rejection creates prior rejection memory",
+  "purpose": "Tests whether a prior review rejection observation becomes high-risk routing memory."
+}

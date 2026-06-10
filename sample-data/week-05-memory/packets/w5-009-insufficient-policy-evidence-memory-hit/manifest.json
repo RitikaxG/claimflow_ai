@@ -1,0 +1,6 @@
+{
+  "packetId": "w5-009-insufficient-policy-evidence-memory-hit",
+  "category": "memory_retrieval",
+  "title": "Insufficient policy evidence memory hit",
+  "purpose": "Retrieves policy-history memory when current retrieval status is insufficient."
+}

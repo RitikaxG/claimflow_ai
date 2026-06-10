@@ -1,0 +1,26 @@
+{
+  "packetId": "w5-005-review-decision-create-prior-rejection-memory",
+  "expectedCreated": true,
+  "expectedKind": "PRIOR_REJECTION",
+  "expectedRiskLevel": "HIGH",
+  "expectedEntityType": "CLAIMANT",
+  "expectedEntityId": "CUST-W5-003",
+  "expectedFieldPath": null,
+  "requiredSummaryIncludes": [
+    "rejected",
+    "claimant"
+  ],
+  "requiredSafeUseIncludes": [
+    "Route",
+    "human review"
+  ],
+  "requiredMustNotDo": [
+    "auto-reject a future claim",
+    "draft a denial based only on memory",
+    "treat memory as policy evidence"
+  ],
+  "requiredTags": [
+    "prior_rejection",
+    "human_review"
+  ]
+}
