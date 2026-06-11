@@ -203,16 +203,24 @@ function proposedActionMentionsMemory(
 function isMemoryOverwriteAttempt(
   proposedAction: ProposedAgentAction,
 ): boolean {
-  const toolInput = stringifyForGuardrail(proposedAction.toolInputJson);
+  const toolInput = proposedAction.toolInputJson;
 
-  return (
-    toolInput.includes("overwrite") ||
-    toolInput.includes("auto_correct") ||
-    toolInput.includes("autocorrect") ||
-    toolInput.includes("correctedjson") ||
-    toolInput.includes("extractedjson") ||
-    toolInput.includes("replace_current_extraction")
-  );
+  if (!isRecord(toolInput)) {
+    return false;
+  }
+
+  const unsafeMutationKeys = [
+    "correctedJson",
+    "extractedJson",
+    "replaceCurrentExtraction",
+    "replace_current_extraction",
+    "autoCorrect",
+    "auto_correct",
+    "overwriteFields",
+    "overwrite_fields",
+  ];
+
+  return unsafeMutationKeys.some((key) => key in toolInput);
 }
 
 function hasMemoryConflictWithCurrentEvidence(
