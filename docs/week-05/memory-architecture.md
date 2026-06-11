@@ -76,6 +76,10 @@ This creates a closed learning loop, but with guardrails. The system learns from
 
 ---
 
+## Memory Architecture Diagram
+
+![ClaimFlow AI memory architecture](./images/memory-architecture.png)
+
 ## 4. Types of memory in ClaimFlow
 
 ClaimFlow uses three practical memory types: episodic, procedural, and semantic.
