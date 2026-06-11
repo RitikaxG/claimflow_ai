@@ -771,18 +771,3 @@ semantic memories are still safely used only for future routing and verification
 
 ---
 
-## 10. Interview-ready summary
-
-Week 5 memory adds a controlled learning layer to ClaimFlow AI.
-
-The system first bootstraps memory from past observations, but it does not dump past claims into the agent. It converts old workflow history into safe memory cards with `summary`, `safeUse`, `mustNotDo`, entity scope, field path, risk level, confidence, and evidence trail.
-
-For every new claim, the retriever builds a structured memory query from stable IDs and workflow conditions. It scores memories by exact field match, missing field match, required evidence match, policy/vendor/claimant identity, risk, human verification, and contradiction history. It ignores retired and superseded memories and avoids weak same-name matching.
-
-The agent receives only compact relevant memory, not old claim packets. It can use memory to ask for information, escalate to human review, retrieve policy clauses, or take no action. Guardrails prevent memory from approving, rejecting, overwriting fields, or replacing current evidence.
-
-The memory update loop is driven by human review. When a reviewer edits, approves, rejects, or asks for more information, the system compares `extractedJson` with `correctedJson` and reads the review outcome. Confirmed memories are strengthened, contradicted memories are weakened, repeatedly contradicted memories are retired, and newer same-scope memories supersede older ones. Every update is written to `MemoryUpdate`.
-
-Finally, repeated episodic memories can become semantic memory. Three corrections on the same field can become a recurring error pattern. Two similar vendor-risk memories can become a vendor pattern. Two similar claimant-risk memories can become a claimant pattern. These patterns improve future routing but still remain context, not evidence.
-
-This proves ClaimFlow AI can learn from past human workflow behavior while preserving safety, auditability, and human control.
