@@ -27,7 +27,8 @@
     "agent:smoke:memory": "bun --filter @repo/agent smoke:memory",
     "memory:smoke:update": "bun --filter @repo/memory smoke:update",
     "memory:smoke:patterns": "bun --filter @repo/memory smoke:patterns",
-    "eval:week5:memory": "bun --filter @repo/evals eval:week5:memory"
+    "eval:week5:memory": "bun --filter @repo/evals eval:week5:memory",
+    "gateway:smoke:log": "bun --filter @repo/gateway smoke:log"
   },
   "devDependencies": {
     "prettier": "^3.6.0",
