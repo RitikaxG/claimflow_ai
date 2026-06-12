@@ -128,6 +128,21 @@
         "typescript": "^5",
       },
     },
+    "packages/gateway": {
+      "name": "@repo/gateway",
+      "dependencies": {
+        "@repo/db": "workspace:*",
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@types/node": "^22.0.0",
+        "typescript": "^5",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/memory": {
       "name": "@repo/memory",
       "dependencies": {
@@ -462,6 +477,8 @@
     "@repo/eslint-config": ["@repo/eslint-config@workspace:packages/eslint-config"],
 
     "@repo/evals": ["@repo/evals@workspace:packages/evals"],
+
+    "@repo/gateway": ["@repo/gateway@workspace:packages/gateway"],
 
     "@repo/memory": ["@repo/memory@workspace:packages/memory"],
 

@@ -1,0 +1,25 @@
+{
+  "name": "@repo/gateway",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22.0.0",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@repo/db": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "exports":{
+    ".":"./index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "smoke:log": "bun --env-file ../db/.env scripts/smoke-test-gateway-log.ts"
+  }
+}

@@ -172,6 +172,39 @@ enum MemoryUpdateType {
   GENERALIZED
 }
 
+enum AiCallKind {
+  EXTRACTION
+  VALIDATION_ASSIST
+  RAG_QUERY_REWRITE
+  RAG_ANSWER
+  AGENT_PLANNER
+  MEMORY_WRITER
+  MEMORY_SUMMARIZER
+  EVAL_JUDGE
+  SYNTHETIC_GATEWAY_TEST
+}
+
+enum AiCallStatus  {
+  STARTED
+  SUCCEEDED
+  FAILED
+  RETRYABLE
+  BLOCKED
+}
+
+enum AiGatewayFailureType {
+  MODEL_TIMEOUT
+  INVALID_JSON_RESPONSE
+  PROVIDER_ERROR
+  COST_LIMIT_EXCEEDED
+  LATENCY_SPIKE
+  PROMPT_VERSION_REGRESSION
+  EVAL_SCORE_DROPPED
+  MISSING_TRACE_ID
+  MISSING_MODEL_VERSION
+  UNKNOWN
+}
+
 model Document {
   id String @id @default(cuid())
 
@@ -209,6 +242,7 @@ model ExtractionRun {
   sourceWorkflowMemories WorkflowMemory[] @relation("WorkflowMemorySourceRun")
   memoryHits MemoryHit[]
   memoryUpdates MemoryUpdate[]
+  aiCallLogs AiCallLog[]
 
   status ExtractionRunStatus @default(UPLOADED)
 
@@ -561,4 +595,48 @@ model MemoryUpdate {
   @@index([reviewDecisionId])
   @@index([createdAt])
   @@map("memory_updates")
+}
+
+model AiCallLog {
+  id String  @id @default(cuid())
+  traceId String
+
+  runId String?
+  run ExtractionRun? @relation(fields: [runId], references: [id])
+
+  kind AiCallKind
+  status AiCallStatus
+
+  provider String
+  model String
+  modelVersion String?
+  promptVersion String?
+  schemaVersion String?
+
+  inputJson Json?
+  outputJson Json?
+  parsedOutputJson Json?
+
+  errorType AiGatewayFailureType?
+  errorMessage String?
+  retryable Boolean @default(false)
+
+  latencyMs Int?
+  inputTokens Int?
+  outputTokens Int?
+  totalTokens Int?
+  estimatedCostUsd Float?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([traceId])
+  @@index([runId])
+  @@index([kind])
+  @@index([status])
+  @@index([errorType])
+  @@index([createdAt])
+  @@map("ai_call_logs")
 }
