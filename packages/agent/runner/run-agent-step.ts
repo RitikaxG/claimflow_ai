@@ -3,7 +3,7 @@ import type {
   ProposedAgentAction,
 } from "@repo/shared/schemas";
 import { prisma } from "@repo/db";
-import { callModelThroughGateway } from "@repo/gateway";
+import { callModelThroughGateway, PROMPT_REGISTRY } from "@repo/gateway";
 import { buildAgentContext } from "../planner/build-agent-context";
 import {
   buildAgentUserMessage,
@@ -486,7 +486,7 @@ function toGatewayAgentOutput(message: unknown) {
 
 function buildAgentGatewayInputJson(context: ClaimStateForAgent) {
   return {
-    systemPromptVersion: "claimflow_agent_v1",
+    systemPromptVersion: PROMPT_REGISTRY.agentPlanner.promptVersion,
     contextSummary: {
       runId: context.runId,
       runStatus: context.runStatus,
@@ -537,7 +537,7 @@ export async function runAgentStep(runId: string) {
       provider: "langchain-google-genai",
       model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
       modelVersion: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
-      promptVersion: "claimflow_agent_v1",
+      promptVersion: PROMPT_REGISTRY.agentPlanner.promptVersion,
       schemaVersion: "agent_action_v1",
       inputJson: buildAgentGatewayInputJson(context),
       timeoutMs: 30_000,
@@ -557,7 +557,7 @@ export async function runAgentStep(runId: string) {
           outputJson: toGatewayAgentOutput(response),
           parsedOutputJson,
           metadata: {
-            promptVersion: "claimflow_agent_v1",
+            promptVersion: PROMPT_REGISTRY.agentPlanner.promptVersion,
             schemaVersion: "agent_action_v1",
             relevantMemoryCount: context.relevantMemories.length,
             missingFieldCount: context.missingFields.length,
