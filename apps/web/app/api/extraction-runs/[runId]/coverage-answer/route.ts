@@ -489,6 +489,10 @@ export async function POST(request: Request, { params } : Params ){
             question,
             claimContext,
             retrievalResult,
+            gateway: {
+              traceId: `run_${run.id}`,
+              runId: run.id,
+            },
         });
 
         const citationValidation = validateCoverageCitations({

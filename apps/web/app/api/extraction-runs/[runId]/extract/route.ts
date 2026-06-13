@@ -9,6 +9,7 @@ type Params = {
     }>;
 };
 
+
 function toPrismaJson(value : unknown): Prisma.InputJsonValue {
     return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
@@ -87,6 +88,11 @@ export async function POST(_request : Request, { params } : Params ){
             });
         });
 
+        const gatewayContext = {
+            traceId: `run_${run.id}`,
+            runId: run.id,
+        };
+
         let extractedResult: ClaimExtractionResult;
 
         const mockResult = await maybeLoadMockExtractionResult(run.document);
@@ -98,13 +104,13 @@ export async function POST(_request : Request, { params } : Params ){
                  throw new Error("PDF storage path is missing from this document");
             }
 
-            extractedResult = await extractClaimFromPdf(run.document.storagePath);
+            extractedResult = await extractClaimFromPdf(run.document.storagePath, gatewayContext);
         }
         else if(run.document.sourceType === DocumentSourceType.EMAIL_TEXT){
             if(!run.document.contentText || run.document.contentText.trim().length === 0){
                 throw new Error("Content Text missing from this document");
             }
-            extractedResult = await extractClaimFromEmailText(run.document.contentText);
+            extractedResult = await extractClaimFromEmailText(run.document.contentText, gatewayContext);
         }else{
             throw new Error(`Unsupported document source type ${run.document.sourceType}`);
         }
@@ -120,6 +126,7 @@ export async function POST(_request : Request, { params } : Params ){
                         promptVersion : extractedResult.promptVersion,
                         overallConfidence : extractedResult.confidenceJson.overallConfidence,
                         isRetry,
+                        traceId : gatewayContext.traceId,
                     }),
                 }
             });

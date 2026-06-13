@@ -23,3 +23,4 @@ export function extractGeminiUsage(response: { usageMetadata?: unknown }) {
     totalTokens: getNumber(usage.totalTokenCount),
   };
 }
+

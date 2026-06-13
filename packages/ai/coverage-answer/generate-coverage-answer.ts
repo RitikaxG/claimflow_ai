@@ -2,10 +2,11 @@ import {
   CoverageAnswerSchema,
   type CoverageAnswer,
 } from "@repo/shared/schemas";
-import { callModelThroughGateway } from "@repo/gateway";
+import { callModelThroughGateway, PROMPT_REGISTRY } from "@repo/gateway";
 import { getGeminiClient, GEMINI_MODEL } from "../client/gemini-client";
 import { COVERAGE_ANSWER_RESPONSE_SCHEMA } from "./response-schema";
 import { toRawModelOutput } from "../utils/raw-model-output";
+import { extractGeminiUsage } from "../utils/gemini-usage";
 
 export const COVERAGE_ANSWER_PROMPT_VERSION = "coverage_answer_v1";
 
@@ -51,24 +52,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function getNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
-
-function extractGeminiUsage(response: { usageMetadata?: unknown }) {
-  const usage = response.usageMetadata;
-
-  if (!isRecord(usage)) {
-    return {
-      inputTokens: null,
-      outputTokens: null,
-      totalTokens: null,
-    };
-  }
-
-  return {
-    inputTokens: getNumber(usage.promptTokenCount),
-    outputTokens: getNumber(usage.candidatesTokenCount),
-    totalTokens: getNumber(usage.totalTokenCount),
-  };
 }
 
 function safeJson(value: unknown): string {
@@ -166,7 +149,7 @@ export async function generateCoverageAnswer(
     provider: "google-genai",
     model: GEMINI_MODEL,
     modelVersion: GEMINI_MODEL,
-    promptVersion: COVERAGE_ANSWER_PROMPT_VERSION,
+    promptVersion: PROMPT_REGISTRY.coverageAnswer.promptVersion,
     schemaVersion: "coverage_answer_v1",
     inputJson: {
       question: input.question,
@@ -212,7 +195,7 @@ export async function generateCoverageAnswer(
         parsedOutputJson,
         ...extractGeminiUsage(response),
         metadata: {
-          promptVersion: COVERAGE_ANSWER_PROMPT_VERSION,
+          promptVersion: PROMPT_REGISTRY.coverageAnswer.promptVersion,
           schemaVersion: "coverage_answer_v1",
           responseMimeType: "application/json",
           retrievalStatus: input.retrievalResult.retrievalStatus,
@@ -230,7 +213,7 @@ export async function generateCoverageAnswer(
 
   return {
     model: GEMINI_MODEL,
-    promptVersion: COVERAGE_ANSWER_PROMPT_VERSION,
+    promptVersion: PROMPT_REGISTRY.coverageAnswer.promptVersion,
     rawModelOutput: gatewayResult.outputJson,
     answer: gatewayResult.parsedOutputJson,
   };

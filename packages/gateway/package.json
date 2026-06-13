@@ -20,6 +20,7 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "smoke:log": "bun --env-file ../db/.env scripts/smoke-test-gateway-log.ts"
+    "smoke:log": "bun --env-file ../db/.env scripts/smoke-test-gateway-log.ts",
+    "smoke:wrapper": "bun --env-file ../db/.env scripts/smoke-test-gateway-wrapper.ts"
   }
 }
