@@ -1,79 +1,92 @@
-import type { ClaimStateForAgent, ProposedAgentAction } from "@repo/shared/schemas";
+import type {
+  ClaimStateForAgent,
+  ProposedAgentAction,
+} from "@repo/shared/schemas";
 import { prisma } from "@repo/db";
+import { callModelThroughGateway } from "@repo/gateway";
 import { buildAgentContext } from "../planner/build-agent-context";
-import { buildAgentUserMessage, CLAIMFLOW_AGENT_SYSTEM_PROMPT, createClaimflowAgent } from "../planner/create-claimflow-agent";
+import {
+  buildAgentUserMessage,
+  CLAIMFLOW_AGENT_SYSTEM_PROMPT,
+  createClaimflowAgent,
+} from "../planner/create-claimflow-agent";
 import { parseAgentToolCall } from "../planner/parse-agent-tool-call";
 import { toPrismaJson } from "../tools/prisma-json";
 import { evaluateAgentAction } from "../guardrails";
 import { executeAgentTool } from "./execute-agent-tool";
 import { markNeedsMoreInfoTool } from "../tools";
 import { buildFieldRequests } from "../tools/information-request-metadata";
-function isRecord(value : unknown): value is Record<string,unknown> {
-    return typeof value === "object" && !Array.isArray(value) && value !== null;
-};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && !Array.isArray(value) && value !== null;
+}
 
 const FINAL_REVIEW_TASK_STATUSES = new Set([
-    "APPROVED",
-    "EDITED_AND_APPROVED",
-    "REJECTED",
+  "APPROVED",
+  "EDITED_AND_APPROVED",
+  "REJECTED",
 ]);
 
-function getMissingEvidenceForPostAction(input : {
-    context : ClaimStateForAgent,
-    proposedAction: ProposedAgentAction,
-}) : string[] {
-    if(input.context.requiredEvidence.length > 0){
-        return input.context.requiredEvidence;
+function getMissingEvidenceForPostAction(input: {
+  context: ClaimStateForAgent;
+  proposedAction: ProposedAgentAction;
+}): string[] {
+  if (input.context.requiredEvidence.length > 0) {
+    return input.context.requiredEvidence;
+  }
+
+  const toolInput = input.proposedAction.toolInputJson;
+
+  if (isRecord(toolInput) && Array.isArray(toolInput.missingEvidence)) {
+    const missingEvidence = toolInput.missingEvidence.filter(
+      (item): item is string =>
+        typeof item === "string" && item.trim().length > 0,
+    );
+
+    if (missingEvidence.length > 0) {
+      return missingEvidence;
     }
+  }
 
-    const toolInput = input.proposedAction.toolInputJson;
-
-    if(isRecord(toolInput) && Array.isArray(toolInput.missingEvidence)){
-        const missingEvidence = toolInput.missingEvidence.filter(
-            (item) : item is string => typeof item === "string" && item.trim().length > 0,
-        );
-
-        if(missingEvidence.length > 0){
-            return missingEvidence;
-        }
-    }
-
-    return ["Additional evidence requested by agent."];
-};
-
-function didToolSucceed(toolOutput : unknown): boolean {
-    if(typeof toolOutput !== "string"){
-        return true;
-    }
-
-    try{
-        const parsed = JSON.parse(toolOutput);
-        if(isRecord(parsed) && parsed.ok === false){
-            return false;
-        }
-        return true;
-    }catch{
-        return true;
-    }
+  return ["Additional evidence requested by agent."];
 }
 
-function getStringField(value : unknown, key : string): string | null {
-    if(!isRecord(value)){
-        return null;
+function didToolSucceed(toolOutput: unknown): boolean {
+  if (typeof toolOutput !== "string") {
+    return true;
+  }
+
+  try {
+    const parsed = JSON.parse(toolOutput);
+
+    if (isRecord(parsed) && parsed.ok === false) {
+      return false;
     }
 
-    const field = value[key];
-
-    if(typeof field !== "string"){
-        return null;
-    }
-
-    const trimmed = field.trim();
-    return trimmed.length > 0 ? trimmed : null;
+    return true;
+  } catch {
+    return true;
+  }
 }
 
-function formatList(values : string[]): string {
-    return values.join(", ");
+function getStringField(value: unknown, key: string): string | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const field = value[key];
+
+  if (typeof field !== "string") {
+    return null;
+  }
+
+  const trimmed = field.trim();
+
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function formatList(values: string[]): string {
+  return values.join(", ");
 }
 
 type AgentRelevantMemory = ClaimStateForAgent["relevantMemories"][number];
@@ -136,14 +149,6 @@ function getEscalationWorthyMemories(
   return context.relevantMemories.filter(shouldEscalateBecauseOfMemory);
 }
 
-function getMemoryHitIds(context: ClaimStateForAgent): string[] {
-  return context.relevantMemories
-    .map((memory) => memory.memoryHitId)
-    .filter((memoryHitId): memoryHitId is string => {
-      return typeof memoryHitId === "string" && memoryHitId.trim().length > 0;
-    });
-}
-
 type AgentMemoryGuidanceItem = {
   memoryId: string;
   memoryHitId: string | null;
@@ -171,10 +176,13 @@ function isActiveMemory(memory: AgentRelevantMemory): boolean {
 function memoryRiskRank(memory: AgentRelevantMemory): number {
   if (memory.riskLevel === "HIGH") return 3;
   if (memory.riskLevel === "MEDIUM") return 2;
+
   return 1;
 }
 
-function shouldHardEscalateBecauseOfMemory(memory: AgentRelevantMemory): boolean {
+function shouldHardEscalateBecauseOfMemory(
+  memory: AgentRelevantMemory,
+): boolean {
   if (!isActiveMemory(memory)) {
     return false;
   }
@@ -415,7 +423,9 @@ function getDeterministicProposedAction(
 
     if (context.missingFields.length > 0) {
       parts.push(
-        `required extracted fields are missing: ${formatList(context.missingFields)}`,
+        `required extracted fields are missing: ${formatList(
+          context.missingFields,
+        )}`,
       );
     }
 
@@ -460,183 +470,260 @@ function getDeterministicProposedAction(
   return null;
 }
 
-export async function runAgentStep(runId : string){
-    await prisma.extractionEvent.create({
-        data : {
-            runId,
-            type : "AGENT_STEP_STARTED",
-            message : "Agent step started",
-        }
-    });
+function toGatewayAgentOutput(message: unknown) {
+  if (!isRecord(message)) {
+    return {
+      content: null,
+      tool_calls: [],
+    };
+  }
 
-    const context = await buildAgentContext(runId);
+  return {
+    content: "content" in message ? message.content : null,
+    tool_calls: "tool_calls" in message ? message.tool_calls : [],
+  };
+}
 
-    const deterministicProposedAction = getDeterministicProposedAction(context);
+function buildAgentGatewayInputJson(context: ClaimStateForAgent) {
+  return {
+    systemPromptVersion: "claimflow_agent_v1",
+    contextSummary: {
+      runId: context.runId,
+      runStatus: context.runStatus,
+      reviewTaskStatus: context.reviewTaskStatus,
+      missingFieldCount: context.missingFields.length,
+      requiredEvidenceCount: context.requiredEvidence.length,
+      relevantMemoryCount: context.relevantMemories.length,
+      latestRetrievalStatus: context.latestRetrievalStatus,
+      previousAgentActionCount: context.previousAgentActions.length,
+    },
+    memorySummary: context.relevantMemories.slice(0, 3).map((memory) => ({
+      memoryId: memory.memoryId,
+      memoryHitId: memory.memoryHitId,
+      kind: memory.kind,
+      riskLevel: memory.riskLevel,
+      score: memory.score,
+      confidence: memory.confidence,
+      matchedOn: memory.matchedOn.map((signal) => signal.type),
+    })),
+    note: "Full agent context is not duplicated in gateway inputJson. The workflow state remains available through ExtractionRun, memory hits, retrieval status, and agent logs.",
+  };
+}
+export async function runAgentStep(runId: string) {
+  await prisma.extractionEvent.create({
+    data: {
+      runId,
+      type: "AGENT_STEP_STARTED",
+      message: "Agent step started",
+    },
+  });
 
-    let proposedAction: ProposedAgentAction;
+  const context = await buildAgentContext(runId);
 
-    if(deterministicProposedAction){
-        proposedAction = deterministicProposedAction;
-    } else {
-        const agent = createClaimflowAgent();
+  const deterministicProposedAction = getDeterministicProposedAction(context);
 
+  let proposedAction: ProposedAgentAction;
+
+  if (deterministicProposedAction) {
+    proposedAction = deterministicProposedAction;
+  } else {
+    const agent = createClaimflowAgent();
+    const humanMessage = buildAgentUserMessage(context);
+
+    const gatewayResult = await callModelThroughGateway<ProposedAgentAction>({
+      traceId: `run_${runId}`,
+      runId,
+      kind: "AGENT_PLANNER",
+      provider: "langchain-google-genai",
+      model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+      modelVersion: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+      promptVersion: "claimflow_agent_v1",
+      schemaVersion: "agent_action_v1",
+      inputJson: buildAgentGatewayInputJson(context),
+      timeoutMs: 30_000,
+      latencyLimitMs: 20_000,
+      call: async () => {
         const response = await agent.invoke([
-            ["system", CLAIMFLOW_AGENT_SYSTEM_PROMPT],
-            ["human", buildAgentUserMessage(context)]
+          ["system", CLAIMFLOW_AGENT_SYSTEM_PROMPT],
+          ["human", humanMessage],
         ]);
 
-        proposedAction = parseAgentToolCall({
-            runId,
-            message : response,
-        });
-    }
-
-    const proposedLog = await prisma.agentActionLog.create({
-        data : {
-            runId,
-            action : proposedAction.action,
-            status : "PROPOSED",
-            rationale : proposedAction.rationale,
-            toolName : proposedAction.toolName,
-            toolInputJson : toPrismaJson(proposedAction.toolInputJson ?? {}),
-        },
-    });
-
-    const usedMemoryHitIds = await markMemoryHitsUsedByAgent({
-        runId,
-        agentActionLogId: proposedLog.id,
-        memoryHitIds: getMemoryHitIdsFromProposedAction(proposedAction),
-    });
-
-    await prisma.extractionEvent.create({
-        data : {
-            runId,
-            type : "AGENT_ACTION_PROPOSED",
-            message : `Agent proposed ${proposedAction.action}`,
-            metadata : toPrismaJson({
-                agentActionLogId : proposedLog.id,
-                action : proposedAction.action,
-                toolName : proposedAction.toolName,
-                usedMemoryHitIds,
-                relevantMemoryCount: context.relevantMemories.length,
-            }),
-        },
-    });
-
-    const guardrail = evaluateAgentAction({
-        context,
-        proposedAction,
-    });
-
-    if(guardrail.decision === "BLOCKED"){
-        const blockedLog = await prisma.agentActionLog.create({
-            data : {
-                runId,
-                action : proposedAction.action,
-                status : "BLOCKED",
-                rationale : proposedAction.rationale,
-                guardrailDecision : "BLOCKED",
-                blockedReason : guardrail.reason,
-                toolName : proposedAction.toolName,
-                toolInputJson : toPrismaJson(proposedAction.toolInputJson ?? {}),
-            },
-        });
-
-        await prisma.extractionEvent.create({
-            data : {
-                runId,
-                type : "AGENT_ACTION_BLOCKED",
-                message : guardrail.reason,
-                metadata : toPrismaJson({
-                    agentActionLogId : blockedLog.id,
-                    ruleId : guardrail.ruleId,
-                    action : proposedAction.action,
-                    toolName : proposedAction.toolName,
-                }),
-            },
+        const parsedOutputJson = parseAgentToolCall({
+          runId,
+          message: response,
         });
 
         return {
-            runId,
-            proposedAction,
-            guardrail,
-            executed : false,
-            toolOutput : null,
-            deterministicPostActionOutput: null,
+          outputJson: toGatewayAgentOutput(response),
+          parsedOutputJson,
+          metadata: {
+            promptVersion: "claimflow_agent_v1",
+            schemaVersion: "agent_action_v1",
+            relevantMemoryCount: context.relevantMemories.length,
+            missingFieldCount: context.missingFields.length,
+            requiredEvidenceCount: context.requiredEvidence.length,
+          },
         };
+      },
+    });
+
+    if (!gatewayResult.ok || !gatewayResult.parsedOutputJson) {
+      throw new Error(
+        gatewayResult.errorMessage ?? "Gateway agent planner call failed.",
+      );
     }
 
-    const toolOutput = await executeAgentTool(proposedAction);
-    const toolSucceeded = didToolSucceed(toolOutput);
+    proposedAction = gatewayResult.parsedOutputJson;
+  }
 
-    let deterministicPostActionOutput: unknown = null;
-    let deterministicPostActionSucceeded = true;
+  const proposedLog = await prisma.agentActionLog.create({
+    data: {
+      runId,
+      action: proposedAction.action,
+      status: "PROPOSED",
+      rationale: proposedAction.rationale,
+      toolName: proposedAction.toolName,
+      toolInputJson: toPrismaJson(proposedAction.toolInputJson ?? {}),
+    },
+  });
 
-    if (
-        (proposedAction.action === "DRAFT_INFORMATION_REQUEST" ||
-            proposedAction.action === "DRAFT_FOLLOWUP_REQUEST") &&
-        toolSucceeded
-        ) {
-        deterministicPostActionOutput = await markNeedsMoreInfoTool.invoke({
-            runId,
-            missingEvidence: getMissingEvidenceForPostAction({
-            context,
-            proposedAction,
-            }),
-            missingFields: context.missingFields,
-            note: "Deterministic post-action after information request draft creation.",
-        });
+  const usedMemoryHitIds = await markMemoryHitsUsedByAgent({
+    runId,
+    agentActionLogId: proposedLog.id,
+    memoryHitIds: getMemoryHitIdsFromProposedAction(proposedAction),
+  });
 
-        deterministicPostActionSucceeded = didToolSucceed(deterministicPostActionOutput);
-    }
+  await prisma.extractionEvent.create({
+    data: {
+      runId,
+      type: "AGENT_ACTION_PROPOSED",
+      message: `Agent proposed ${proposedAction.action}`,
+      metadata: toPrismaJson({
+        agentActionLogId: proposedLog.id,
+        action: proposedAction.action,
+        toolName: proposedAction.toolName,
+        usedMemoryHitIds,
+        relevantMemoryCount: context.relevantMemories.length,
+        planningMode: deterministicProposedAction ? "DETERMINISTIC" : "MODEL",
+      }),
+    },
+  });
 
-    const workflowSucceeded = toolSucceeded && deterministicPostActionSucceeded;
+  const guardrail = evaluateAgentAction({
+    context,
+    proposedAction,
+  });
 
-    const executedLog = await prisma.agentActionLog.create({
-        data : {
-            runId,
-            action : proposedAction.action,
-            status : workflowSucceeded ? "EXECUTED" : "FAILED",
-            rationale : proposedAction.rationale,
-            guardrailDecision : "ALLOWED",
-            toolName : proposedAction.toolName,
-            toolInputJson : toPrismaJson(proposedAction.toolInputJson ?? {}),
-            toolOutputJson : toPrismaJson({
-                toolOutput,
-                deterministicPostActionOutput,
-            }),
-        },
+  if (guardrail.decision === "BLOCKED") {
+    const blockedLog = await prisma.agentActionLog.create({
+      data: {
+        runId,
+        action: proposedAction.action,
+        status: "BLOCKED",
+        rationale: proposedAction.rationale,
+        guardrailDecision: "BLOCKED",
+        blockedReason: guardrail.reason,
+        toolName: proposedAction.toolName,
+        toolInputJson: toPrismaJson(proposedAction.toolInputJson ?? {}),
+      },
     });
 
     await prisma.extractionEvent.create({
-        data : {
-            runId,
-            type : "AGENT_TOOL_EXECUTED",
-            message : workflowSucceeded
-            ? `Agent tool executed: ${proposedAction.toolName}.`
-            : `Agent workflow failed after guardrail approval: ${proposedAction.toolName}.`,
-            metadata : toPrismaJson({
-                agentActionLogId: executedLog.id,
-                action: proposedAction.action,
-                status: workflowSucceeded ? "EXECUTED" : "FAILED",
-                toolName: proposedAction.toolName,
-                deterministicPostAction:
-                (proposedAction.action === "DRAFT_INFORMATION_REQUEST" ||
-                    proposedAction.action === "DRAFT_FOLLOWUP_REQUEST") &&
-                toolSucceeded
-                    ? "MARK_NEEDS_MORE_INFO"
-                    : null,
-            }),
-        },
+      data: {
+        runId,
+        type: "AGENT_ACTION_BLOCKED",
+        message: guardrail.reason,
+        metadata: toPrismaJson({
+          agentActionLogId: blockedLog.id,
+          ruleId: guardrail.ruleId,
+          action: proposedAction.action,
+          toolName: proposedAction.toolName,
+        }),
+      },
     });
 
     return {
-        runId,
+      runId,
+      proposedAction,
+      guardrail,
+      executed: false,
+      toolOutput: null,
+      deterministicPostActionOutput: null,
+    };
+  }
+
+  const toolOutput = await executeAgentTool(proposedAction);
+  const toolSucceeded = didToolSucceed(toolOutput);
+
+  let deterministicPostActionOutput: unknown = null;
+  let deterministicPostActionSucceeded = true;
+
+  if (
+    (proposedAction.action === "DRAFT_INFORMATION_REQUEST" ||
+      proposedAction.action === "DRAFT_FOLLOWUP_REQUEST") &&
+    toolSucceeded
+  ) {
+    deterministicPostActionOutput = await markNeedsMoreInfoTool.invoke({
+      runId,
+      missingEvidence: getMissingEvidenceForPostAction({
+        context,
         proposedAction,
-        guardrail,
-        executed : workflowSucceeded,
+      }),
+      missingFields: context.missingFields,
+      note: "Deterministic post-action after information request draft creation.",
+    });
+
+    deterministicPostActionSucceeded = didToolSucceed(
+      deterministicPostActionOutput,
+    );
+  }
+
+  const workflowSucceeded = toolSucceeded && deterministicPostActionSucceeded;
+
+  const executedLog = await prisma.agentActionLog.create({
+    data: {
+      runId,
+      action: proposedAction.action,
+      status: workflowSucceeded ? "EXECUTED" : "FAILED",
+      rationale: proposedAction.rationale,
+      guardrailDecision: "ALLOWED",
+      toolName: proposedAction.toolName,
+      toolInputJson: toPrismaJson(proposedAction.toolInputJson ?? {}),
+      toolOutputJson: toPrismaJson({
         toolOutput,
         deterministicPostActionOutput,
-    }
+      }),
+    },
+  });
 
+  await prisma.extractionEvent.create({
+    data: {
+      runId,
+      type: "AGENT_TOOL_EXECUTED",
+      message: workflowSucceeded
+        ? `Agent tool executed: ${proposedAction.toolName}.`
+        : `Agent workflow failed after guardrail approval: ${proposedAction.toolName}.`,
+      metadata: toPrismaJson({
+        agentActionLogId: executedLog.id,
+        action: proposedAction.action,
+        status: workflowSucceeded ? "EXECUTED" : "FAILED",
+        toolName: proposedAction.toolName,
+        deterministicPostAction:
+          (proposedAction.action === "DRAFT_INFORMATION_REQUEST" ||
+            proposedAction.action === "DRAFT_FOLLOWUP_REQUEST") &&
+          toolSucceeded
+            ? "MARK_NEEDS_MORE_INFO"
+            : null,
+      }),
+    },
+  });
+
+  return {
+    runId,
+    proposedAction,
+    guardrail,
+    executed: workflowSucceeded,
+    toolOutput,
+    deterministicPostActionOutput,
+  };
 }

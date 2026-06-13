@@ -1,103 +1,224 @@
 import { readFile } from "node:fs/promises";
+import { callModelThroughGateway } from "@repo/gateway";
 import { getGeminiClient, GEMINI_MODEL } from "../client/gemini-client";
-import { CLAIM_EXTRACTION_SYSTEM_PROMPT, CLAIM_EXTRACTION_PROMPT_VERSION } from "./prompt";
-import { ClaimExtractionSchema, type ClaimExtraction } from "@repo/shared/schemas";
+import {
+  CLAIM_EXTRACTION_PROMPT_VERSION,
+  CLAIM_EXTRACTION_SYSTEM_PROMPT,
+} from "./prompt";
+import {
+  ClaimExtractionSchema,
+  type ClaimExtraction,
+} from "@repo/shared/schemas";
 import { CLAIM_EXTRACTION_RESPONSE_SCHEMA } from "./response-schema";
 import { toRawModelOutput } from "../utils/raw-model-output";
 
-export type ClaimExtractionResult = {
-    model : string,
-    promptVersion : string,
-    rawModelOutput : unknown,
-    extractedJson : ClaimExtraction,
-    confidenceJson : {
-        overallConfidence : number,
-    }
+export type GatewayRunContext = {
+  traceId?: string | null;
+  runId?: string | null;
 };
 
-function parseGeminiClaimResponse(responseText : string): ClaimExtraction{
-    const parsed = JSON.parse(responseText);
-    return ClaimExtractionSchema.parse(parsed);
+export type ClaimExtractionResult = {
+  model: string;
+  promptVersion: string;
+  rawModelOutput: unknown;
+  extractedJson: ClaimExtraction;
+  confidenceJson: {
+    overallConfidence: number;
+  };
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function toClaimExtractionResult(params : {
-    responseText : string,
-    rawModelOutput : unknown,
-}) : ClaimExtractionResult {
-    const extractedJson = parseGeminiClaimResponse(params.responseText);
+function getNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
 
-    return{
-        model : GEMINI_MODEL,
-        promptVersion : CLAIM_EXTRACTION_PROMPT_VERSION,
-        rawModelOutput : params.rawModelOutput,
-        extractedJson,
-        confidenceJson : {
-            overallConfidence : extractedJson.overallConfidence,
-        },
+function extractGeminiUsage(response: { usageMetadata?: unknown }) {
+  const usage = response.usageMetadata;
+
+  if (!isRecord(usage)) {
+    return {
+      inputTokens: null,
+      outputTokens: null,
+      totalTokens: null,
     };
+  }
+
+  return {
+    inputTokens: getNumber(usage.promptTokenCount),
+    outputTokens: getNumber(usage.candidatesTokenCount),
+    totalTokens: getNumber(usage.totalTokenCount),
+  };
 }
 
+function toClaimExtractionResult(params: {
+  rawModelOutput: unknown;
+  extractedJson: ClaimExtraction;
+}): ClaimExtractionResult {
+  return {
+    model: GEMINI_MODEL,
+    promptVersion: CLAIM_EXTRACTION_PROMPT_VERSION,
+    rawModelOutput: params.rawModelOutput,
+    extractedJson: params.extractedJson,
+    confidenceJson: {
+      overallConfidence: params.extractedJson.overallConfidence,
+    },
+  };
+}
 
 export async function extractClaimFromPdf(
-    filePath : string
-): Promise<ClaimExtractionResult>{
-    const ai = getGeminiClient();
-    const pdfBuffer = await readFile(filePath);
+  filePath: string,
+  gateway?: GatewayRunContext,
+): Promise<ClaimExtractionResult> {
+  const ai = getGeminiClient();
+  const pdfBuffer = await readFile(filePath);
 
-    const contents = [
-        { text : CLAIM_EXTRACTION_SYSTEM_PROMPT },
-        {
-            inlineData : {
-                mimeType : 'application/pdf',
-                data : pdfBuffer.toString("base64"),
-            }
-        }
-    ];
+  const contents = [
+    { text: CLAIM_EXTRACTION_SYSTEM_PROMPT },
+    {
+      inlineData: {
+        mimeType: "application/pdf",
+        data: pdfBuffer.toString("base64"),
+      },
+    },
+  ];
 
-    const response = await ai.models.generateContent({
-        model : GEMINI_MODEL,
-        contents : contents,
-        config : {
-            responseMimeType : "application/json",
-            responseSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
-        }
-    });
+  const gatewayResult = await callModelThroughGateway<ClaimExtraction>({
+    traceId: gateway?.traceId,
+    runId: gateway?.runId,
+    kind: "EXTRACTION",
+    provider: "google-genai",
+    model: GEMINI_MODEL,
+    modelVersion: GEMINI_MODEL,
+    promptVersion: CLAIM_EXTRACTION_PROMPT_VERSION,
+    schemaVersion: "auto_claim_v1",
+    inputJson: {
+      sourceType: "PDF",
+      mimeType: "application/pdf",
+      filePath,
+      note: "PDF bytes are intentionally not stored in gateway inputJson.",
+    },
+    expectedJson: ClaimExtractionSchema,
+    timeoutMs: 30_000,
+    latencyLimitMs: 20_000,
+    call: async () => {
+      const response = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: CLAIM_EXTRACTION_RESPONSE_SCHEMA,
+        },
+      });
 
-    if(!response.text){
+      if (!response.text) {
         throw new Error("Gemini returned an empty extraction response");
-    }
+      }
 
-    return toClaimExtractionResult({
-        responseText : response.text,
-        rawModelOutput : toRawModelOutput(response),
-    });
+      const parsedOutputJson = ClaimExtractionSchema.parse(
+        JSON.parse(response.text),
+      );
+
+      return {
+        responseText: response.text,
+        outputJson: toRawModelOutput(response),
+        parsedOutputJson,
+        ...extractGeminiUsage(response),
+        metadata: {
+          promptVersion: CLAIM_EXTRACTION_PROMPT_VERSION,
+          schemaVersion: "auto_claim_v1",
+          responseMimeType: "application/json",
+          sourceType: "PDF",
+        },
+      };
+    },
+  });
+
+  if (!gatewayResult.ok || !gatewayResult.parsedOutputJson) {
+    throw new Error(
+      gatewayResult.errorMessage ?? "Gateway extraction call failed.",
+    );
+  }
+
+  return toClaimExtractionResult({
+    rawModelOutput: gatewayResult.outputJson,
+    extractedJson: gatewayResult.parsedOutputJson,
+  });
 }
 
 export async function extractClaimFromEmailText(
-    contentText : string
-): Promise<ClaimExtractionResult>{
-    const ai = getGeminiClient();
+  contentText: string,
+  gateway?: GatewayRunContext,
+): Promise<ClaimExtractionResult> {
+  const ai = getGeminiClient();
 
-    const response = await ai.models.generateContent({
-        model : GEMINI_MODEL,
-        contents : [
-            { text : `${CLAIM_EXTRACTION_SYSTEM_PROMPT}
-            Email Text:
-            ${contentText}
-            `},
+  const gatewayResult = await callModelThroughGateway<ClaimExtraction>({
+    traceId: gateway?.traceId,
+    runId: gateway?.runId,
+    kind: "EXTRACTION",
+    provider: "google-genai",
+    model: GEMINI_MODEL,
+    modelVersion: GEMINI_MODEL,
+    promptVersion: CLAIM_EXTRACTION_PROMPT_VERSION,
+    schemaVersion: "auto_claim_v1",
+    inputJson: {
+      sourceType: "EMAIL_TEXT",
+      contentLength: contentText.length,
+      note: "Full email text is intentionally not stored in gateway inputJson.",
+    },
+    expectedJson: ClaimExtractionSchema,
+    timeoutMs: 30_000,
+    latencyLimitMs: 20_000,
+    call: async () => {
+      const response = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: [
+          {
+            text: `${CLAIM_EXTRACTION_SYSTEM_PROMPT}
+
+Email Text:
+${contentText}`,
+          },
         ],
         config: {
-            responseMimeType : "application/json",
-            responseSchema : CLAIM_EXTRACTION_RESPONSE_SCHEMA,
-        }
-    });
+          responseMimeType: "application/json",
+          responseSchema: CLAIM_EXTRACTION_RESPONSE_SCHEMA,
+        },
+      });
 
-    if(!response.text){
+      if (!response.text) {
         throw new Error("Gemini returned an empty extraction response");
-    }
+      }
 
-    return toClaimExtractionResult({
-        responseText : response.text,
-        rawModelOutput : toRawModelOutput(response),
-    });
+      const parsedOutputJson = ClaimExtractionSchema.parse(
+        JSON.parse(response.text),
+      );
+
+      return {
+        responseText: response.text,
+        outputJson: toRawModelOutput(response),
+        parsedOutputJson,
+        ...extractGeminiUsage(response),
+        metadata: {
+          promptVersion: CLAIM_EXTRACTION_PROMPT_VERSION,
+          schemaVersion: "auto_claim_v1",
+          responseMimeType: "application/json",
+          sourceType: "EMAIL_TEXT",
+        },
+      };
+    },
+  });
+
+  if (!gatewayResult.ok || !gatewayResult.parsedOutputJson) {
+    throw new Error(
+      gatewayResult.errorMessage ?? "Gateway extraction call failed.",
+    );
+  }
+
+  return toClaimExtractionResult({
+    rawModelOutput: gatewayResult.outputJson,
+    extractedJson: gatewayResult.parsedOutputJson,
+  });
 }
