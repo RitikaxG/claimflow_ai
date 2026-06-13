@@ -8,9 +8,7 @@ import { COVERAGE_ANSWER_RESPONSE_SCHEMA } from "./response-schema";
 import { toRawModelOutput } from "../utils/raw-model-output";
 import { extractGeminiUsage } from "../utils/gemini-usage";
 
-export const COVERAGE_ANSWER_PROMPT_VERSION = "coverage_answer_v1";
-
-export type GatewayRunContext = {
+type GatewayRunContext = {
   traceId?: string | null;
   runId?: string | null;
 };
@@ -45,14 +43,6 @@ export type GenerateCoverageAnswerResult = {
   rawModelOutput: unknown;
   answer: CoverageAnswer;
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function getNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
 
 function safeJson(value: unknown): string {
   return JSON.stringify(value, null, 2);
@@ -145,12 +135,12 @@ export async function generateCoverageAnswer(
   const gatewayResult = await callModelThroughGateway<CoverageAnswer>({
     traceId: input.gateway?.traceId,
     runId: input.gateway?.runId,
-    kind: "RAG_ANSWER",
+    kind: PROMPT_REGISTRY.coverageAnswer.kind,
     provider: "google-genai",
     model: GEMINI_MODEL,
     modelVersion: GEMINI_MODEL,
     promptVersion: PROMPT_REGISTRY.coverageAnswer.promptVersion,
-    schemaVersion: "coverage_answer_v1",
+    schemaVersion: PROMPT_REGISTRY.coverageAnswer.schemaVersion,
     inputJson: {
       question: input.question,
       retrievalStatus: input.retrievalResult.retrievalStatus,
@@ -196,7 +186,7 @@ export async function generateCoverageAnswer(
         ...extractGeminiUsage(response),
         metadata: {
           promptVersion: PROMPT_REGISTRY.coverageAnswer.promptVersion,
-          schemaVersion: "coverage_answer_v1",
+          schemaVersion: PROMPT_REGISTRY.coverageAnswer.schemaVersion,
           responseMimeType: "application/json",
           retrievalStatus: input.retrievalResult.retrievalStatus,
           retrievedChunkCount: input.retrievalResult.matches.length,

@@ -2,7 +2,6 @@ import { readFile } from "node:fs/promises";
 import { callModelThroughGateway, PROMPT_REGISTRY } from "@repo/gateway";
 import { getGeminiClient, GEMINI_MODEL } from "../client/gemini-client";
 import {
-  CLAIM_EXTRACTION_PROMPT_VERSION,
   CLAIM_EXTRACTION_SYSTEM_PROMPT,
 } from "./prompt";
 import {
@@ -13,7 +12,7 @@ import { CLAIM_EXTRACTION_RESPONSE_SCHEMA } from "./response-schema";
 import { toRawModelOutput } from "../utils/raw-model-output";
 import { extractGeminiUsage } from "../utils/gemini-usage";
 
-export type GatewayRunContext = {
+type GatewayRunContext = {
   traceId?: string | null;
   runId?: string | null;
 };
@@ -27,14 +26,6 @@ export type ClaimExtractionResult = {
     overallConfidence: number;
   };
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function getNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
 
 function toClaimExtractionResult(params: {
   rawModelOutput: unknown;
@@ -71,12 +62,12 @@ export async function extractClaimFromPdf(
   const gatewayResult = await callModelThroughGateway<ClaimExtraction>({
     traceId: gateway?.traceId,
     runId: gateway?.runId,
-    kind: "EXTRACTION",
+    kind: PROMPT_REGISTRY.extraction.kind,
     provider: "google-genai",
     model: GEMINI_MODEL,
     modelVersion: GEMINI_MODEL,
     promptVersion: PROMPT_REGISTRY.extraction.promptVersion,
-    schemaVersion: "auto_claim_v1",
+    schemaVersion: PROMPT_REGISTRY.extraction.schemaVersion,
     inputJson: {
       sourceType: "PDF",
       mimeType: "application/pdf",
@@ -111,7 +102,7 @@ export async function extractClaimFromPdf(
         ...extractGeminiUsage(response),
         metadata: {
           promptVersion: PROMPT_REGISTRY.extraction.promptVersion,
-          schemaVersion: "auto_claim_v1",
+          schemaVersion: PROMPT_REGISTRY.extraction.schemaVersion,
           responseMimeType: "application/json",
           sourceType: "PDF",
         },
@@ -140,12 +131,12 @@ export async function extractClaimFromEmailText(
   const gatewayResult = await callModelThroughGateway<ClaimExtraction>({
     traceId: gateway?.traceId,
     runId: gateway?.runId,
-    kind: "EXTRACTION",
+    kind: PROMPT_REGISTRY.extraction.kind,
     provider: "google-genai",
     model: GEMINI_MODEL,
     modelVersion: GEMINI_MODEL,
     promptVersion: PROMPT_REGISTRY.extraction.promptVersion,
-    schemaVersion: "auto_claim_v1",
+    schemaVersion: PROMPT_REGISTRY.extraction.schemaVersion,
     inputJson: {
       sourceType: "EMAIL_TEXT",
       contentLength: contentText.length,
@@ -186,7 +177,7 @@ ${contentText}`,
         ...extractGeminiUsage(response),
         metadata: {
           promptVersion: PROMPT_REGISTRY.extraction.promptVersion,
-          schemaVersion: "auto_claim_v1",
+          schemaVersion: PROMPT_REGISTRY.extraction.schemaVersion,
           responseMimeType: "application/json",
           sourceType: "EMAIL_TEXT",
         },

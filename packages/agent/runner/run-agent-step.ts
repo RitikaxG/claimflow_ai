@@ -533,12 +533,12 @@ export async function runAgentStep(runId: string) {
     const gatewayResult = await callModelThroughGateway<ProposedAgentAction>({
       traceId: `run_${runId}`,
       runId,
-      kind: "AGENT_PLANNER",
+      kind: PROMPT_REGISTRY.agentPlanner.kind,
       provider: "langchain-google-genai",
       model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
       modelVersion: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
       promptVersion: PROMPT_REGISTRY.agentPlanner.promptVersion,
-      schemaVersion: "agent_action_v1",
+      schemaVersion: PROMPT_REGISTRY.agentPlanner.schemaVersion,
       inputJson: buildAgentGatewayInputJson(context),
       timeoutMs: 30_000,
       latencyLimitMs: 20_000,
@@ -558,7 +558,7 @@ export async function runAgentStep(runId: string) {
           parsedOutputJson,
           metadata: {
             promptVersion: PROMPT_REGISTRY.agentPlanner.promptVersion,
-            schemaVersion: "agent_action_v1",
+            schemaVersion: PROMPT_REGISTRY.agentPlanner.schemaVersion,
             relevantMemoryCount: context.relevantMemories.length,
             missingFieldCount: context.missingFields.length,
             requiredEvidenceCount: context.requiredEvidence.length,
