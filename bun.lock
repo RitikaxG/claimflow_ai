@@ -50,6 +50,7 @@
         "@langchain/core": "^1.1.48",
         "@langchain/google-genai": "^2.1.31",
         "@repo/db": "workspace:*",
+        "@repo/gateway": "workspace:*",
         "@repo/memory": "workspace:*",
         "@repo/rag": "workspace:*",
         "@repo/shared": "workspace:*",
@@ -69,6 +70,7 @@
       "name": "@repo/ai",
       "dependencies": {
         "@google/genai": "^1.52.0",
+        "@repo/gateway": "workspace:*",
         "@repo/shared": "workspace:*",
       },
       "devDependencies": {

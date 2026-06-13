@@ -602,7 +602,7 @@ model AiCallLog {
   traceId String
 
   runId String?
-  run ExtractionRun? @relation(fields: [runId], references: [id])
+  run ExtractionRun? @relation(fields: [runId], references: [id], onDelete: SetNull)
 
   kind AiCallKind
   status AiCallStatus
