@@ -162,15 +162,15 @@ sample-data/week-06-observability/
 
 ## How the dataset is used
 
-Day 3 creates this dataset.
+The dataset is created.
 
-Day 4 adds the Week 6 eval runner:
+Eval runner is added:
 
 ```txt
 packages/evals/evaluate-week6-gateway-observability.ts
 ```
 
-The eval runner will:
+The eval runner :
 
 ```txt
 1. Load every gateway case.
@@ -181,13 +181,13 @@ The eval runner will:
 6. Write dashboard-compatible JSON and Markdown reports.
 ```
 
-Expected Day 4 command:
+Expected eval command:
 
 ```bash
 bun run eval:week6:gateway
 ```
 
-Expected Day 4 outputs:
+Expected eval outputs:
 
 ```txt
 sample-data/week-06-observability/eval-results/week-6-gateway-observability-eval.json
