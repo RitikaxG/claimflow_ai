@@ -1,0 +1,14 @@
+{
+  "caseId": "w6-008-missing-trace-id",
+  "expectedStatus": "SUCCEEDED",
+  "expectedFailureType": null,
+  "expectedRetryable": false,
+  "mustStoreTraceId": true,
+  "mustGenerateTraceId": true,
+  "mustStorePromptVersion": true,
+  "mustStoreModelVersion": true,
+  "mustRecordLatency": true,
+  "mustRecordCost": true,
+  "mustAppearInDashboard": true,
+  "dashboardSeverity": "ok"
+}

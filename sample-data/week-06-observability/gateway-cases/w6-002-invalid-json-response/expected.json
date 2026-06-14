@@ -1,0 +1,14 @@
+{
+  "caseId": "w6-002-invalid-json-response",
+  "expectedStatus": "FAILED",
+  "expectedFailureType": "INVALID_JSON_RESPONSE",
+  "expectedRetryable": false,
+  "mustStoreTraceId": true,
+  "mustGenerateTraceId": false,
+  "mustStorePromptVersion": true,
+  "mustStoreModelVersion": true,
+  "mustRecordLatency": true,
+  "mustRecordCost": true,
+  "mustAppearInDashboard": true,
+  "dashboardSeverity": "error"
+}

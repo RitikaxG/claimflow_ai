@@ -1,0 +1,29 @@
+{
+  "caseId": "w6-003-cost-limit-exceeded",
+  "gatewayInput": {
+    "traceId": "trace_w6_003",
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": "synthetic-v1",
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 30000,
+    "latencyLimitMs": 1000,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-003-cost-limit-exceeded",
+      "purpose": "Verifies a high token synthetic call is blocked by gateway cost policy."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "cost_spike",
+    "parsedOutputJson": {
+      "decision": "OK"
+    },
+    "inputTokens": 1000000,
+    "outputTokens": 1000000,
+    "totalTokens": 2000000
+  }
+}

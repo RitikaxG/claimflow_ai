@@ -1,0 +1,29 @@
+{
+  "caseId": "w6-008-missing-trace-id",
+  "gatewayInput": {
+    "traceId": null,
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": "synthetic-v1",
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 30000,
+    "latencyLimitMs": 1000,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-008-missing-trace-id",
+      "purpose": "Verifies gateway generates and stores a trace ID when caller does not provide one."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "success",
+    "parsedOutputJson": {
+      "decision": "OK"
+    },
+    "inputTokens": 100,
+    "outputTokens": 20,
+    "totalTokens": 120
+  }
+}

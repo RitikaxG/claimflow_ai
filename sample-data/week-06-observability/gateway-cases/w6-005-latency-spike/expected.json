@@ -1,0 +1,14 @@
+{
+  "caseId": "w6-005-latency-spike",
+  "expectedStatus": "SUCCEEDED",
+  "expectedFailureType": "LATENCY_SPIKE",
+  "expectedRetryable": false,
+  "mustStoreTraceId": true,
+  "mustGenerateTraceId": false,
+  "mustStorePromptVersion": true,
+  "mustStoreModelVersion": true,
+  "mustRecordLatency": true,
+  "mustRecordCost": true,
+  "mustAppearInDashboard": true,
+  "dashboardSeverity": "warning"
+}

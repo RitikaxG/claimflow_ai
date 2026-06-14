@@ -1,0 +1,24 @@
+{
+  "caseId": "w6-002-invalid-json-response",
+  "gatewayInput": {
+    "traceId": "trace_w6_002",
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": "synthetic-v1",
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 30000,
+    "latencyLimitMs": 1000,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-002-invalid-json-response",
+      "purpose": "Verifies malformed model JSON is logged as FAILED with INVALID_JSON_RESPONSE."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "invalid_json",
+    "responseText": "{ invalid json"
+  }
+}

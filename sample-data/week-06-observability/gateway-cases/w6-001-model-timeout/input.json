@@ -1,0 +1,24 @@
+{
+  "caseId": "w6-001-model-timeout",
+  "gatewayInput": {
+    "traceId": "trace_w6_001",
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": "synthetic-v1",
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 10,
+    "latencyLimitMs": 1000,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-001-model-timeout",
+      "purpose": "Verifies timeout is logged as RETRYABLE with MODEL_TIMEOUT."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "timeout",
+    "delayMs": 50
+  }
+}

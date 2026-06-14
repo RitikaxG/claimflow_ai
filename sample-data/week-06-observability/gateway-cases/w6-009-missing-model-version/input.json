@@ -1,0 +1,23 @@
+{
+  "caseId": "w6-009-missing-model-version",
+  "gatewayInput": {
+    "traceId": "trace_w6_009",
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": null,
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 30000,
+    "latencyLimitMs": 1000,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-009-missing-model-version",
+      "purpose": "Verifies governed calls cannot proceed without modelVersion."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "should_not_call_provider"
+  }
+}

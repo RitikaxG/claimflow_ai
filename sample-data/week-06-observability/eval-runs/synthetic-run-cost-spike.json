@@ -1,0 +1,21 @@
+{
+  "runId": "synthetic-run-cost-spike",
+  "suite": "WEEK6_GATEWAY_OBSERVABILITY",
+  "label": "Synthetic cost policy spike run",
+  "totalCases": 9,
+  "passedCases": 8,
+  "failedCases": 1,
+  "warningCases": 1,
+  "passRate": 0.8889,
+  "metrics": {
+    "cost_per_run": 0.42,
+    "latency_p95": 530,
+    "model_error_rate": 0,
+    "invalid_json_rate": 0,
+    "prompt_version_regression_rate": 0,
+    "missing_trace_rate": 0,
+    "missing_model_version_rate": 0,
+    "retryable_failure_rate": 0,
+    "blocked_by_cost_policy_rate": 0.11
+  }
+}

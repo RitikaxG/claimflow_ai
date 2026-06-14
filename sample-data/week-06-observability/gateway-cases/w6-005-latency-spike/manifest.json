@@ -1,0 +1,6 @@
+{
+  "caseId": "w6-005-latency-spike",
+  "category": "gateway_observability_warning",
+  "title": "Latency spike is visible on successful gateway call",
+  "purpose": "Verifies slow successful calls are logged with LATENCY_SPIKE warning metadata."
+}

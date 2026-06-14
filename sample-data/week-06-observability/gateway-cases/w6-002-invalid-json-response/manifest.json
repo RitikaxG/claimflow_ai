@@ -1,0 +1,6 @@
+{
+  "caseId": "w6-002-invalid-json-response",
+  "category": "gateway_failure",
+  "title": "Invalid JSON response becomes failed gateway call",
+  "purpose": "Verifies malformed model JSON is logged as FAILED with INVALID_JSON_RESPONSE."
+}

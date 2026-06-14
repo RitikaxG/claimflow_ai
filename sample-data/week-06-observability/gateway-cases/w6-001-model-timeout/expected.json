@@ -1,0 +1,14 @@
+{
+  "caseId": "w6-001-model-timeout",
+  "expectedStatus": "RETRYABLE",
+  "expectedFailureType": "MODEL_TIMEOUT",
+  "expectedRetryable": true,
+  "mustStoreTraceId": true,
+  "mustGenerateTraceId": false,
+  "mustStorePromptVersion": true,
+  "mustStoreModelVersion": true,
+  "mustRecordLatency": true,
+  "mustRecordCost": true,
+  "mustAppearInDashboard": true,
+  "dashboardSeverity": "warning"
+}

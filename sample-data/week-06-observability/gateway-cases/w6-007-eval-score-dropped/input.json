@@ -1,0 +1,26 @@
+{
+  "caseId": "w6-007-eval-score-dropped",
+  "gatewayInput": {
+    "traceId": "trace_w6_007",
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": "synthetic-v1",
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 30000,
+    "latencyLimitMs": 1000,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-007-eval-score-dropped",
+      "purpose": "Verifies Week 6 can represent score regression from a previous eval run."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "eval_score_dropped",
+    "previousScore": 1,
+    "currentScore": 0.72,
+    "minimumAllowedScore": 0.95
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "caseId": "w6-005-latency-spike",
+  "gatewayInput": {
+    "traceId": "trace_w6_005",
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": "synthetic-v1",
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 30000,
+    "latencyLimitMs": 10,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-005-latency-spike",
+      "purpose": "Verifies slow successful calls are logged with LATENCY_SPIKE warning metadata."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "latency_spike",
+    "delayMs": 30,
+    "parsedOutputJson": {
+      "decision": "OK"
+    },
+    "inputTokens": 100,
+    "outputTokens": 20,
+    "totalTokens": 120
+  }
+}

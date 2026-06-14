@@ -1,0 +1,14 @@
+{
+  "caseId": "w6-004-provider-error",
+  "expectedStatus": "RETRYABLE",
+  "expectedFailureType": "PROVIDER_ERROR",
+  "expectedRetryable": true,
+  "mustStoreTraceId": true,
+  "mustGenerateTraceId": false,
+  "mustStorePromptVersion": true,
+  "mustStoreModelVersion": true,
+  "mustRecordLatency": true,
+  "mustRecordCost": true,
+  "mustAppearInDashboard": true,
+  "dashboardSeverity": "warning"
+}

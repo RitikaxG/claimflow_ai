@@ -1,0 +1,21 @@
+{
+  "runId": "synthetic-run-latency-spike",
+  "suite": "WEEK6_GATEWAY_OBSERVABILITY",
+  "label": "Synthetic latency spike run",
+  "totalCases": 9,
+  "passedCases": 9,
+  "failedCases": 0,
+  "warningCases": 3,
+  "passRate": 1,
+  "metrics": {
+    "cost_per_run": 0.004,
+    "latency_p95": 1850,
+    "model_error_rate": 0,
+    "invalid_json_rate": 0,
+    "prompt_version_regression_rate": 0,
+    "missing_trace_rate": 0,
+    "missing_model_version_rate": 0,
+    "retryable_failure_rate": 0,
+    "blocked_by_cost_policy_rate": 0
+  }
+}

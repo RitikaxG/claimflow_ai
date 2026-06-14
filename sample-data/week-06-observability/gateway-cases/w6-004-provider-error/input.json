@@ -1,0 +1,24 @@
+{
+  "caseId": "w6-004-provider-error",
+  "gatewayInput": {
+    "traceId": "trace_w6_004",
+    "runId": null,
+    "kind": "SYNTHETIC_GATEWAY_TEST",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "modelVersion": "synthetic-v1",
+    "promptVersion": "synthetic_gateway_test_v1",
+    "schemaVersion": "gateway_log_v1",
+    "timeoutMs": 30000,
+    "latencyLimitMs": 1000,
+    "costLimitUsd": 0.01,
+    "inputJson": {
+      "caseId": "w6-004-provider-error",
+      "purpose": "Verifies provider-side errors are classified as retryable provider failures."
+    }
+  },
+  "syntheticCall": {
+    "behavior": "provider_error",
+    "errorMessage": "Provider returned 500 internal server error."
+  }
+}

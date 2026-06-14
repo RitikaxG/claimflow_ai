@@ -1,0 +1,6 @@
+{
+  "caseId": "w6-004-provider-error",
+  "category": "gateway_failure",
+  "title": "Provider 500 becomes retryable gateway failure",
+  "purpose": "Verifies provider-side errors are classified as retryable provider failures."
+}

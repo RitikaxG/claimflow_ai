@@ -1,0 +1,14 @@
+{
+  "caseId": "w6-006-prompt-version-regression",
+  "expectedStatus": "FAILED",
+  "expectedFailureType": "PROMPT_VERSION_REGRESSION",
+  "expectedRetryable": false,
+  "mustStoreTraceId": true,
+  "mustGenerateTraceId": false,
+  "mustStorePromptVersion": true,
+  "mustStoreModelVersion": true,
+  "mustRecordLatency": true,
+  "mustRecordCost": true,
+  "mustAppearInDashboard": true,
+  "dashboardSeverity": "error"
+}

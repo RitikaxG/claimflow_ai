@@ -1,0 +1,14 @@
+{
+  "caseId": "w6-003-cost-limit-exceeded",
+  "expectedStatus": "BLOCKED",
+  "expectedFailureType": "COST_LIMIT_EXCEEDED",
+  "expectedRetryable": false,
+  "mustStoreTraceId": true,
+  "mustGenerateTraceId": false,
+  "mustStorePromptVersion": true,
+  "mustStoreModelVersion": true,
+  "mustRecordLatency": true,
+  "mustRecordCost": true,
+  "mustAppearInDashboard": true,
+  "dashboardSeverity": "error"
+}

@@ -1,0 +1,21 @@
+{
+  "runId": "synthetic-run-failure",
+  "suite": "WEEK6_GATEWAY_OBSERVABILITY",
+  "label": "Synthetic provider and parser failure run",
+  "totalCases": 9,
+  "passedCases": 7,
+  "failedCases": 2,
+  "warningCases": 1,
+  "passRate": 0.7778,
+  "metrics": {
+    "cost_per_run": 0.0031,
+    "latency_p95": 410,
+    "model_error_rate": 0.22,
+    "invalid_json_rate": 0.11,
+    "prompt_version_regression_rate": 0,
+    "missing_trace_rate": 0,
+    "missing_model_version_rate": 0,
+    "retryable_failure_rate": 0.11,
+    "blocked_by_cost_policy_rate": 0
+  }
+}
