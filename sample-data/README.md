@@ -152,12 +152,6 @@ bun run eval:week6:gateway
 bun run check-types
 ```
 
-For Week 6 Day 3 only, validate the JSON dataset before the eval runner exists:
-
-```bash
-find sample-data/week-06-observability -name "*.json" -print0 \
-  | xargs -0 -n1 node -e 'const fs=require("node:fs"); JSON.parse(fs.readFileSync(process.argv[1],"utf8")); console.log("valid", process.argv[1]);'
-```
 
 ---
 
