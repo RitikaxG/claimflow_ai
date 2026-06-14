@@ -2,59 +2,27 @@
 
 This folder contains the Week 6 dataset for ClaimFlow AI's **AI gateway and observability** layer.
 
-Week 6 does not add more claim adjudication logic. It adds the production-control layer around AI behavior:
+The dataset does not add new claim adjudication logic. It proves that every AI call in the agent workflow can be traced, measured, governed, evaluated, and explained when something fails.
 
 ```txt
 model call
--> gateway wrapper
--> trace ID, model version, prompt version, cost, latency, tokens, status, and error type
--> AiCallLog row
--> eval report
+-> gateway boundary
+-> structured AI call log
+-> deterministic eval evidence
 -> dashboard-ready observability signal
 ```
-
-The dataset is intentionally synthetic. It should not depend on real Gemini/provider failures because production failure behavior must be tested deterministically.
-
----
-
-## Why this dataset exists
-
-Previous weeks proved the claim workflow itself:
-
-```txt
-Week 1 -> extraction and validation
-Week 2 -> human review workflow
-Week 3 -> policy-grounded RAG
-Week 4 -> safe agent action selection
-Week 5 -> workflow memory from past corrections and review outcomes
-```
-
-Week 6 proves that the AI workflow is governed:
-
-```txt
-Every AI call is logged.
-Every call has a trace ID.
-Every call stores model and prompt versions.
-Every call records latency and estimated cost.
-Every failure is classified.
-Retryable failures are distinguishable from hard failures.
-Cost and governance policies can block unsafe calls.
-Eval and dashboard layers can consume the same structured evidence.
-```
-
-This matters because ClaimFlow AI is an agentic workflow, but the agent does not act freely. It acts inside a system that can explain what model call happened, why it failed, whether it can be retried, what it cost, and which prompt/model version produced the output.
 
 ---
 
 ## Core rule
 
-The gateway is not only a wrapper around model calls. It is the audit boundary for AI behavior.
+The gateway is the audit boundary for AI behavior.
 
-The gateway must record:
+It must record:
 
 ```txt
 traceId
-runId, when available
+runId
 call kind
 provider
 model
@@ -73,17 +41,15 @@ estimated cost
 metadata
 ```
 
-The gateway must never:
+It must never:
 
-```txt
-silently drop model failures
-hide invalid JSON failures
-allow governed calls without model version
-ignore cost limits
-depend on real provider outages for eval coverage
-make retryable and non-retryable failures look the same
-produce dashboard data without traceability
-```
+- silently drop model failures
+- hide invalid JSON failures
+- treat retryable and non-retryable failures the same
+- allow governed calls without model version metadata
+- ignore configured cost limits
+- lose traceability when the caller omits a trace ID
+- depend on real provider outages for eval coverage
 
 ---
 
@@ -93,66 +59,57 @@ produce dashboard data without traceability
 sample-data/week-06-observability/
   README.md
 
-  eval-runs/
-    synthetic-run-success.json
-    synthetic-run-failure.json
-    synthetic-run-cost-spike.json
-    synthetic-run-latency-spike.json
-
   gateway-cases/
     w6-001-model-timeout/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-002-invalid-json-response/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-003-cost-limit-exceeded/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-004-provider-error/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-005-latency-spike/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-006-prompt-version-regression/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-007-eval-score-dropped/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-008-missing-trace-id/
       manifest.json
       input.json
       expected.json
-      README.md
 
     w6-009-missing-model-version/
       manifest.json
       input.json
       expected.json
-      README.md
+
+  eval-runs/
+    synthetic-run-success.json
+    synthetic-run-failure.json
+    synthetic-run-cost-spike.json
+    synthetic-run-latency-spike.json
 
   eval-results/
     .gitkeep
@@ -160,51 +117,59 @@ sample-data/week-06-observability/
 
 ---
 
-## How the dataset is used
+## Why this dataset exists
 
-The dataset is created.
+ClaimFlow AI already has extraction, human review, policy-grounded RAG, safe agent actions, and workflow memory.
 
-Eval runner is added:
-
-```txt
-packages/evals/evaluate-week6-gateway-observability.ts
-```
-
-The eval runner :
+Week 6 adds the production proof around those AI behaviors:
 
 ```txt
-1. Load every gateway case.
-2. Execute synthetic gateway behavior where possible.
-3. Compare actual gateway result with expected.json.
-4. Verify AiCallLog fields.
-5. Compute observability metrics.
-6. Write dashboard-compatible JSON and Markdown reports.
+Can every model call be audited?
+Can gateway failures be classified?
+Can cost and latency be measured?
+Can governance rules block unsafe calls?
+Can eval and dashboard layers read the same structured evidence?
 ```
 
-Expected eval command:
-
-```bash
-bun run eval:week6:gateway
-```
-
-Expected eval outputs:
-
-```txt
-sample-data/week-06-observability/eval-results/week-6-gateway-observability-eval.json
-sample-data/week-06-observability/eval-results/week-6-gateway-observability-eval.md
-```
+The dataset is intentionally synthetic. Timeout, provider error, invalid JSON, cost spike, and latency spike cases should be deterministic instead of depending on real provider failures.
 
 ---
 
-## Gateway case contract
+## Data model idea
 
-Each packet has four files.
+Each gateway packet represents one controlled AI-call scenario:
+
+```txt
+gateway input
+-> synthetic provider behavior
+-> expected gateway result
+-> expected AiCallLog fields
+-> expected dashboard/eval signal
+```
+
+The packet should be small enough for evals to run repeatedly, but complete enough to prove the gateway stores the evidence needed for debugging and governance.
+
+---
+
+## `gateway-cases/`
+
+Each folder under `gateway-cases/` is one observability packet.
+
+Every packet has:
+
+```txt
+manifest.json
+input.json
+expected.json
+```
+
+There is intentionally no per-packet `README.md`. The packet purpose lives in `manifest.json`, the executable setup lives in `input.json`, and the assertions live in `expected.json`. Keeping only these three files makes the dataset easier for the eval runner to load and avoids repetitive documentation.
 
 ### `manifest.json`
 
-Human-readable case metadata.
+Describes the packet at a human-readable level.
 
-Example:
+Expected shape:
 
 ```json
 {
@@ -215,13 +180,20 @@ Example:
 }
 ```
 
+Fields:
+
+```txt
+caseId    -> stable packet ID
+category  -> eval category
+title     -> short readable name
+purpose   -> what production behavior this packet proves
+```
+
 ### `input.json`
 
-Synthetic input for the gateway eval runner.
+Defines the synthetic gateway call and fake provider behavior.
 
-This file describes the gateway call plus the fake provider behavior. It should not call a real model.
-
-Example:
+Expected shape:
 
 ```json
 {
@@ -249,11 +221,44 @@ Example:
 }
 ```
 
+Important parts:
+
+```txt
+gatewayInput.traceId        -> caller-provided trace ID, or null for trace generation tests
+gatewayInput.runId          -> workflow run ID when available
+gatewayInput.kind           -> type of AI call being observed
+gatewayInput.provider       -> synthetic/provider name
+gatewayInput.model          -> model label
+gatewayInput.modelVersion   -> required governance metadata
+gatewayInput.promptVersion  -> required prompt metadata
+gatewayInput.schemaVersion  -> expected output/log schema version
+gatewayInput.timeoutMs      -> timeout threshold for the packet
+gatewayInput.latencyLimitMs -> latency warning threshold
+gatewayInput.costLimitUsd   -> max allowed estimated cost
+gatewayInput.inputJson      -> payload passed through the gateway
+syntheticCall.behavior      -> fake provider behavior to simulate
+syntheticCall.delayMs       -> artificial latency when needed
+```
+
+Possible synthetic behaviors:
+
+```txt
+success
+timeout
+invalid_json
+provider_error
+cost_limit_exceeded
+latency_spike
+prompt_version_regression
+eval_score_dropped
+missing_model_version
+```
+
 ### `expected.json`
 
-Assertions the eval runner must check.
+Defines what the gateway/eval layer should assert.
 
-Example:
+Expected shape:
 
 ```json
 {
@@ -272,18 +277,20 @@ Example:
 }
 ```
 
-### `README.md`
-
-Short explanation for the individual packet.
-
-It should say:
+Fields:
 
 ```txt
-what failure/signal is being tested
-why that behavior matters
-expected gateway status
-expected failure type
-whether the failure should be retryable
+expectedStatus          -> SUCCEEDED, FAILED, RETRYABLE, or BLOCKED
+expectedFailureType     -> gateway failure/governance type, or null
+expectedRetryable       -> whether retry is allowed
+mustStoreTraceId        -> AiCallLog must contain a trace ID
+mustGenerateTraceId     -> gateway must create trace ID if caller omitted it
+mustStorePromptVersion  -> prompt version must be stored
+mustStoreModelVersion   -> model version must be stored
+mustRecordLatency       -> latency must be measured
+mustRecordCost          -> cost must be estimated or recorded
+mustAppearInDashboard   -> result should be dashboard-visible
+dashboardSeverity       -> ok, warning, or error
 ```
 
 ---
@@ -291,82 +298,29 @@ whether the failure should be retryable
 ## Packet categories
 
 ```txt
-gateway_failure
-gateway_policy_block
-gateway_observability_warning
-gateway_governance
-eval_regression
-trace_generation
-```
-
-### `gateway_failure`
-
-Tests failures caused by model/provider behavior:
-
-```txt
-timeout
-invalid JSON
-provider 500
-```
-
-### `gateway_policy_block`
-
-Tests calls blocked by gateway policy:
-
-```txt
-estimated cost exceeds configured cost limit
-```
-
-### `gateway_observability_warning`
-
-Tests calls that succeed but still need visibility:
-
-```txt
-latency spike on a valid model response
-```
-
-### `gateway_governance`
-
-Tests governance failures:
-
-```txt
-missing model version
-prompt version regression
-```
-
-### `eval_regression`
-
-Tests eval-level regression behavior:
-
-```txt
-current eval score drops below expected threshold
-```
-
-### `trace_generation`
-
-Tests trace hygiene:
-
-```txt
-caller omits traceId
-gateway generates one
-stored log still remains traceable
+gateway_failure                 -> provider/model behavior failed
+gateway_policy_block            -> gateway rule blocked the call
+gateway_observability_warning   -> call succeeded but produced a warning signal
+gateway_governance              -> required governance metadata or prompt behavior failed
+eval_regression                 -> eval evidence shows quality dropped
+trace_generation                -> gateway repairs missing trace metadata
 ```
 
 ---
 
 ## Packet list
 
-| Packet | Category | Expected status | Expected failure type | What it proves |
+| Packet | Category | Expected status | Expected failure type | What it tests |
 | --- | --- | --- | --- | --- |
-| `w6-001-model-timeout` | `gateway_failure` | `RETRYABLE` | `MODEL_TIMEOUT` | Timeout is retryable and visible in logs. |
-| `w6-002-invalid-json-response` | `gateway_failure` | `FAILED` | `INVALID_JSON_RESPONSE` | Bad model JSON is a hard parse failure. |
-| `w6-003-cost-limit-exceeded` | `gateway_policy_block` | `BLOCKED` | `COST_LIMIT_EXCEEDED` | Cost policy can stop expensive model calls. |
-| `w6-004-provider-error` | `gateway_failure` | `RETRYABLE` | `PROVIDER_ERROR` | Provider 500-style failures are retryable. |
-| `w6-005-latency-spike` | `gateway_observability_warning` | `SUCCEEDED` | `LATENCY_SPIKE` | Slow successful calls are still observable. |
-| `w6-006-prompt-version-regression` | `gateway_governance` | `FAILED` | `PROMPT_VERSION_REGRESSION` | Prompt regressions can be represented in eval/gateway evidence. |
-| `w6-007-eval-score-dropped` | `eval_regression` | `FAILED` | `EVAL_SCORE_DROPPED` | Eval score drops are treated as production regressions. |
-| `w6-008-missing-trace-id` | `trace_generation` | `SUCCEEDED` | `null` | Gateway generates trace ID when caller omits it. |
-| `w6-009-missing-model-version` | `gateway_governance` | `BLOCKED` | `MISSING_MODEL_VERSION` | Governed calls cannot proceed without model version. |
+| `w6-001-model-timeout` | `gateway_failure` | `RETRYABLE` | `MODEL_TIMEOUT` | timeout is logged, classified, and marked retryable |
+| `w6-002-invalid-json-response` | `gateway_failure` | `FAILED` | `INVALID_JSON_RESPONSE` | invalid model JSON becomes a hard parse failure |
+| `w6-003-cost-limit-exceeded` | `gateway_policy_block` | `BLOCKED` | `COST_LIMIT_EXCEEDED` | gateway can block calls that exceed cost policy |
+| `w6-004-provider-error` | `gateway_failure` | `RETRYABLE` | `PROVIDER_ERROR` | provider-side failures stay visible and retryable |
+| `w6-005-latency-spike` | `gateway_observability_warning` | `SUCCEEDED` | `LATENCY_SPIKE` | slow successful calls still produce observability signal |
+| `w6-006-prompt-version-regression` | `gateway_governance` | `FAILED` | `PROMPT_VERSION_REGRESSION` | prompt regressions are captured as governance failures |
+| `w6-007-eval-score-dropped` | `eval_regression` | `FAILED` | `EVAL_SCORE_DROPPED` | eval quality drops become production risk signals |
+| `w6-008-missing-trace-id` | `trace_generation` | `SUCCEEDED` | `null` | gateway generates and stores trace ID when missing |
+| `w6-009-missing-model-version` | `gateway_governance` | `BLOCKED` | `MISSING_MODEL_VERSION` | governed calls cannot proceed without model version |
 
 ---
 
@@ -374,50 +328,49 @@ stored log still remains traceable
 
 ### Missing trace ID should pass
 
-`w6-008-missing-trace-id` is not expected to fail.
+`w6-008-missing-trace-id` should not fail only because the caller omitted `traceId`.
 
-The Day 2 gateway behavior generates a trace ID when one is missing:
+Expected behavior:
 
 ```txt
 input traceId = null
--> gateway creates trace_<uuid>
--> AiCallLog stores generated traceId
+-> gateway creates trace ID
+-> AiCallLog stores generated trace ID
 -> eval passes
 ```
 
-This means `missing_trace_rate` should remain `0`.
-
 ### Latency spike should not automatically fail
 
-`w6-005-latency-spike` is expected to have:
+`w6-005-latency-spike` should have:
 
 ```txt
 status = SUCCEEDED
-errorType = LATENCY_SPIKE
+failureType = LATENCY_SPIKE
 ```
 
-The model response was valid, so the call succeeds. The latency warning is still stored so the dashboard can show that performance degraded.
+The model response is valid, so the call succeeds. The latency warning remains visible for dashboards and reports.
 
-### Prompt and eval regressions are governance cases
+### Governance cases may not come from provider exceptions
 
-`w6-006-prompt-version-regression` and `w6-007-eval-score-dropped` may not come directly from a provider exception.
+`w6-006-prompt-version-regression`, `w6-007-eval-score-dropped`, and `w6-009-missing-model-version` represent production governance signals.
 
-They represent production governance signals:
-
-```txt
-prompt version regressed
-eval score dropped
-```
-
-The Week 6 eval runner can synthesize these as gateway-observable failures so they appear in reports and dashboards.
+They prove the system can treat governance failures as first-class observability events, not only network/provider errors.
 
 ---
 
 ## `eval-runs/`
 
-The `eval-runs/` folder contains small dashboard-compatible synthetic summaries.
+The `eval-runs/` folder contains synthetic aggregate summaries that show what dashboard-compatible results should look like after Week 6 evals run.
 
-These are not the final Day 4 eval reports. They are fixture-like examples that show how Week 6 results should look when later persisted into an eval dashboard.
+These files exist because Day 5 will build an eval dashboard. The dashboard should not have to infer every metric from packet files. It should be able to read a compact run summary with pass/fail counts and key observability metrics.
+
+Think of these files as dashboard fixtures:
+
+```txt
+gateway-cases/  -> individual case-level evidence
+eval-runs/      -> aggregate run-level examples for the future dashboard
+eval-results/   -> real generated eval reports once Day 4 exists
+```
 
 Files:
 
@@ -428,41 +381,110 @@ synthetic-run-cost-spike.json
 synthetic-run-latency-spike.json
 ```
 
-Each file should contain:
+Expected shape:
 
-```txt
-runId
-suite
-label
-totalCases
-passedCases
-failedCases
-warningCases
-passRate
-metrics
+```json
+{
+  "runId": "synthetic-run-success",
+  "suite": "WEEK6_GATEWAY_OBSERVABILITY",
+  "label": "Synthetic healthy gateway run",
+  "totalCases": 9,
+  "passedCases": 9,
+  "failedCases": 0,
+  "warningCases": 2,
+  "passRate": 1,
+  "metrics": {
+    "cost_per_run": 0.0024,
+    "latency_p95": 240,
+    "model_error_rate": 0,
+    "invalid_json_rate": 0,
+    "prompt_version_regression_rate": 0,
+    "missing_trace_rate": 0,
+    "missing_model_version_rate": 0,
+    "retryable_failure_rate": 0,
+    "blocked_by_cost_policy_rate": 0
+  }
+}
 ```
 
-Example metrics:
+### `synthetic-run-success.json`
+
+Represents a healthy run where all cases pass. This is the baseline dashboard state.
+
+Use it to show:
 
 ```txt
-cost_per_run
-latency_p95
-model_error_rate
-invalid_json_rate
-prompt_version_regression_rate
-missing_trace_rate
-missing_model_version_rate
-retryable_failure_rate
-blocked_by_cost_policy_rate
+passRate = 1
+failedCases = 0
+missing_trace_rate = 0
+model_error_rate = 0
 ```
 
-These metrics are the bridge between gateway logs and the Day 5 eval dashboard.
+### `synthetic-run-failure.json`
+
+Represents a run where provider/parser failures appear in the summary.
+
+Use it to show:
+
+```txt
+model_error_rate > 0
+invalid_json_rate > 0
+retryable_failure_rate > 0
+```
+
+This proves the dashboard can show production AI failures instead of only green-path results.
+
+### `synthetic-run-cost-spike.json`
+
+Represents a run where cost policy becomes visible.
+
+Use it to show:
+
+```txt
+cost_per_run increases
+blocked_by_cost_policy_rate > 0
+```
+
+This proves the gateway can enforce and report cost governance.
+
+### `synthetic-run-latency-spike.json`
+
+Represents a run where calls still pass but latency gets worse.
+
+Use it to show:
+
+```txt
+latency_p95 increases
+warningCases increases
+failedCases can still be 0
+```
+
+This proves latency is an observability signal, not only a binary failure.
+
+These files are not claim packets and should not be evaluated as individual gateway cases. They are run-level examples for dashboard and reporting work.
 
 ---
 
-## Expected Week 6 eval metrics
+## `eval-results/`
 
-The Day 4 eval should compute:
+The `eval-results/` folder is reserved for generated eval output.
+
+Day 3 only keeps `.gitkeep` here so the folder exists in git. Day 4 will generate the actual reports.
+
+Expected generated files:
+
+```txt
+week-6-gateway-observability-eval.json
+week-6-gateway-observability-eval.md
+```
+
+The JSON report should be machine-readable. The Markdown report should be human-readable.
+
+---
+
+## Metrics
+
+The dataset should support these metrics:
 
 ```txt
 eval_pass_rate
@@ -477,91 +499,32 @@ retryable_failure_rate
 blocked_by_cost_policy_rate
 ```
 
-Target behavior:
+Expected safety targets:
 
 ```txt
-all 9 cases pass
 missing_trace_rate = 0
-missing_model_version_rate captures blocked governance case
-retryable_failure_rate includes timeout and provider error
-blocked_by_cost_policy_rate includes cost limit case
-latency_p95 reflects latency spike case
-invalid_json_rate includes invalid JSON case
+unclassified_failure_rate = 0
+ungoverned_model_call_rate = 0
 ```
 
 ---
 
-## Safety and production value
+## Production value
 
-This dataset proves that ClaimFlow AI can handle production AI failure modes in a controlled way.
+This dataset proves that ClaimFlow AI is not only able to run an agentic workflow. It can also explain and audit the AI behavior around that workflow.
 
-It checks that:
+The system should be able to answer:
 
-```txt
-model failures do not disappear
-invalid JSON does not silently become valid state
-provider errors are retryable
-cost limits are enforced
-latency is measured
-trace IDs survive every call
-model and prompt versions are auditable
-gateway results are dashboard-compatible
-```
+- which model and prompt version were used
+- which call failed and why
+- whether the failure can be retried
+- whether the call was blocked by policy
+- whether latency or cost crossed a threshold
+- whether the output can be traced back to a specific run
+- whether eval evidence shows a regression
 
-This is what makes the Week 6 story production-grade:
+That is the production-grade proof for Week 6:
 
 ```txt
-The agent workflow is not only smart.
-It is traceable, measurable, governed, and evaluable.
+AI behavior is observable, governed, and evaluable.
 ```
-
----
-
-## Run commands
-
-After Day 3 dataset creation, validate JSON files:
-
-```bash
-find sample-data/week-06-observability -name "*.json" -print0 \
-  | xargs -0 -n1 node -e 'const fs=require("node:fs"); JSON.parse(fs.readFileSync(process.argv[1],"utf8")); console.log("valid", process.argv[1]);'
-```
-
-Run type checks:
-
-```bash
-bun run check-types
-```
-
-After Day 4, run:
-
-```bash
-bun run eval:week6:gateway
-```
-
-Expected output:
-
-```txt
-Week 6 Gateway Observability Eval
-Cases: 9
-Passed: 9
-Failed: 0
-Pass rate: 100%
-```
-
----
-
-## What Week 6 Day 3 proves
-
-By the end of Day 3, ClaimFlow AI should have a complete deterministic observability dataset:
-
-```txt
-gateway failure cases exist
-gateway governance cases exist
-trace generation is tested
-cost and latency behavior is tested
-prompt/eval regressions are represented
-dashboard fixture summaries exist
-future Week 6 eval runner has a stable file contract
-```
-
-This completes the dataset layer for the final production-grade proof.
