@@ -20,13 +20,10 @@ function toPrismaJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
-function optionalJson(value: unknown): Prisma.InputJsonValue | undefined {
-  if (value === undefined || value === null) {
-    return undefined;
-  }
-
-  return toPrismaJson(value);
+function optionalJson(value: unknown): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
+
 
 function nowMs() {
   return Date.now();
@@ -104,13 +101,17 @@ export async function createAiCallLog(input: CreateAiCallLogInput) {
       promptVersion: input.promptVersion ?? null,
       schemaVersion: input.schemaVersion ?? null,
 
-      inputJson: input.inputJson === undefined ? undefined : optionalJson(input.inputJson),
-      outputJson: input.outputJson === undefined ? undefined : optionalJson(input.outputJson),
-      parsedOutputJson:
-        input.parsedOutputJson === undefined
-          ? undefined
-          : optionalJson(input.parsedOutputJson),
+      ...(input.inputJson !== undefined && input.inputJson !== null
+        ? { inputJson: optionalJson(input.inputJson) }
+        : {}),
 
+      ...(input.outputJson !== undefined && input.outputJson !== null
+        ? { outputJson: optionalJson(input.outputJson) }
+        : {}),
+
+      ...(input.parsedOutputJson !== undefined && input.parsedOutputJson !== null
+        ? { parsedOutputJson: optionalJson(input.parsedOutputJson) }
+        : {}),
 
       errorType: input.errorType ?? null,
       errorMessage: input.errorMessage ?? null,
@@ -122,7 +123,9 @@ export async function createAiCallLog(input: CreateAiCallLogInput) {
       totalTokens: input.totalTokens ?? null,
       estimatedCostUsd: input.estimatedCostUsd ?? null,
 
-      metadata: input.metadata === undefined ? undefined : optionalJson(input.metadata),
+      ...(input.metadata !== undefined && input.metadata !== null
+        ? { metadata: optionalJson(input.metadata) }
+        : {}),
     },
   });
 }
@@ -136,30 +139,40 @@ async function updateAiCallLog(
       id,
     },
     data: {
-      status: data.status,
+      ...(data.status !== undefined ? { status: data.status } : {}),
 
-      outputJson:
-        data.outputJson === undefined ? undefined : optionalJson(data.outputJson),
+      ...(data.outputJson !== undefined && data.outputJson !== null
+        ? { outputJson: optionalJson(data.outputJson) }
+        : {}),
 
-      parsedOutputJson:
-        data.parsedOutputJson === undefined
-          ? undefined
-          : optionalJson(data.parsedOutputJson),
+      ...(data.parsedOutputJson !== undefined && data.parsedOutputJson !== null
+        ? { parsedOutputJson: optionalJson(data.parsedOutputJson) }
+        : {}),
 
-      errorType: data.errorType === undefined ? undefined : data.errorType,
-      errorMessage:
-        data.errorMessage === undefined ? undefined : data.errorMessage,
+      ...(data.errorType !== undefined ? { errorType: data.errorType } : {}),
+      ...(data.errorMessage !== undefined
+        ? { errorMessage: data.errorMessage }
+        : {}),
 
-      retryable: data.retryable,
+      ...(data.retryable !== undefined ? { retryable: data.retryable } : {}),
 
-      latencyMs: data.latencyMs,
-      inputTokens: data.inputTokens,
-      outputTokens: data.outputTokens,
-      totalTokens: data.totalTokens,
-      estimatedCostUsd: data.estimatedCostUsd,
+      ...(data.latencyMs !== undefined ? { latencyMs: data.latencyMs } : {}),
+      ...(data.inputTokens !== undefined
+        ? { inputTokens: data.inputTokens }
+        : {}),
+      ...(data.outputTokens !== undefined
+        ? { outputTokens: data.outputTokens }
+        : {}),
+      ...(data.totalTokens !== undefined
+        ? { totalTokens: data.totalTokens }
+        : {}),
+      ...(data.estimatedCostUsd !== undefined
+        ? { estimatedCostUsd: data.estimatedCostUsd }
+        : {}),
 
-      metadata:
-        data.metadata === undefined ? undefined : optionalJson(data.metadata),
+      ...(data.metadata !== undefined && data.metadata !== null
+        ? { metadata: optionalJson(data.metadata) }
+        : {}),
     },
   });
 }

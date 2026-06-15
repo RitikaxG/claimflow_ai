@@ -39,11 +39,11 @@ export function classifyGatewayError(error: unknown): AiGatewayFailureType {
   }
 
   if (
-  message.includes("prompt version regression") ||
-  message.includes("prompt_version_regression")
-) {
-  return "PROMPT_VERSION_REGRESSION";
-}
+    message.includes("prompt version regression") ||
+    message.includes("prompt_version_regression")
+  ) {
+    return "PROMPT_VERSION_REGRESSION";
+  }
 
   if (
     message.includes("eval score dropped") ||

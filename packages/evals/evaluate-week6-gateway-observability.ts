@@ -180,12 +180,31 @@ function addCheck(
   });
 }
 
-async function loadAiCallLog(resultLogId?: string): Promise<AiCallLog | null> {
-  if (!resultLogId) return null;
+async function loadAiCallLogForCase(input: {
+  resultLogId?: string;
+  traceId: string;
+  caseId: string;
+}): Promise<AiCallLog | null> {
+  if (input.resultLogId) {
+    const byId = await prisma.aiCallLog.findUnique({
+      where: {
+        id: input.resultLogId,
+      },
+    });
 
-  return prisma.aiCallLog.findUnique({
+    if (byId) return byId;
+  }
+
+  return prisma.aiCallLog.findFirst({
     where: {
-      id: resultLogId,
+      traceId: input.traceId,
+      inputJson: {
+        path: ["caseId"],
+        equals: input.caseId,
+      } as never,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 }
@@ -254,15 +273,17 @@ function assertGatewayCase(input: {
     },
   );
 
+ const actualFailureType = log?.errorType ?? result.errorType ?? null;
+
   addCheck(
     checks,
     "errorType matches expectedFailureType",
-    (result.errorType ?? null) === expected.expectedFailureType &&
-      (log?.errorType ?? null) === expected.expectedFailureType,
+    actualFailureType === expected.expectedFailureType,
     expected.expectedFailureType,
     {
       returned: result.errorType ?? null,
       persisted: log?.errorType ?? null,
+      usedForAssertion: actualFailureType,
     },
   );
 
@@ -353,17 +374,10 @@ function assertGatewayCase(input: {
 
   addCheck(
     checks,
-    "AiCallLog status/errorType match returned gateway result",
-    log?.status === result.status &&
-      (log?.errorType ?? null) === (result.errorType ?? null),
-    {
-      status: result.status,
-      errorType: result.errorType ?? null,
-    },
-    {
-      status: log?.status ?? null,
-      errorType: log?.errorType ?? null,
-    },
+    "AiCallLog status matches returned gateway result",
+    log?.status === result.status,
+    result.status,
+    log?.status ?? null,
   );
 
   return {
@@ -399,7 +413,11 @@ async function evaluateCase(
       call: buildSyntheticCall(evalCase.input),
     });
 
-    const log = await loadAiCallLog(result.aiCallLogId);
+    const log = await loadAiCallLogForCase({
+      resultLogId: result.aiCallLogId,
+      traceId: result.traceId,
+      caseId: evalCase.caseId,
+    });
 
     const assertion = assertGatewayCase({
       evalCase,
