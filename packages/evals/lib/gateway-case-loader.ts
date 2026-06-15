@@ -22,6 +22,7 @@ export type GatewaySyntheticBehavior =
   | "invalid_json"
   | "provider_error"
   | "cost_limit_exceeded"
+  | "cost_spike"
   | "latency_spike"
   | "governance_regression"
   | "eval_score_dropped"
