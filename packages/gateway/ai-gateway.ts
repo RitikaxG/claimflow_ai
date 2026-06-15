@@ -20,11 +20,9 @@ function toPrismaJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
-function optionalJson(
-  value: unknown,
-): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+function optionalJson(value: unknown): Prisma.InputJsonValue | undefined {
   if (value === undefined || value === null) {
-    return Prisma.JsonNull;
+    return undefined;
   }
 
   return toPrismaJson(value);
@@ -106,9 +104,13 @@ export async function createAiCallLog(input: CreateAiCallLogInput) {
       promptVersion: input.promptVersion ?? null,
       schemaVersion: input.schemaVersion ?? null,
 
-      inputJson: optionalJson(input.inputJson),
-      outputJson: optionalJson(input.outputJson),
-      parsedOutputJson: optionalJson(input.parsedOutputJson),
+      inputJson: input.inputJson === undefined ? undefined : optionalJson(input.inputJson),
+      outputJson: input.outputJson === undefined ? undefined : optionalJson(input.outputJson),
+      parsedOutputJson:
+        input.parsedOutputJson === undefined
+          ? undefined
+          : optionalJson(input.parsedOutputJson),
+
 
       errorType: input.errorType ?? null,
       errorMessage: input.errorMessage ?? null,
@@ -120,7 +122,7 @@ export async function createAiCallLog(input: CreateAiCallLogInput) {
       totalTokens: input.totalTokens ?? null,
       estimatedCostUsd: input.estimatedCostUsd ?? null,
 
-      metadata: optionalJson(input.metadata),
+      metadata: input.metadata === undefined ? undefined : optionalJson(input.metadata),
     },
   });
 }

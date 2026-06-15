@@ -52,9 +52,11 @@ function getErrorMessage(error: unknown): string {
 }
 
 function toRecord(value: unknown): Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
-    ? value
-    : {};
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return {};
+  }
+
+  return value as Record<string, unknown>;
 }
 
 function buildSyntheticCall(input: GatewayCaseInput) {
