@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
   "suite": "WEEK6_GATEWAY_OBSERVABILITY",
-  "generatedAt": "2026-06-15T12:07:32.537Z",
+  "generatedAt": "2026-06-15T12:15:41.181Z",
   "datasetRoot": "/Users/ritikagupta/Desktop/Devops/claimflow-ai/sample-data/week-06-observability",
   "summary": {
     "totalCases": 9,
-    "passed": 0,
-    "failed": 9,
-    "warningCases": 0,
-    "passRate": 0,
+    "passed": 8,
+    "failed": 1,
+    "warningCases": 3,
+    "passRate": 0.8888888888888888,
     "metrics": {
-      "eval_pass_rate": 0,
-      "cost_per_run": 0,
-      "latency_p95": null,
-      "model_error_rate": 0,
-      "invalid_json_rate": 0,
-      "prompt_version_regression_rate": 0,
-      "missing_trace_rate": 1,
-      "missing_model_version_rate": 0,
-      "retryable_failure_rate": 0,
+      "eval_pass_rate": 0.8888888888888888,
+      "cost_per_run": 0.0024,
+      "latency_p95": 380,
+      "model_error_rate": 0.2222222222222222,
+      "invalid_json_rate": 0.1111111111111111,
+      "prompt_version_regression_rate": 0.1111111111111111,
+      "missing_trace_rate": 0,
+      "missing_model_version_rate": 0.1111111111111111,
+      "retryable_failure_rate": 0.2222222222222222,
       "blocked_by_cost_policy_rate": 0
     }
   },
@@ -27,7 +27,7 @@
       "caseId": "w6-001-model-timeout",
       "category": "gateway_failure",
       "title": "Model timeout becomes retryable gateway failure",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-001-model-timeout",
         "expectedStatus": "RETRYABLE",
@@ -42,15 +42,130 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "warning"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-001-model-timeout",
+        "status": "RETRYABLE",
+        "severity": "warning",
+        "failureType": "MODEL_TIMEOUT",
+        "retryable": true,
+        "latencyMs": 380,
+        "estimatedCostUsd": 0,
+        "traceId": "trace_w6_001",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ff8b0000s9y8lff9q9qy",
+        "returnedStatus": "RETRYABLE",
+        "returnedFailureType": "MODEL_TIMEOUT",
+        "returnedRetryable": true,
+        "returnedTraceId": "trace_w6_001"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "RETRYABLE",
+          "actual": {
+            "returned": "RETRYABLE",
+            "persisted": "RETRYABLE"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": "MODEL_TIMEOUT",
+          "actual": {
+            "returned": "MODEL_TIMEOUT",
+            "persisted": "MODEL_TIMEOUT",
+            "usedForAssertion": "MODEL_TIMEOUT"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "returned": true,
+            "persisted": true
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_001"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_001"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 380
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-001-model-timeout",
+            "status": "RETRYABLE",
+            "severity": "warning",
+            "failureType": "MODEL_TIMEOUT",
+            "retryable": true,
+            "latencyMs": 380,
+            "estimatedCostUsd": 0,
+            "traceId": "trace_w6_001",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ff8b0000s9y8lff9q9qy",
+            "returnedStatus": "RETRYABLE",
+            "returnedFailureType": "MODEL_TIMEOUT",
+            "returnedRetryable": true,
+            "returnedTraceId": "trace_w6_001"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "RETRYABLE",
+          "actual": "RETRYABLE"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-002-invalid-json-response",
       "category": "gateway_failure",
       "title": "Invalid JSON response becomes failed gateway call",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-002-invalid-json-response",
         "expectedStatus": "FAILED",
@@ -65,9 +180,124 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "error"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-002-invalid-json-response",
+        "status": "FAILED",
+        "severity": "error",
+        "failureType": "INVALID_JSON_RESPONSE",
+        "retryable": false,
+        "latencyMs": 4,
+        "estimatedCostUsd": 0,
+        "traceId": "trace_w6_002",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ffcu0001s9y8rclyalyi",
+        "returnedStatus": "FAILED",
+        "returnedFailureType": "INVALID_JSON_RESPONSE",
+        "returnedRetryable": false,
+        "returnedTraceId": "trace_w6_002"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "FAILED",
+          "actual": {
+            "returned": "FAILED",
+            "persisted": "FAILED"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": "INVALID_JSON_RESPONSE",
+          "actual": {
+            "returned": "INVALID_JSON_RESPONSE",
+            "persisted": "INVALID_JSON_RESPONSE",
+            "usedForAssertion": "INVALID_JSON_RESPONSE"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": false,
+          "actual": {
+            "returned": false,
+            "persisted": false
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_002"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_002"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 4
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-002-invalid-json-response",
+            "status": "FAILED",
+            "severity": "error",
+            "failureType": "INVALID_JSON_RESPONSE",
+            "retryable": false,
+            "latencyMs": 4,
+            "estimatedCostUsd": 0,
+            "traceId": "trace_w6_002",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ffcu0001s9y8rclyalyi",
+            "returnedStatus": "FAILED",
+            "returnedFailureType": "INVALID_JSON_RESPONSE",
+            "returnedRetryable": false,
+            "returnedTraceId": "trace_w6_002"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "FAILED",
+          "actual": "FAILED"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-003-cost-limit-exceeded",
@@ -88,15 +318,130 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "error"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-003-cost-limit-exceeded",
+        "status": "FAILED",
+        "severity": "error",
+        "failureType": "UNKNOWN",
+        "retryable": false,
+        "latencyMs": 6,
+        "estimatedCostUsd": 0,
+        "traceId": "trace_w6_003",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ffdh0002s9y82u5nmu9t",
+        "returnedStatus": "FAILED",
+        "returnedFailureType": "UNKNOWN",
+        "returnedRetryable": false,
+        "returnedTraceId": "trace_w6_003"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": false,
+          "expected": "BLOCKED",
+          "actual": {
+            "returned": "FAILED",
+            "persisted": "FAILED"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": false,
+          "expected": "COST_LIMIT_EXCEEDED",
+          "actual": {
+            "returned": "UNKNOWN",
+            "persisted": "UNKNOWN",
+            "usedForAssertion": "UNKNOWN"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": false,
+          "actual": {
+            "returned": false,
+            "persisted": false
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_003"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_003"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 6
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-003-cost-limit-exceeded",
+            "status": "FAILED",
+            "severity": "error",
+            "failureType": "UNKNOWN",
+            "retryable": false,
+            "latencyMs": 6,
+            "estimatedCostUsd": 0,
+            "traceId": "trace_w6_003",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ffdh0002s9y82u5nmu9t",
+            "returnedStatus": "FAILED",
+            "returnedFailureType": "UNKNOWN",
+            "returnedRetryable": false,
+            "returnedTraceId": "trace_w6_003"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "FAILED",
+          "actual": "FAILED"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-004-provider-error",
       "category": "gateway_failure",
       "title": "Provider 500 becomes retryable gateway failure",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-004-provider-error",
         "expectedStatus": "RETRYABLE",
@@ -111,15 +456,130 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "warning"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-004-provider-error",
+        "status": "RETRYABLE",
+        "severity": "warning",
+        "failureType": "PROVIDER_ERROR",
+        "retryable": true,
+        "latencyMs": 5,
+        "estimatedCostUsd": 0,
+        "traceId": "trace_w6_004",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ffe10003s9y8kjx36k4y",
+        "returnedStatus": "RETRYABLE",
+        "returnedFailureType": "PROVIDER_ERROR",
+        "returnedRetryable": true,
+        "returnedTraceId": "trace_w6_004"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "RETRYABLE",
+          "actual": {
+            "returned": "RETRYABLE",
+            "persisted": "RETRYABLE"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": "PROVIDER_ERROR",
+          "actual": {
+            "returned": "PROVIDER_ERROR",
+            "persisted": "PROVIDER_ERROR",
+            "usedForAssertion": "PROVIDER_ERROR"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "returned": true,
+            "persisted": true
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_004"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_004"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 5
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-004-provider-error",
+            "status": "RETRYABLE",
+            "severity": "warning",
+            "failureType": "PROVIDER_ERROR",
+            "retryable": true,
+            "latencyMs": 5,
+            "estimatedCostUsd": 0,
+            "traceId": "trace_w6_004",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ffe10003s9y8kjx36k4y",
+            "returnedStatus": "RETRYABLE",
+            "returnedFailureType": "PROVIDER_ERROR",
+            "returnedRetryable": true,
+            "returnedTraceId": "trace_w6_004"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "RETRYABLE",
+          "actual": "RETRYABLE"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-005-latency-spike",
       "category": "gateway_observability_warning",
       "title": "Latency spike is visible on successful gateway call",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-005-latency-spike",
         "expectedStatus": "SUCCEEDED",
@@ -134,15 +594,130 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "warning"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-005-latency-spike",
+        "status": "SUCCEEDED",
+        "severity": "warning",
+        "failureType": "LATENCY_SPIKE",
+        "retryable": false,
+        "latencyMs": 39,
+        "estimatedCostUsd": 0.0012,
+        "traceId": "trace_w6_005",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ffeg0004s9y8196x94w3",
+        "returnedStatus": "SUCCEEDED",
+        "returnedFailureType": null,
+        "returnedRetryable": false,
+        "returnedTraceId": "trace_w6_005"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "SUCCEEDED",
+          "actual": {
+            "returned": "SUCCEEDED",
+            "persisted": "SUCCEEDED"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": "LATENCY_SPIKE",
+          "actual": {
+            "returned": null,
+            "persisted": "LATENCY_SPIKE",
+            "usedForAssertion": "LATENCY_SPIKE"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": false,
+          "actual": {
+            "returned": false,
+            "persisted": false
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_005"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_005"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 39
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0.0012
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-005-latency-spike",
+            "status": "SUCCEEDED",
+            "severity": "warning",
+            "failureType": "LATENCY_SPIKE",
+            "retryable": false,
+            "latencyMs": 39,
+            "estimatedCostUsd": 0.0012,
+            "traceId": "trace_w6_005",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ffeg0004s9y8196x94w3",
+            "returnedStatus": "SUCCEEDED",
+            "returnedFailureType": null,
+            "returnedRetryable": false,
+            "returnedTraceId": "trace_w6_005"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "SUCCEEDED",
+          "actual": "SUCCEEDED"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-006-prompt-version-regression",
       "category": "gateway_governance",
       "title": "Prompt version regression is detected",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-006-prompt-version-regression",
         "expectedStatus": "FAILED",
@@ -157,15 +732,130 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "error"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-006-prompt-version-regression",
+        "status": "FAILED",
+        "severity": "error",
+        "failureType": "PROMPT_VERSION_REGRESSION",
+        "retryable": false,
+        "latencyMs": 25,
+        "estimatedCostUsd": 0,
+        "traceId": "trace_w6_006",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v0",
+        "aiCallLogId": "cmqf6ffh10005s9y8tac2r6oc",
+        "returnedStatus": "FAILED",
+        "returnedFailureType": "PROMPT_VERSION_REGRESSION",
+        "returnedRetryable": false,
+        "returnedTraceId": "trace_w6_006"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "FAILED",
+          "actual": {
+            "returned": "FAILED",
+            "persisted": "FAILED"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": "PROMPT_VERSION_REGRESSION",
+          "actual": {
+            "returned": "PROMPT_VERSION_REGRESSION",
+            "persisted": "PROMPT_VERSION_REGRESSION",
+            "usedForAssertion": "PROMPT_VERSION_REGRESSION"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": false,
+          "actual": {
+            "returned": false,
+            "persisted": false
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_006"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_006"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v0"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 25
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-006-prompt-version-regression",
+            "status": "FAILED",
+            "severity": "error",
+            "failureType": "PROMPT_VERSION_REGRESSION",
+            "retryable": false,
+            "latencyMs": 25,
+            "estimatedCostUsd": 0,
+            "traceId": "trace_w6_006",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v0",
+            "aiCallLogId": "cmqf6ffh10005s9y8tac2r6oc",
+            "returnedStatus": "FAILED",
+            "returnedFailureType": "PROMPT_VERSION_REGRESSION",
+            "returnedRetryable": false,
+            "returnedTraceId": "trace_w6_006"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "FAILED",
+          "actual": "FAILED"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-007-eval-score-dropped",
       "category": "eval_regression",
       "title": "Eval score drop is represented as observability failure",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-007-eval-score-dropped",
         "expectedStatus": "FAILED",
@@ -180,15 +870,130 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "error"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-007-eval-score-dropped",
+        "status": "FAILED",
+        "severity": "error",
+        "failureType": "EVAL_SCORE_DROPPED",
+        "retryable": false,
+        "latencyMs": 6,
+        "estimatedCostUsd": 0,
+        "traceId": "trace_w6_007",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ffht0006s9y8i4hy59mn",
+        "returnedStatus": "FAILED",
+        "returnedFailureType": "EVAL_SCORE_DROPPED",
+        "returnedRetryable": false,
+        "returnedTraceId": "trace_w6_007"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "FAILED",
+          "actual": {
+            "returned": "FAILED",
+            "persisted": "FAILED"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": "EVAL_SCORE_DROPPED",
+          "actual": {
+            "returned": "EVAL_SCORE_DROPPED",
+            "persisted": "EVAL_SCORE_DROPPED",
+            "usedForAssertion": "EVAL_SCORE_DROPPED"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": false,
+          "actual": {
+            "returned": false,
+            "persisted": false
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_007"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_007"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 6
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-007-eval-score-dropped",
+            "status": "FAILED",
+            "severity": "error",
+            "failureType": "EVAL_SCORE_DROPPED",
+            "retryable": false,
+            "latencyMs": 6,
+            "estimatedCostUsd": 0,
+            "traceId": "trace_w6_007",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ffht0006s9y8i4hy59mn",
+            "returnedStatus": "FAILED",
+            "returnedFailureType": "EVAL_SCORE_DROPPED",
+            "returnedRetryable": false,
+            "returnedTraceId": "trace_w6_007"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "FAILED",
+          "actual": "FAILED"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-008-missing-trace-id",
       "category": "trace_generation",
       "title": "Missing trace ID is generated by gateway",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-008-missing-trace-id",
         "expectedStatus": "SUCCEEDED",
@@ -203,15 +1008,130 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "ok"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-008-missing-trace-id",
+        "status": "SUCCEEDED",
+        "severity": "ok",
+        "failureType": null,
+        "retryable": false,
+        "latencyMs": 8,
+        "estimatedCostUsd": 0.0012,
+        "traceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d",
+        "modelVersion": "synthetic-v1",
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ffik0007s9y8xtjfpl1k",
+        "returnedStatus": "SUCCEEDED",
+        "returnedFailureType": null,
+        "returnedRetryable": false,
+        "returnedTraceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "SUCCEEDED",
+          "actual": {
+            "returned": "SUCCEEDED",
+            "persisted": "SUCCEEDED"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": null,
+          "actual": {
+            "returned": null,
+            "persisted": null,
+            "usedForAssertion": null
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": false,
+          "actual": {
+            "returned": false,
+            "persisted": false
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic-v1"
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 8
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0.0012
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-008-missing-trace-id",
+            "status": "SUCCEEDED",
+            "severity": "ok",
+            "failureType": null,
+            "retryable": false,
+            "latencyMs": 8,
+            "estimatedCostUsd": 0.0012,
+            "traceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d",
+            "modelVersion": "synthetic-v1",
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ffik0007s9y8xtjfpl1k",
+            "returnedStatus": "SUCCEEDED",
+            "returnedFailureType": null,
+            "returnedRetryable": false,
+            "returnedTraceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "SUCCEEDED",
+          "actual": "SUCCEEDED"
+        }
+      ],
+      "error": null
     },
     {
       "caseId": "w6-009-missing-model-version",
       "category": "gateway_governance",
       "title": "Missing model version is blocked",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-009-missing-model-version",
         "expectedStatus": "BLOCKED",
@@ -226,9 +1146,124 @@
         "mustAppearInDashboard": true,
         "dashboardSeverity": "error"
       },
-      "actual": {},
-      "checks": [],
-      "error": "\nInvalid `prisma.aiCallLog.create()` invocation:\n\n\n"
+      "actual": {
+        "caseId": "w6-009-missing-model-version",
+        "status": "BLOCKED",
+        "severity": "error",
+        "failureType": "MISSING_MODEL_VERSION",
+        "retryable": false,
+        "latencyMs": 9,
+        "estimatedCostUsd": 0,
+        "traceId": "trace_w6_009",
+        "modelVersion": null,
+        "promptVersion": "synthetic_gateway_test_v1",
+        "aiCallLogId": "cmqf6ffjd0008s9y80hdy4g0h",
+        "returnedStatus": "BLOCKED",
+        "returnedFailureType": "MISSING_MODEL_VERSION",
+        "returnedRetryable": false,
+        "returnedTraceId": "trace_w6_009"
+      },
+      "checks": [
+        {
+          "name": "AiCallLog row exists",
+          "passed": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "status matches expectedStatus",
+          "passed": true,
+          "expected": "BLOCKED",
+          "actual": {
+            "returned": "BLOCKED",
+            "persisted": "BLOCKED"
+          }
+        },
+        {
+          "name": "errorType matches expectedFailureType",
+          "passed": true,
+          "expected": "MISSING_MODEL_VERSION",
+          "actual": {
+            "returned": "MISSING_MODEL_VERSION",
+            "persisted": "MISSING_MODEL_VERSION",
+            "usedForAssertion": "MISSING_MODEL_VERSION"
+          }
+        },
+        {
+          "name": "retryable matches expectedRetryable",
+          "passed": true,
+          "expected": false,
+          "actual": {
+            "returned": false,
+            "persisted": false
+          }
+        },
+        {
+          "name": "traceId exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "trace_w6_009"
+        },
+        {
+          "name": "traceId is generated when required",
+          "passed": true,
+          "expected": false,
+          "actual": "trace_w6_009"
+        },
+        {
+          "name": "promptVersion exists when required",
+          "passed": true,
+          "expected": true,
+          "actual": "synthetic_gateway_test_v1"
+        },
+        {
+          "name": "modelVersion exists when required",
+          "passed": true,
+          "expected": false,
+          "actual": null
+        },
+        {
+          "name": "latencyMs is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 9
+        },
+        {
+          "name": "estimatedCostUsd is recorded when required",
+          "passed": true,
+          "expected": true,
+          "actual": 0
+        },
+        {
+          "name": "case is dashboard-compatible",
+          "passed": true,
+          "expected": true,
+          "actual": {
+            "caseId": "w6-009-missing-model-version",
+            "status": "BLOCKED",
+            "severity": "error",
+            "failureType": "MISSING_MODEL_VERSION",
+            "retryable": false,
+            "latencyMs": 9,
+            "estimatedCostUsd": 0,
+            "traceId": "trace_w6_009",
+            "modelVersion": null,
+            "promptVersion": "synthetic_gateway_test_v1",
+            "aiCallLogId": "cmqf6ffjd0008s9y80hdy4g0h",
+            "returnedStatus": "BLOCKED",
+            "returnedFailureType": "MISSING_MODEL_VERSION",
+            "returnedRetryable": false,
+            "returnedTraceId": "trace_w6_009"
+          }
+        },
+        {
+          "name": "AiCallLog status matches returned gateway result",
+          "passed": true,
+          "expected": "BLOCKED",
+          "actual": "BLOCKED"
+        }
+      ],
+      "error": null
     }
   ]
 }
