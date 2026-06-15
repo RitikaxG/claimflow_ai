@@ -16,10 +16,6 @@ import { isLatencySpike } from "./latency-policy";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
-function toPrismaJson(value: unknown): Prisma.InputJsonValue {
-  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
-}
-
 function optionalJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
