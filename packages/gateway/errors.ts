@@ -38,6 +38,21 @@ export function classifyGatewayError(error: unknown): AiGatewayFailureType {
     return "PROVIDER_ERROR";
   }
 
+  if (
+  message.includes("prompt version regression") ||
+  message.includes("prompt_version_regression")
+) {
+  return "PROMPT_VERSION_REGRESSION";
+}
+
+  if (
+    message.includes("eval score dropped") ||
+    message.includes("eval_score_dropped") ||
+    message.includes("score regression")
+  ) {
+    return "EVAL_SCORE_DROPPED";
+  }
+
   return "UNKNOWN";
 }
 
