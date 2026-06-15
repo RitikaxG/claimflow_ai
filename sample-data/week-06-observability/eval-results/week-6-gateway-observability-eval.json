@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
   "suite": "WEEK6_GATEWAY_OBSERVABILITY",
-  "generatedAt": "2026-06-15T12:15:41.181Z",
+  "generatedAt": "2026-06-15T12:20:49.139Z",
   "datasetRoot": "/Users/ritikagupta/Desktop/Devops/claimflow-ai/sample-data/week-06-observability",
   "summary": {
     "totalCases": 9,
-    "passed": 8,
-    "failed": 1,
+    "passed": 9,
+    "failed": 0,
     "warningCases": 3,
-    "passRate": 0.8888888888888888,
+    "passRate": 1,
     "metrics": {
-      "eval_pass_rate": 0.8888888888888888,
-      "cost_per_run": 0.0024,
-      "latency_p95": 380,
+      "eval_pass_rate": 1,
+      "cost_per_run": 20.0024,
+      "latency_p95": 372,
       "model_error_rate": 0.2222222222222222,
       "invalid_json_rate": 0.1111111111111111,
       "prompt_version_regression_rate": 0.1111111111111111,
       "missing_trace_rate": 0,
       "missing_model_version_rate": 0.1111111111111111,
       "retryable_failure_rate": 0.2222222222222222,
-      "blocked_by_cost_policy_rate": 0
+      "blocked_by_cost_policy_rate": 0.1111111111111111
     }
   },
   "cases": [
@@ -48,12 +48,12 @@
         "severity": "warning",
         "failureType": "MODEL_TIMEOUT",
         "retryable": true,
-        "latencyMs": 380,
+        "latencyMs": 372,
         "estimatedCostUsd": 0,
         "traceId": "trace_w6_001",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ff8b0000s9y8lff9q9qy",
+        "aiCallLogId": "cmqf6m0tf00004qy89hr0y51m",
         "returnedStatus": "RETRYABLE",
         "returnedFailureType": "MODEL_TIMEOUT",
         "returnedRetryable": true,
@@ -122,7 +122,7 @@
           "name": "latencyMs is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 380
+          "actual": 372
         },
         {
           "name": "estimatedCostUsd is recorded when required",
@@ -140,12 +140,12 @@
             "severity": "warning",
             "failureType": "MODEL_TIMEOUT",
             "retryable": true,
-            "latencyMs": 380,
+            "latencyMs": 372,
             "estimatedCostUsd": 0,
             "traceId": "trace_w6_001",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ff8b0000s9y8lff9q9qy",
+            "aiCallLogId": "cmqf6m0tf00004qy89hr0y51m",
             "returnedStatus": "RETRYABLE",
             "returnedFailureType": "MODEL_TIMEOUT",
             "returnedRetryable": true,
@@ -186,12 +186,12 @@
         "severity": "error",
         "failureType": "INVALID_JSON_RESPONSE",
         "retryable": false,
-        "latencyMs": 4,
+        "latencyMs": 18,
         "estimatedCostUsd": 0,
         "traceId": "trace_w6_002",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ffcu0001s9y8rclyalyi",
+        "aiCallLogId": "cmqf6m0yh00014qy8a17kwua6",
         "returnedStatus": "FAILED",
         "returnedFailureType": "INVALID_JSON_RESPONSE",
         "returnedRetryable": false,
@@ -260,7 +260,7 @@
           "name": "latencyMs is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 4
+          "actual": 18
         },
         {
           "name": "estimatedCostUsd is recorded when required",
@@ -278,12 +278,12 @@
             "severity": "error",
             "failureType": "INVALID_JSON_RESPONSE",
             "retryable": false,
-            "latencyMs": 4,
+            "latencyMs": 18,
             "estimatedCostUsd": 0,
             "traceId": "trace_w6_002",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ffcu0001s9y8rclyalyi",
+            "aiCallLogId": "cmqf6m0yh00014qy8a17kwua6",
             "returnedStatus": "FAILED",
             "returnedFailureType": "INVALID_JSON_RESPONSE",
             "returnedRetryable": false,
@@ -303,7 +303,7 @@
       "caseId": "w6-003-cost-limit-exceeded",
       "category": "gateway_policy_block",
       "title": "Cost limit exceeded blocks gateway call",
-      "passed": false,
+      "passed": true,
       "expected": {
         "caseId": "w6-003-cost-limit-exceeded",
         "expectedStatus": "BLOCKED",
@@ -320,18 +320,18 @@
       },
       "actual": {
         "caseId": "w6-003-cost-limit-exceeded",
-        "status": "FAILED",
+        "status": "BLOCKED",
         "severity": "error",
-        "failureType": "UNKNOWN",
+        "failureType": "COST_LIMIT_EXCEEDED",
         "retryable": false,
-        "latencyMs": 6,
-        "estimatedCostUsd": 0,
+        "latencyMs": 12,
+        "estimatedCostUsd": 20,
         "traceId": "trace_w6_003",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ffdh0002s9y82u5nmu9t",
-        "returnedStatus": "FAILED",
-        "returnedFailureType": "UNKNOWN",
+        "aiCallLogId": "cmqf6m0zq00024qy8g0fj2hj3",
+        "returnedStatus": "BLOCKED",
+        "returnedFailureType": "COST_LIMIT_EXCEEDED",
         "returnedRetryable": false,
         "returnedTraceId": "trace_w6_003"
       },
@@ -344,21 +344,21 @@
         },
         {
           "name": "status matches expectedStatus",
-          "passed": false,
+          "passed": true,
           "expected": "BLOCKED",
           "actual": {
-            "returned": "FAILED",
-            "persisted": "FAILED"
+            "returned": "BLOCKED",
+            "persisted": "BLOCKED"
           }
         },
         {
           "name": "errorType matches expectedFailureType",
-          "passed": false,
+          "passed": true,
           "expected": "COST_LIMIT_EXCEEDED",
           "actual": {
-            "returned": "UNKNOWN",
-            "persisted": "UNKNOWN",
-            "usedForAssertion": "UNKNOWN"
+            "returned": "COST_LIMIT_EXCEEDED",
+            "persisted": "COST_LIMIT_EXCEEDED",
+            "usedForAssertion": "COST_LIMIT_EXCEEDED"
           }
         },
         {
@@ -398,13 +398,13 @@
           "name": "latencyMs is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 6
+          "actual": 12
         },
         {
           "name": "estimatedCostUsd is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 0
+          "actual": 20
         },
         {
           "name": "case is dashboard-compatible",
@@ -412,18 +412,18 @@
           "expected": true,
           "actual": {
             "caseId": "w6-003-cost-limit-exceeded",
-            "status": "FAILED",
+            "status": "BLOCKED",
             "severity": "error",
-            "failureType": "UNKNOWN",
+            "failureType": "COST_LIMIT_EXCEEDED",
             "retryable": false,
-            "latencyMs": 6,
-            "estimatedCostUsd": 0,
+            "latencyMs": 12,
+            "estimatedCostUsd": 20,
             "traceId": "trace_w6_003",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ffdh0002s9y82u5nmu9t",
-            "returnedStatus": "FAILED",
-            "returnedFailureType": "UNKNOWN",
+            "aiCallLogId": "cmqf6m0zq00024qy8g0fj2hj3",
+            "returnedStatus": "BLOCKED",
+            "returnedFailureType": "COST_LIMIT_EXCEEDED",
             "returnedRetryable": false,
             "returnedTraceId": "trace_w6_003"
           }
@@ -431,8 +431,8 @@
         {
           "name": "AiCallLog status matches returned gateway result",
           "passed": true,
-          "expected": "FAILED",
-          "actual": "FAILED"
+          "expected": "BLOCKED",
+          "actual": "BLOCKED"
         }
       ],
       "error": null
@@ -462,12 +462,12 @@
         "severity": "warning",
         "failureType": "PROVIDER_ERROR",
         "retryable": true,
-        "latencyMs": 5,
+        "latencyMs": 7,
         "estimatedCostUsd": 0,
         "traceId": "trace_w6_004",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ffe10003s9y8kjx36k4y",
+        "aiCallLogId": "cmqf6m11d00034qy8sm8uekb2",
         "returnedStatus": "RETRYABLE",
         "returnedFailureType": "PROVIDER_ERROR",
         "returnedRetryable": true,
@@ -536,7 +536,7 @@
           "name": "latencyMs is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 5
+          "actual": 7
         },
         {
           "name": "estimatedCostUsd is recorded when required",
@@ -554,12 +554,12 @@
             "severity": "warning",
             "failureType": "PROVIDER_ERROR",
             "retryable": true,
-            "latencyMs": 5,
+            "latencyMs": 7,
             "estimatedCostUsd": 0,
             "traceId": "trace_w6_004",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ffe10003s9y8kjx36k4y",
+            "aiCallLogId": "cmqf6m11d00034qy8sm8uekb2",
             "returnedStatus": "RETRYABLE",
             "returnedFailureType": "PROVIDER_ERROR",
             "returnedRetryable": true,
@@ -605,7 +605,7 @@
         "traceId": "trace_w6_005",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ffeg0004s9y8196x94w3",
+        "aiCallLogId": "cmqf6m12200044qy8624tc4jt",
         "returnedStatus": "SUCCEEDED",
         "returnedFailureType": null,
         "returnedRetryable": false,
@@ -697,7 +697,7 @@
             "traceId": "trace_w6_005",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ffeg0004s9y8196x94w3",
+            "aiCallLogId": "cmqf6m12200044qy8624tc4jt",
             "returnedStatus": "SUCCEEDED",
             "returnedFailureType": null,
             "returnedRetryable": false,
@@ -738,12 +738,12 @@
         "severity": "error",
         "failureType": "PROMPT_VERSION_REGRESSION",
         "retryable": false,
-        "latencyMs": 25,
+        "latencyMs": 4,
         "estimatedCostUsd": 0,
         "traceId": "trace_w6_006",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v0",
-        "aiCallLogId": "cmqf6ffh10005s9y8tac2r6oc",
+        "aiCallLogId": "cmqf6m14400054qy8dy03xd7b",
         "returnedStatus": "FAILED",
         "returnedFailureType": "PROMPT_VERSION_REGRESSION",
         "returnedRetryable": false,
@@ -812,7 +812,7 @@
           "name": "latencyMs is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 25
+          "actual": 4
         },
         {
           "name": "estimatedCostUsd is recorded when required",
@@ -830,12 +830,12 @@
             "severity": "error",
             "failureType": "PROMPT_VERSION_REGRESSION",
             "retryable": false,
-            "latencyMs": 25,
+            "latencyMs": 4,
             "estimatedCostUsd": 0,
             "traceId": "trace_w6_006",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v0",
-            "aiCallLogId": "cmqf6ffh10005s9y8tac2r6oc",
+            "aiCallLogId": "cmqf6m14400054qy8dy03xd7b",
             "returnedStatus": "FAILED",
             "returnedFailureType": "PROMPT_VERSION_REGRESSION",
             "returnedRetryable": false,
@@ -881,7 +881,7 @@
         "traceId": "trace_w6_007",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ffht0006s9y8i4hy59mn",
+        "aiCallLogId": "cmqf6m14n00064qy88zwi2nyo",
         "returnedStatus": "FAILED",
         "returnedFailureType": "EVAL_SCORE_DROPPED",
         "returnedRetryable": false,
@@ -973,7 +973,7 @@
             "traceId": "trace_w6_007",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ffht0006s9y8i4hy59mn",
+            "aiCallLogId": "cmqf6m14n00064qy88zwi2nyo",
             "returnedStatus": "FAILED",
             "returnedFailureType": "EVAL_SCORE_DROPPED",
             "returnedRetryable": false,
@@ -1014,16 +1014,16 @@
         "severity": "ok",
         "failureType": null,
         "retryable": false,
-        "latencyMs": 8,
+        "latencyMs": 3,
         "estimatedCostUsd": 0.0012,
-        "traceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d",
+        "traceId": "trace_67170ce8-410d-4c93-9e00-9521c35190de",
         "modelVersion": "synthetic-v1",
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ffik0007s9y8xtjfpl1k",
+        "aiCallLogId": "cmqf6m15700074qy8w8nkug8u",
         "returnedStatus": "SUCCEEDED",
         "returnedFailureType": null,
         "returnedRetryable": false,
-        "returnedTraceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+        "returnedTraceId": "trace_67170ce8-410d-4c93-9e00-9521c35190de"
       },
       "checks": [
         {
@@ -1064,13 +1064,13 @@
           "name": "traceId exists when required",
           "passed": true,
           "expected": true,
-          "actual": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+          "actual": "trace_67170ce8-410d-4c93-9e00-9521c35190de"
         },
         {
           "name": "traceId is generated when required",
           "passed": true,
           "expected": true,
-          "actual": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+          "actual": "trace_67170ce8-410d-4c93-9e00-9521c35190de"
         },
         {
           "name": "promptVersion exists when required",
@@ -1088,7 +1088,7 @@
           "name": "latencyMs is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 8
+          "actual": 3
         },
         {
           "name": "estimatedCostUsd is recorded when required",
@@ -1106,16 +1106,16 @@
             "severity": "ok",
             "failureType": null,
             "retryable": false,
-            "latencyMs": 8,
+            "latencyMs": 3,
             "estimatedCostUsd": 0.0012,
-            "traceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d",
+            "traceId": "trace_67170ce8-410d-4c93-9e00-9521c35190de",
             "modelVersion": "synthetic-v1",
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ffik0007s9y8xtjfpl1k",
+            "aiCallLogId": "cmqf6m15700074qy8w8nkug8u",
             "returnedStatus": "SUCCEEDED",
             "returnedFailureType": null,
             "returnedRetryable": false,
-            "returnedTraceId": "trace_b9714211-f54b-4ecc-8a9a-92ef0386458d"
+            "returnedTraceId": "trace_67170ce8-410d-4c93-9e00-9521c35190de"
           }
         },
         {
@@ -1152,12 +1152,12 @@
         "severity": "error",
         "failureType": "MISSING_MODEL_VERSION",
         "retryable": false,
-        "latencyMs": 9,
+        "latencyMs": 7,
         "estimatedCostUsd": 0,
         "traceId": "trace_w6_009",
         "modelVersion": null,
         "promptVersion": "synthetic_gateway_test_v1",
-        "aiCallLogId": "cmqf6ffjd0008s9y80hdy4g0h",
+        "aiCallLogId": "cmqf6m15r00084qy8zkedz7e1",
         "returnedStatus": "BLOCKED",
         "returnedFailureType": "MISSING_MODEL_VERSION",
         "returnedRetryable": false,
@@ -1226,7 +1226,7 @@
           "name": "latencyMs is recorded when required",
           "passed": true,
           "expected": true,
-          "actual": 9
+          "actual": 7
         },
         {
           "name": "estimatedCostUsd is recorded when required",
@@ -1244,12 +1244,12 @@
             "severity": "error",
             "failureType": "MISSING_MODEL_VERSION",
             "retryable": false,
-            "latencyMs": 9,
+            "latencyMs": 7,
             "estimatedCostUsd": 0,
             "traceId": "trace_w6_009",
             "modelVersion": null,
             "promptVersion": "synthetic_gateway_test_v1",
-            "aiCallLogId": "cmqf6ffjd0008s9y80hdy4g0h",
+            "aiCallLogId": "cmqf6m15r00084qy8zkedz7e1",
             "returnedStatus": "BLOCKED",
             "returnedFailureType": "MISSING_MODEL_VERSION",
             "returnedRetryable": false,

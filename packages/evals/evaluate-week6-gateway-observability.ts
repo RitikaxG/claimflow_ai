@@ -110,6 +110,7 @@ function buildSyntheticCall(input: GatewayCaseInput) {
         throw new Error("Provider returned 500 internal server error.");
 
       case "cost_limit_exceeded":
+      case "cost_spike":
         return {
           parsedOutputJson: {
             decision: "OK",
