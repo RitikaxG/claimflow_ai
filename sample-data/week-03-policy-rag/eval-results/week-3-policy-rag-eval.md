@@ -1,17 +1,17 @@
 # Week 3 Policy RAG Eval
 
-Generated at: 2026-06-16T08:52:15.477Z
+Generated at: 2026-06-16T09:04:01.569Z
 
 ## Summary
 
 | Metric | Value |
 | --- | --- |
 | Total cases | 12 |
-| Passed | 11 |
-| Failed | 1 |
+| Passed | 10 |
+| Failed | 2 |
 | Retrieval hit rate | 91.7% |
-| Decision match rate | 100.0% |
-| Citation present rate | 91.7% |
+| Decision match rate | 91.7% |
+| Citation present rate | 83.3% |
 | Citation support rate | 91.7% |
 | Unsupported refusal rate | 100.0% |
 | False approval rate | 0.0% |
@@ -36,7 +36,7 @@ Retrieval status: `ENOUGH_EVIDENCE`
 
 Top similarity: 0.8369
 
-Citation count: 1
+Citation count: 2
 
 Forced NEEDS_REVIEW: no
 
@@ -78,6 +78,37 @@ Actual decision: `NEEDS_REVIEW`
 
 Expected clauses: ["LIMIT-RP-001","EV-OD-001"]
 
+Retrieved clauses: ["COV-OD-001","COV-TH-001","COV-TP-001","EV-FLD-001","EV-OD-001","EV-TH-001","EV-TP-001","LIMIT-RP-001"]
+
+Retrieval status: `ENOUGH_EVIDENCE`
+
+Top similarity: 0.8373
+
+Citation count: 0
+
+Forced NEEDS_REVIEW: yes
+
+Guardrail reasons:
+
+- Citation clauseId LIMIT-RP-001 does not match retrieved chunk cmppkhs6y0003evy8m798u0mf
+- Coverage answer did not contain any valid citations to retrieved chunks.
+
+Blockers:
+
+- Expected at least one citation, but answer had none.
+
+### ❌ W3-COV-004
+
+Question: Does the policy cover damage if the private vehicle was used for commercial delivery?
+
+Packet: w3-004-excluded-commercial-use
+
+Expected decision: `NOT_COVERED`
+
+Actual decision: `NEEDS_REVIEW`
+
+Expected clauses: ["EX-COM-001"]
+
 Retrieved clauses: []
 
 Retrieval status: `INSUFFICIENT_EVIDENCE`
@@ -95,28 +126,6 @@ Guardrail reasons:
 Blockers:
 
 - Eval execution failed: {"error":{"code":503,"message":"The service is currently unavailable.","status":"UNAVAILABLE"}}
-
-### ✅ W3-COV-004
-
-Question: Does the policy cover damage if the private vehicle was used for commercial delivery?
-
-Packet: w3-004-excluded-commercial-use
-
-Expected decision: `NOT_COVERED`
-
-Actual decision: `NOT_COVERED`
-
-Expected clauses: ["EX-COM-001"]
-
-Retrieved clauses: ["COV-OD-001","COV-TH-001","EV-OD-001","EV-TH-001","EX-ALC-001","EX-COM-001","EX-LIC-001","EX-WEAR-001"]
-
-Retrieval status: `ENOUGH_EVIDENCE`
-
-Top similarity: 0.8408
-
-Citation count: 1
-
-Forced NEEDS_REVIEW: no
 
 ### ✅ W3-COV-005
 

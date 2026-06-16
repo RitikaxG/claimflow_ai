@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-16T08:52:15.477Z",
+  "generatedAt": "2026-06-16T09:04:01.569Z",
   "summary": {
     "total": 12,
-    "passed": 11,
-    "failed": 1,
+    "passed": 10,
+    "failed": 2,
     "retrievalHitRate": 0.9166666666666666,
-    "decisionMatchRate": 1,
-    "citationPresentRate": 0.9166666666666666,
+    "decisionMatchRate": 0.9166666666666666,
+    "citationPresentRate": 0.8333333333333334,
     "citationSupportRate": 0.9166666666666666,
     "unsupportedRefusalRate": 1,
     "falseApprovalRate": 0
@@ -33,7 +33,7 @@
       "retrievalStatus": "ENOUGH_EVIDENCE",
       "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
       "topSimilarity": 0.8368881137638059,
-      "citationCount": 1,
+      "citationCount": 2,
       "citationSupportPassed": true,
       "forcedNeedsReview": false,
       "guardrailReasons": [],
@@ -83,6 +83,41 @@
         "LIMIT-RP-001",
         "EV-OD-001"
       ],
+      "retrievedClauseIds": [
+        "COV-OD-001",
+        "COV-TH-001",
+        "COV-TP-001",
+        "EV-FLD-001",
+        "EV-OD-001",
+        "EV-TH-001",
+        "EV-TP-001",
+        "LIMIT-RP-001"
+      ],
+      "retrievalStatus": "ENOUGH_EVIDENCE",
+      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
+      "topSimilarity": 0.8373044244362561,
+      "citationCount": 0,
+      "citationSupportPassed": true,
+      "forcedNeedsReview": true,
+      "guardrailReasons": [
+        "Citation clauseId LIMIT-RP-001 does not match retrieved chunk cmppkhs6y0003evy8m798u0mf",
+        "Coverage answer did not contain any valid citations to retrieved chunks."
+      ],
+      "falseApproval": false,
+      "passed": false,
+      "blockers": [
+        "Expected at least one citation, but answer had none."
+      ]
+    },
+    {
+      "questionId": "W3-COV-004",
+      "packetId": "w3-004-excluded-commercial-use",
+      "question": "Does the policy cover damage if the private vehicle was used for commercial delivery?",
+      "expectedDecision": "NOT_COVERED",
+      "actualDecision": "NEEDS_REVIEW",
+      "expectedRetrievedClauses": [
+        "EX-COM-001"
+      ],
       "retrievedClauseIds": [],
       "retrievalStatus": "INSUFFICIENT_EVIDENCE",
       "retrievalReason": "{\"error\":{\"code\":503,\"message\":\"The service is currently unavailable.\",\"status\":\"UNAVAILABLE\"}}",
@@ -98,36 +133,6 @@
       "blockers": [
         "Eval execution failed: {\"error\":{\"code\":503,\"message\":\"The service is currently unavailable.\",\"status\":\"UNAVAILABLE\"}}"
       ]
-    },
-    {
-      "questionId": "W3-COV-004",
-      "packetId": "w3-004-excluded-commercial-use",
-      "question": "Does the policy cover damage if the private vehicle was used for commercial delivery?",
-      "expectedDecision": "NOT_COVERED",
-      "actualDecision": "NOT_COVERED",
-      "expectedRetrievedClauses": [
-        "EX-COM-001"
-      ],
-      "retrievedClauseIds": [
-        "COV-OD-001",
-        "COV-TH-001",
-        "EV-OD-001",
-        "EV-TH-001",
-        "EX-ALC-001",
-        "EX-COM-001",
-        "EX-LIC-001",
-        "EX-WEAR-001"
-      ],
-      "retrievalStatus": "ENOUGH_EVIDENCE",
-      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
-      "topSimilarity": 0.8407780433167384,
-      "citationCount": 1,
-      "citationSupportPassed": true,
-      "forcedNeedsReview": false,
-      "guardrailReasons": [],
-      "falseApproval": false,
-      "passed": true,
-      "blockers": []
     },
     {
       "questionId": "W3-COV-005",
