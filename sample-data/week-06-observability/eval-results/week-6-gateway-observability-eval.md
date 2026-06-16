@@ -1,6 +1,6 @@
 # Week 6 Gateway Observability Eval Report
 
-Generated at: 2026-06-15T12:20:49.139Z
+Generated at: 2026-06-16T08:02:56.541Z
 
 ## Executive Summary
 
@@ -14,7 +14,7 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 |---|---:|
 | eval_pass_rate | 100.0% |
 | cost_per_run | 20.0024 |
-| latency_p95 | 372 |
+| latency_p95 | 341 |
 | model_error_rate | 22.2% |
 | invalid_json_rate | 11.1% |
 | prompt_version_regression_rate | 11.1% |
@@ -55,9 +55,9 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | traceId is generated when required | PASS | false | trace_w6_001 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v1 |
 | modelVersion exists when required | PASS | true | synthetic-v1 |
-| latencyMs is recorded when required | PASS | true | 372 |
+| latencyMs is recorded when required | PASS | true | 341 |
 | estimatedCostUsd is recorded when required | PASS | true | 0 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-001-model-timeout","status":"RETRYABLE","severity":"warning","failureType":"MODEL_TIMEOUT","retryable":true,"latencyMs":372,"estimatedCostUsd":0,"traceId":"trace_w6_001","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m0tf00004qy89hr0y51m","returnedStatus":"RETRYABLE","returnedFailureType":"MODEL_TIMEOUT","returnedRetryable":true,"returnedTraceId":"trace_w6_001"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-001-model-timeout","status":"RETRYABLE","severity":"warning","failureType":"MODEL_TIMEOUT","retryable":true,"latencyMs":341,"estimatedCostUsd":0,"traceId":"trace_w6_001","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu8ru0000mmy8q63honpm","returnedStatus":"RETRYABLE","returnedFailureType":"MODEL_TIMEOUT","returnedRetryable":true,"returnedTraceId":"trace_w6_001"} |
 | AiCallLog status matches returned gateway result | PASS | RETRYABLE | RETRYABLE |
 
 ### w6-002-invalid-json-response
@@ -76,9 +76,9 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | traceId is generated when required | PASS | false | trace_w6_002 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v1 |
 | modelVersion exists when required | PASS | true | synthetic-v1 |
-| latencyMs is recorded when required | PASS | true | 18 |
+| latencyMs is recorded when required | PASS | true | 20 |
 | estimatedCostUsd is recorded when required | PASS | true | 0 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-002-invalid-json-response","status":"FAILED","severity":"error","failureType":"INVALID_JSON_RESPONSE","retryable":false,"latencyMs":18,"estimatedCostUsd":0,"traceId":"trace_w6_002","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m0yh00014qy8a17kwua6","returnedStatus":"FAILED","returnedFailureType":"INVALID_JSON_RESPONSE","returnedRetryable":false,"returnedTraceId":"trace_w6_002"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-002-invalid-json-response","status":"FAILED","severity":"error","failureType":"INVALID_JSON_RESPONSE","retryable":false,"latencyMs":20,"estimatedCostUsd":0,"traceId":"trace_w6_002","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu8x80001mmy8hbxezor7","returnedStatus":"FAILED","returnedFailureType":"INVALID_JSON_RESPONSE","returnedRetryable":false,"returnedTraceId":"trace_w6_002"} |
 | AiCallLog status matches returned gateway result | PASS | FAILED | FAILED |
 
 ### w6-003-cost-limit-exceeded
@@ -97,9 +97,9 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | traceId is generated when required | PASS | false | trace_w6_003 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v1 |
 | modelVersion exists when required | PASS | true | synthetic-v1 |
-| latencyMs is recorded when required | PASS | true | 12 |
+| latencyMs is recorded when required | PASS | true | 5 |
 | estimatedCostUsd is recorded when required | PASS | true | 20 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-003-cost-limit-exceeded","status":"BLOCKED","severity":"error","failureType":"COST_LIMIT_EXCEEDED","retryable":false,"latencyMs":12,"estimatedCostUsd":20,"traceId":"trace_w6_003","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m0zq00024qy8g0fj2hj3","returnedStatus":"BLOCKED","returnedFailureType":"COST_LIMIT_EXCEEDED","returnedRetryable":false,"returnedTraceId":"trace_w6_003"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-003-cost-limit-exceeded","status":"BLOCKED","severity":"error","failureType":"COST_LIMIT_EXCEEDED","retryable":false,"latencyMs":5,"estimatedCostUsd":20,"traceId":"trace_w6_003","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu8ya0002mmy87d4ah86g","returnedStatus":"BLOCKED","returnedFailureType":"COST_LIMIT_EXCEEDED","returnedRetryable":false,"returnedTraceId":"trace_w6_003"} |
 | AiCallLog status matches returned gateway result | PASS | BLOCKED | BLOCKED |
 
 ### w6-004-provider-error
@@ -118,9 +118,9 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | traceId is generated when required | PASS | false | trace_w6_004 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v1 |
 | modelVersion exists when required | PASS | true | synthetic-v1 |
-| latencyMs is recorded when required | PASS | true | 7 |
+| latencyMs is recorded when required | PASS | true | 6 |
 | estimatedCostUsd is recorded when required | PASS | true | 0 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-004-provider-error","status":"RETRYABLE","severity":"warning","failureType":"PROVIDER_ERROR","retryable":true,"latencyMs":7,"estimatedCostUsd":0,"traceId":"trace_w6_004","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m11d00034qy8sm8uekb2","returnedStatus":"RETRYABLE","returnedFailureType":"PROVIDER_ERROR","returnedRetryable":true,"returnedTraceId":"trace_w6_004"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-004-provider-error","status":"RETRYABLE","severity":"warning","failureType":"PROVIDER_ERROR","retryable":true,"latencyMs":6,"estimatedCostUsd":0,"traceId":"trace_w6_004","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu8yu0003mmy82e2neoq3","returnedStatus":"RETRYABLE","returnedFailureType":"PROVIDER_ERROR","returnedRetryable":true,"returnedTraceId":"trace_w6_004"} |
 | AiCallLog status matches returned gateway result | PASS | RETRYABLE | RETRYABLE |
 
 ### w6-005-latency-spike
@@ -139,9 +139,9 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | traceId is generated when required | PASS | false | trace_w6_005 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v1 |
 | modelVersion exists when required | PASS | true | synthetic-v1 |
-| latencyMs is recorded when required | PASS | true | 39 |
+| latencyMs is recorded when required | PASS | true | 38 |
 | estimatedCostUsd is recorded when required | PASS | true | 0.0012 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-005-latency-spike","status":"SUCCEEDED","severity":"warning","failureType":"LATENCY_SPIKE","retryable":false,"latencyMs":39,"estimatedCostUsd":0.0012,"traceId":"trace_w6_005","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m12200044qy8624tc4jt","returnedStatus":"SUCCEEDED","returnedFailureType":null,"returnedRetryable":false,"returnedTraceId":"trace_w6_005"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-005-latency-spike","status":"SUCCEEDED","severity":"warning","failureType":"LATENCY_SPIKE","retryable":false,"latencyMs":38,"estimatedCostUsd":0.0012,"traceId":"trace_w6_005","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu8zd0004mmy86imsy6dn","returnedStatus":"SUCCEEDED","returnedFailureType":null,"returnedRetryable":false,"returnedTraceId":"trace_w6_005"} |
 | AiCallLog status matches returned gateway result | PASS | SUCCEEDED | SUCCEEDED |
 
 ### w6-006-prompt-version-regression
@@ -160,9 +160,9 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | traceId is generated when required | PASS | false | trace_w6_006 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v0 |
 | modelVersion exists when required | PASS | true | synthetic-v1 |
-| latencyMs is recorded when required | PASS | true | 4 |
+| latencyMs is recorded when required | PASS | true | 14 |
 | estimatedCostUsd is recorded when required | PASS | true | 0 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-006-prompt-version-regression","status":"FAILED","severity":"error","failureType":"PROMPT_VERSION_REGRESSION","retryable":false,"latencyMs":4,"estimatedCostUsd":0,"traceId":"trace_w6_006","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v0","aiCallLogId":"cmqf6m14400054qy8dy03xd7b","returnedStatus":"FAILED","returnedFailureType":"PROMPT_VERSION_REGRESSION","returnedRetryable":false,"returnedTraceId":"trace_w6_006"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-006-prompt-version-regression","status":"FAILED","severity":"error","failureType":"PROMPT_VERSION_REGRESSION","retryable":false,"latencyMs":14,"estimatedCostUsd":0,"traceId":"trace_w6_006","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v0","aiCallLogId":"cmqgcu90v0005mmy81sbnbam9","returnedStatus":"FAILED","returnedFailureType":"PROMPT_VERSION_REGRESSION","returnedRetryable":false,"returnedTraceId":"trace_w6_006"} |
 | AiCallLog status matches returned gateway result | PASS | FAILED | FAILED |
 
 ### w6-007-eval-score-dropped
@@ -183,7 +183,7 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | modelVersion exists when required | PASS | true | synthetic-v1 |
 | latencyMs is recorded when required | PASS | true | 6 |
 | estimatedCostUsd is recorded when required | PASS | true | 0 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-007-eval-score-dropped","status":"FAILED","severity":"error","failureType":"EVAL_SCORE_DROPPED","retryable":false,"latencyMs":6,"estimatedCostUsd":0,"traceId":"trace_w6_007","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m14n00064qy88zwi2nyo","returnedStatus":"FAILED","returnedFailureType":"EVAL_SCORE_DROPPED","returnedRetryable":false,"returnedTraceId":"trace_w6_007"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-007-eval-score-dropped","status":"FAILED","severity":"error","failureType":"EVAL_SCORE_DROPPED","retryable":false,"latencyMs":6,"estimatedCostUsd":0,"traceId":"trace_w6_007","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu91w0006mmy8b6d1sk1g","returnedStatus":"FAILED","returnedFailureType":"EVAL_SCORE_DROPPED","returnedRetryable":false,"returnedTraceId":"trace_w6_007"} |
 | AiCallLog status matches returned gateway result | PASS | FAILED | FAILED |
 
 ### w6-008-missing-trace-id
@@ -198,13 +198,13 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | status matches expectedStatus | PASS | SUCCEEDED | {"returned":"SUCCEEDED","persisted":"SUCCEEDED"} |
 | errorType matches expectedFailureType | PASS | none | {"returned":null,"persisted":null,"usedForAssertion":null} |
 | retryable matches expectedRetryable | PASS | false | {"returned":false,"persisted":false} |
-| traceId exists when required | PASS | true | trace_67170ce8-410d-4c93-9e00-9521c35190de |
-| traceId is generated when required | PASS | true | trace_67170ce8-410d-4c93-9e00-9521c35190de |
+| traceId exists when required | PASS | true | trace_8693afa3-38ea-4ac0-840f-fd852966cfc3 |
+| traceId is generated when required | PASS | true | trace_8693afa3-38ea-4ac0-840f-fd852966cfc3 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v1 |
 | modelVersion exists when required | PASS | true | synthetic-v1 |
-| latencyMs is recorded when required | PASS | true | 3 |
+| latencyMs is recorded when required | PASS | true | 5 |
 | estimatedCostUsd is recorded when required | PASS | true | 0.0012 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-008-missing-trace-id","status":"SUCCEEDED","severity":"ok","failureType":null,"retryable":false,"latencyMs":3,"estimatedCostUsd":0.0012,"traceId":"trace_67170ce8-410d-4c93-9e00-9521c35190de","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m15700074qy8w8nkug8u","returnedStatus":"SUCCEEDED","returnedFailureType":null,"returnedRetryable":false,"returnedTraceId":"trace_67170ce8-410d-4c93-9e00-9521c35190de"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-008-missing-trace-id","status":"SUCCEEDED","severity":"ok","failureType":null,"retryable":false,"latencyMs":5,"estimatedCostUsd":0.0012,"traceId":"trace_8693afa3-38ea-4ac0-840f-fd852966cfc3","modelVersion":"synthetic-v1","promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu92g0007mmy8zcfclumu","returnedStatus":"SUCCEEDED","returnedFailureType":null,"returnedRetryable":false,"returnedTraceId":"trace_8693afa3-38ea-4ac0-840f-fd852966cfc3"} |
 | AiCallLog status matches returned gateway result | PASS | SUCCEEDED | SUCCEEDED |
 
 ### w6-009-missing-model-version
@@ -223,9 +223,9 @@ This eval verifies that synthetic gateway failures become structured, dashboard-
 | traceId is generated when required | PASS | false | trace_w6_009 |
 | promptVersion exists when required | PASS | true | synthetic_gateway_test_v1 |
 | modelVersion exists when required | PASS | false | none |
-| latencyMs is recorded when required | PASS | true | 7 |
+| latencyMs is recorded when required | PASS | true | 17 |
 | estimatedCostUsd is recorded when required | PASS | true | 0 |
-| case is dashboard-compatible | PASS | true | {"caseId":"w6-009-missing-model-version","status":"BLOCKED","severity":"error","failureType":"MISSING_MODEL_VERSION","retryable":false,"latencyMs":7,"estimatedCostUsd":0,"traceId":"trace_w6_009","modelVersion":null,"promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqf6m15r00084qy8zkedz7e1","returnedStatus":"BLOCKED","returnedFailureType":"MISSING_MODEL_VERSION","returnedRetryable":false,"returnedTraceId":"trace_w6_009"} |
+| case is dashboard-compatible | PASS | true | {"caseId":"w6-009-missing-model-version","status":"BLOCKED","severity":"error","failureType":"MISSING_MODEL_VERSION","retryable":false,"latencyMs":17,"estimatedCostUsd":0,"traceId":"trace_w6_009","modelVersion":null,"promptVersion":"synthetic_gateway_test_v1","aiCallLogId":"cmqgcu9370008mmy8hctvsogn","returnedStatus":"BLOCKED","returnedFailureType":"MISSING_MODEL_VERSION","returnedRetryable":false,"returnedTraceId":"trace_w6_009"} |
 | AiCallLog status matches returned gateway result | PASS | BLOCKED | BLOCKED |
 
 ## Production Proof

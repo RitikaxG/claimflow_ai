@@ -33,6 +33,13 @@ export function DashboardHeader() {
         >
           Review Queue
         </Link>
+
+        <Link
+          href="/evals"
+          className="rounded-lg border border-gray-200 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+        >
+          Eval Dashboard
+        </Link>
       </nav>
     </header>
   );
