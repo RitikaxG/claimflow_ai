@@ -640,3 +640,66 @@ model AiCallLog {
   @@index([createdAt])
   @@map("ai_call_logs")
 }
+
+enum EvalSuiteKind {
+  WEEK1_EXTRACTION
+  WEEK2_REVIEW
+  WEEK3_RAG
+  WEEK4_AGENT
+  WEEK5_MEMORY
+  WEEK6_GATEWAY_OBSERVABILITY
+}
+
+enum EvalCaseStatus {
+  PASSED
+  FAILED
+  WARNING
+}
+
+model EvalRun {
+  id String @id @default(cuid())
+
+  suite EvalSuiteKind
+  label String?
+  totalCases Int
+  passedCases Int
+  failedCases Int
+  warningCases Int
+
+  passRate Float
+  averageScore Float?
+
+  metricsJson Json?
+  metadataJson Json?
+
+  createdAt DateTime @default(now())
+
+  cases EvalCaseResult[]
+
+  @@index([suite])
+  @@index([createdAt])
+  @@map("eval_runs")
+}
+
+model EvalCaseResult {
+  id String @id @default(cuid())
+
+  evalRunId String
+  evalRun EvalRun @relation(fields: [evalRunId], references: [id], onDelete: Cascade)
+
+  caseId String
+  status EvalCaseStatus
+  score Float?
+
+  expectedJson Json?
+  actualJson Json?
+  failureReason String?
+  metadataJson Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([evalRunId])
+  @@index([caseId])
+  @@index([status])
+  @@map("eval_case_results")
+}
