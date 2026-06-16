@@ -2,6 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { prisma } from "@repo/db";
+import { recordEvalRun } from "./lib/eval-run-recorder";
 
 type SourceType = "EMAIL_TEXT" | "PDF";
 
@@ -786,9 +787,35 @@ async function evaluatePacket(packetDir: string): Promise<PacketEvalResult> {
   };
 }
 
-function toMarkdown(results: PacketEvalResult[]) {
+async function toMarkdown(results: PacketEvalResult[]) {
   const passed = results.filter((result) => result.passed).length;
   const failed = results.length - passed;
+
+  await recordEvalRun({
+    suite: "WEEK2_REVIEW",
+    label: "Week 2 Review Workflow Eval",
+    totalCases: results.length,
+    passedCases: passed,
+    failedCases: failed,
+    passRate: passed / Math.max(results.length, 1),
+    metricsJson: {
+      review_routing_accuracy: passed / Math.max(results.length, 1),
+    },
+    metadataJson: {
+      packetsRoot: PACKETS_ROOT,
+      reportRoot: REPORT_ROOT,
+    },
+    cases: results.map((result) => ({
+      caseId: result.packetId,
+      status: result.passed ? "PASSED" : "FAILED",
+      actualJson: result,
+      failureReason: result.blockers.join("; ") || null,
+      metadataJson: {
+        scenario: result.scenario,
+        lines: result.lines,
+      },
+    })),
+  });
 
   const lines: string[] = [];
 
@@ -883,7 +910,7 @@ async function main() {
 
   await writeFile(
     path.join(REPORT_ROOT, "week-2-review-workflow-eval.md"),
-    toMarkdown(results),
+    await toMarkdown(results),
   );
 
   const passed = results.filter((result) => result.passed).length;

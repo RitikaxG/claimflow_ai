@@ -16,6 +16,7 @@ import {
   type ClaimStateForAgent,
   type ProposedAgentAction,
 } from "@repo/shared/schemas";
+import { recordEvalRun } from "./lib/eval-run-recorder";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -1195,6 +1196,41 @@ async function main() {
   await mkdir(REPORT_ROOT, { recursive: true });
   await writeFile(JSON_REPORT_PATH, toPrettyJson(report));
   await writeFile(MARKDOWN_REPORT_PATH, renderMarkdown(report));
+
+  const persistedCases = report.cases.filter((item) => item.mode === "mock");
+  const persistedPassed = persistedCases.filter((item) => item.passed).length;
+
+  await recordEvalRun({
+    suite: "WEEK4_AGENT",
+    label: "Week 4 Agent Actions Eval",
+    totalCases: persistedCases.length,
+    passedCases: persistedPassed,
+    failedCases: persistedCases.length - persistedPassed,
+    passRate: persistedPassed / Math.max(persistedCases.length, 1),
+    metricsJson: report.summary,
+    metadataJson: {
+      datasetRoot: DATASET_ROOT,
+      batchProgress: report.batchProgress,
+      realAgentMode: report.realAgentMode,
+      jsonReportPath: JSON_REPORT_PATH,
+      markdownReportPath: MARKDOWN_REPORT_PATH,
+    },
+    cases: persistedCases.map((item) => ({
+      caseId: item.packetId,
+      status: item.passed ? "PASSED" : "FAILED",
+      expectedJson: {
+        expectedActions: item.expectedActions,
+        expectedPostActions: item.expectedPostActions,
+        expectedFinalStatus: item.expectedFinalStatus,
+      },
+      actualJson: item,
+      failureReason: item.error,
+      metadataJson: {
+        mode: item.mode,
+        initialState: item.initialState,
+      },
+    })),
+  });
 
   console.log("");
   console.log("Week 4 agent actions eval batch complete.");

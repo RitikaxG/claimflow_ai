@@ -10,6 +10,7 @@ import {
   CoverageAnswerSchema,
   type CoverageAnswer,
 } from "@repo/shared/schemas";
+import { recordEvalRun } from "./lib/eval-run-recorder";
 
 type CoverageDecision =
   | "COVERED"
@@ -790,6 +791,35 @@ async function main() {
   await mkdir(REPORT_ROOT, { recursive: true });
   await writeFile(JSON_REPORT_PATH, toPrettyJson(report));
   await writeFile(MARKDOWN_REPORT_PATH, buildMarkdownReport(report));
+
+  await recordEvalRun({
+    suite: "WEEK3_RAG",
+    label: "Week 3 Policy RAG Eval",
+    totalCases: report.summary.total,
+    passedCases: report.summary.passed,
+    failedCases: report.summary.failed,
+    passRate: report.summary.passed / Math.max(report.summary.total, 1),
+    metricsJson: report.summary,
+    metadataJson: {
+      datasetRoot: DATASET_ROOT,
+      jsonReportPath: JSON_REPORT_PATH,
+      markdownReportPath: MARKDOWN_REPORT_PATH,
+    },
+    cases: report.cases.map((item) => ({
+      caseId: item.questionId,
+      status: item.passed ? "PASSED" : "FAILED",
+      expectedJson: {
+        expectedDecision: item.expectedDecision,
+        expectedRetrievedClauses: item.expectedRetrievedClauses,
+      },
+      actualJson: item,
+      failureReason: item.blockers.join("; ") || null,
+      metadataJson: {
+        packetId: item.packetId,
+        question: item.question,
+      },
+    })),
+  });
 
   console.log("");
   console.log("Week 3 RAG eval complete.");

@@ -16,6 +16,7 @@ import {
   type Week6GatewayCaseReport,
   type Week6GatewayEvalReport,
 } from "./lib/eval-result-writer";
+import { recordEvalRun } from "./lib/eval-run-recorder";
 
 const REPORT_SCHEMA_VERSION = 1;
 
@@ -527,6 +528,45 @@ async function main() {
   const written = await writeWeek6GatewayEvalReport({
     reportRoot,
     report,
+  });
+
+  await recordEvalRun({
+    suite: "WEEK6_GATEWAY_OBSERVABILITY",
+    label: "Week 6 Gateway Observability Eval",
+    totalCases: report.summary.totalCases,
+    passedCases: report.summary.passed,
+    failedCases: report.summary.failed,
+    warningCases: report.summary.warningCases,
+    passRate: report.summary.passRate ?? 0,
+    metricsJson: report.summary.metrics,
+    metadataJson: {
+      datasetRoot,
+      generatedAt: report.generatedAt,
+      jsonReportPath: written.jsonPath,
+      markdownReportPath: written.markdownPath,
+      schemaVersion: report.schemaVersion,
+    },
+    cases: results.map((result) => {
+      const actual = toRecord(result.actual);
+      const severity = actual.severity;
+
+      return {
+        caseId: result.caseId,
+        status: !result.passed
+          ? "FAILED"
+          : severity === "warning"
+            ? "WARNING"
+            : "PASSED",
+        expectedJson: result.expected,
+        actualJson: result.actual,
+        failureReason: result.error,
+        metadataJson: {
+          category: result.category,
+          title: result.title,
+          checks: result.checks,
+        },
+      };
+    }),
   });
 
   console.log("");

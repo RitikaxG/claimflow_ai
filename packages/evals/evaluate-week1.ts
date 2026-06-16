@@ -5,6 +5,7 @@ import {
   ClaimExtractionSchema,
   ClaimValidationResultSchema,
 } from "@repo/shared/schemas";
+import { recordEvalRun } from "./lib/eval-run-recorder";
 
 type FieldCheck = {
   field: string;
@@ -210,13 +211,58 @@ function formatValue(value: unknown): string {
   return `\`${typeof value === "string" ? value : JSON.stringify(value)}\``;
 }
 
-function toMarkdown(results: SampleResult[]) {
+async function toMarkdown(results: SampleResult[]) {
   const lines: string[] = [];
 
   const blockerCount = results.reduce(
     (total, result) => total + result.blockers.length,
     0,
   );
+
+  const totalChecks = results.reduce(
+    (sum, result) => sum + result.extractionTotal + result.validationChecks.length,
+    0,
+  );
+
+  const passedChecks = results.reduce(
+    (sum, result) =>
+      sum +
+      result.extractionScore +
+      result.validationChecks.filter((check) => check.passed).length,
+    0,
+  );
+
+  await recordEvalRun({
+    suite: "WEEK1_EXTRACTION",
+    label: "Week 1 Extraction and Validation Eval",
+    totalCases: results.length,
+    passedCases: results.filter((result) => result.blockers.length === 0).length,
+    failedCases: results.filter((result) => result.blockers.length > 0).length,
+    passRate: results.length === 0
+      ? 0
+      : results.filter((result) => result.blockers.length === 0).length / results.length,
+    averageScore: totalChecks === 0 ? null : passedChecks / totalChecks,
+    metricsJson: {
+      extraction_field_accuracy: totalChecks === 0 ? null : passedChecks / totalChecks,
+      blocker_count: blockerCount,
+    },
+    metadataJson: {
+      evalResultsDir: EVAL_RESULTS_DIR,
+    },
+    cases: results.map((result) => ({
+      caseId: result.sampleName,
+      status: result.blockers.length === 0 ? "PASSED" : "FAILED",
+      score:
+        result.extractionTotal === 0
+          ? null
+          : result.extractionScore / result.extractionTotal,
+      expectedJson: {
+        expectedFinalStatus: result.expectedFinalStatus,
+      },
+      actualJson: result,
+      failureReason: result.blockers.join("; ") || null,
+    })),
+  });
 
   lines.push("# Week 1 Gemini Extraction + Validation Eval");
   lines.push("");
@@ -425,7 +471,7 @@ async function main() {
 
   await writeFile(
     path.join(EVAL_RESULTS_DIR, "week-1-eval.md"),
-    toMarkdown(results),
+    await toMarkdown(results),
   );
 
   const blockerCount = results.reduce(

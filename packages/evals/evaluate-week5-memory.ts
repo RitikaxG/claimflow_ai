@@ -18,6 +18,7 @@ import {
   type ClaimStateForAgent,
   type ProposedAgentAction,
 } from "@repo/shared/schemas";
+import { recordEvalRun } from "./lib/eval-run-recorder";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -1675,6 +1676,33 @@ async function main() {
 
   await writeJson(JSON_REPORT_PATH, report);
   await writeFile(MARKDOWN_REPORT_PATH, buildMarkdownReport(report));
+
+  await recordEvalRun({
+    suite: "WEEK5_MEMORY",
+    label: "Week 5 Workflow Memory Eval",
+    totalCases: report.summary.totalPackets,
+    passedCases: report.summary.passed,
+    failedCases: report.summary.failed,
+    passRate: report.summary.passed / Math.max(report.summary.totalPackets, 1),
+    metricsJson: report.summary,
+    metadataJson: {
+      datasetRoot: DATASET_ROOT,
+      schemaVersion: report.schemaVersion,
+      jsonReportPath: JSON_REPORT_PATH,
+      markdownReportPath: MARKDOWN_REPORT_PATH,
+    },
+    cases: report.cases.map((item) => ({
+      caseId: item.packetId,
+      status: item.passed ? "PASSED" : "FAILED",
+      expectedJson: item.expected,
+      actualJson: item.actual,
+      failureReason: item.error,
+      metadataJson: {
+        category: item.category,
+        title: item.title,
+      },
+    })),
+  });
 
   console.log("");
   console.log("Week 5 memory eval complete.");
