@@ -17,7 +17,7 @@ import { RunCoverageCtaCard } from "./run-coverage-cta-card";
 import { RunAgentStepCtaCard } from "./run-agent-step-cta-card";
 import { NextRecommendedActionCard } from "./next-recommended-action-card";
 import { RunMemoryPanel } from "./run-memory-panel";
-import { WorkflowTracePanel } from "./workflow-trace-panel";
+import { RunTraceCtaCard } from "./run-trace-cta-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -58,6 +58,13 @@ export function RunDetailScreen() {
         <RunStatusCard run={selectedRun} />
       </div>
 
+      <RunTraceCtaCard
+        runId={selectedRun.id}
+        status={selectedRun.status}
+        reviewTaskStatus={selectedRun.reviewTask?.status ?? null}
+      />
+
+
       <NextRecommendedActionCard run={selectedRun} />
 
       <RunMemoryPanel runId={selectedRun.id} status={selectedRun.status} />
@@ -82,8 +89,6 @@ export function RunDetailScreen() {
         latestActionType={selectedRun.agentActionLogs?.[0]?.action ?? null}
         latestActionStatus={selectedRun.agentActionLogs?.[0]?.status ?? null}
       />
-
-      <WorkflowTracePanel runId={selectedRun.id} />
 
       <RunTimeline
         events={selectedRun.events}

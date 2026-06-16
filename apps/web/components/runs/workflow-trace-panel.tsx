@@ -99,10 +99,10 @@ export function WorkflowTracePanel({ runId }: { runId: string }) {
     <section className="space-y-5 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div>
         <p className="text-sm font-medium text-gray-500">
-          Week 6 · Run-level trace
+          Trace summary
         </p>
         <h2 className="mt-1 text-lg font-semibold text-gray-950">
-          Workflow trace and gateway visibility
+          Gateway and workflow visibility
         </h2>
         <p className="mt-1 max-w-3xl text-sm text-gray-600">
           End-to-end explanation of the claim run: model calls, prompt/model
