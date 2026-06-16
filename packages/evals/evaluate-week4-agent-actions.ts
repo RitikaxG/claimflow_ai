@@ -1226,8 +1226,13 @@ async function main() {
       actualJson: item,
       failureReason: item.error,
       metadataJson: {
+        title: `${item.initialState.replaceAll("_", " ")} -> ${
+          item.actualAction ?? "No action"
+        }`,
         mode: item.mode,
         initialState: item.initialState,
+        evaluated:
+          "Agent tool selection, guardrail decision, final workflow state, unsafe action blocking, and post-action behavior.",
       },
     })),
   });

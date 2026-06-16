@@ -1,6 +1,6 @@
 # Week 5 Memory Eval Report
 
-Generated at: 2026-06-10T07:14:02.965Z
+Generated at: 2026-06-16T08:17:02.404Z
 
 ## Executive Summary
 
@@ -414,7 +414,7 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 **Actual retrieval result**
 
 - Total candidates: `2`
-- Retrieved seed IDs: `WMEM-SEED-W5-007`, `WMEM-SEED-W5-003`
+- Retrieved seed IDs: `WMEM-SEED-W5-003`, `WMEM-SEED-W5-007`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`
 - Hit logging: `none`

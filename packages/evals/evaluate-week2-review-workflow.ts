@@ -811,8 +811,11 @@ async function toMarkdown(results: PacketEvalResult[]) {
       actualJson: result,
       failureReason: result.blockers.join("; ") || null,
       metadataJson: {
+        title: result.scenario,
         scenario: result.scenario,
         lines: result.lines,
+        evaluated:
+          "Upload, extraction, validation, review task routing, and reviewer workflow behavior.",
       },
     })),
   });

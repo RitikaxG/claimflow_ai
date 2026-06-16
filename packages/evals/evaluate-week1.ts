@@ -261,6 +261,13 @@ async function toMarkdown(results: SampleResult[]) {
       },
       actualJson: result,
       failureReason: result.blockers.join("; ") || null,
+      metadataJson: {
+        title: result.sampleName
+          .replaceAll("-", " ")
+          .replace(/\b\w/g, (char) => char.toUpperCase()),
+        evaluated:
+          "Expected extracted claim fields and validation output were compared with actual output.",
+      },
     })),
   });
 

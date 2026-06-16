@@ -815,8 +815,11 @@ async function main() {
       actualJson: item,
       failureReason: item.blockers.join("; ") || null,
       metadataJson: {
+        title: item.question,
         packetId: item.packetId,
         question: item.question,
+        evaluated:
+          "Policy retrieval, coverage decision, citation support, refusal behavior, and false approval safety.",
       },
     })),
   });

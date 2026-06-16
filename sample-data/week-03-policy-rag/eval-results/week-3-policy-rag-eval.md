@@ -1,18 +1,18 @@
 # Week 3 Policy RAG Eval
 
-Generated at: 2026-05-27T06:34:03.888Z
+Generated at: 2026-06-16T08:52:15.477Z
 
 ## Summary
 
 | Metric | Value |
 | --- | --- |
 | Total cases | 12 |
-| Passed | 12 |
-| Failed | 0 |
-| Retrieval hit rate | 100.0% |
+| Passed | 11 |
+| Failed | 1 |
+| Retrieval hit rate | 91.7% |
 | Decision match rate | 100.0% |
-| Citation present rate | 100.0% |
-| Citation support rate | 100.0% |
+| Citation present rate | 91.7% |
+| Citation support rate | 91.7% |
 | Unsupported refusal rate | 100.0% |
 | False approval rate | 0.0% |
 
@@ -58,11 +58,15 @@ Retrieval status: `ENOUGH_EVIDENCE`
 
 Top similarity: 0.8369
 
-Citation count: 2
+Citation count: 1
 
 Forced NEEDS_REVIEW: no
 
-### ✅ W3-COV-003
+Guardrail reasons:
+
+- Citation clauseId COV-TP-001 does not match retrieved chunk cmppkhs6y0001evy8fqre7db9
+
+### ❌ W3-COV-003
 
 Question: Can this high repair estimate be approved directly?
 
@@ -74,15 +78,23 @@ Actual decision: `NEEDS_REVIEW`
 
 Expected clauses: ["LIMIT-RP-001","EV-OD-001"]
 
-Retrieved clauses: ["COV-OD-001","COV-TH-001","COV-TP-001","EV-FLD-001","EV-OD-001","EV-TH-001","EV-TP-001","LIMIT-RP-001"]
+Retrieved clauses: []
 
-Retrieval status: `ENOUGH_EVIDENCE`
+Retrieval status: `INSUFFICIENT_EVIDENCE`
 
-Top similarity: 0.8373
+Top similarity: null
 
-Citation count: 1
+Citation count: 0
 
-Forced NEEDS_REVIEW: no
+Forced NEEDS_REVIEW: yes
+
+Guardrail reasons:
+
+- {"error":{"code":503,"message":"The service is currently unavailable.","status":"UNAVAILABLE"}}
+
+Blockers:
+
+- Eval execution failed: {"error":{"code":503,"message":"The service is currently unavailable.","status":"UNAVAILABLE"}}
 
 ### ✅ W3-COV-004
 

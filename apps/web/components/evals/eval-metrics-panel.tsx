@@ -1,7 +1,28 @@
-function formatValue(value: unknown) {
+function humanizeMetricKey(key: string) {
+  return key
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replaceAll("_", " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function isRateMetric(key: string) {
+  const normalized = key.toLowerCase();
+
+  return (
+    normalized.includes("rate") ||
+    normalized.includes("accuracy") ||
+    normalized.includes("precision") ||
+    normalized.includes("recall")
+  );
+}
+
+function formatValue(key: string, value: unknown) {
   if (typeof value === "number") {
-    if (value >= 0 && value <= 1) return `${(value * 100).toFixed(1)}%`;
-    return Number.isInteger(value) ? String(value) : value.toFixed(4);
+    if (isRateMetric(key)) return `${(value * 100).toFixed(1)}%`;
+    if (Number.isInteger(value)) return String(value);
+    return value.toFixed(4);
   }
 
   if (value === null || value === undefined) return "none";
@@ -25,10 +46,10 @@ export function EvalMetricsPanel({ metrics }: { metrics: unknown }) {
           {metricRows.map(([key, value]) => (
             <div key={key} className="rounded-xl border border-gray-100 bg-gray-50 p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                {key.replaceAll("_", " ")}
+                {humanizeMetricKey(key)}
               </p>
               <p className="mt-1 text-lg font-semibold text-gray-950">
-                {formatValue(value)}
+                {formatValue(key, value)}
               </p>
             </div>
           ))}

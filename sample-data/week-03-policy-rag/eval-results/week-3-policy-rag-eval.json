@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-05-27T06:34:03.888Z",
+  "generatedAt": "2026-06-16T08:52:15.477Z",
   "summary": {
     "total": 12,
-    "passed": 12,
-    "failed": 0,
-    "retrievalHitRate": 1,
+    "passed": 11,
+    "failed": 1,
+    "retrievalHitRate": 0.9166666666666666,
     "decisionMatchRate": 1,
-    "citationPresentRate": 1,
-    "citationSupportRate": 1,
+    "citationPresentRate": 0.9166666666666666,
+    "citationSupportRate": 0.9166666666666666,
     "unsupportedRefusalRate": 1,
     "falseApprovalRate": 0
   },
@@ -63,10 +63,12 @@
       "retrievalStatus": "ENOUGH_EVIDENCE",
       "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
       "topSimilarity": 0.8368881137638059,
-      "citationCount": 2,
+      "citationCount": 1,
       "citationSupportPassed": true,
       "forcedNeedsReview": false,
-      "guardrailReasons": [],
+      "guardrailReasons": [
+        "Citation clauseId COV-TP-001 does not match retrieved chunk cmppkhs6y0001evy8fqre7db9"
+      ],
       "falseApproval": false,
       "passed": true,
       "blockers": []
@@ -81,26 +83,21 @@
         "LIMIT-RP-001",
         "EV-OD-001"
       ],
-      "retrievedClauseIds": [
-        "COV-OD-001",
-        "COV-TH-001",
-        "COV-TP-001",
-        "EV-FLD-001",
-        "EV-OD-001",
-        "EV-TH-001",
-        "EV-TP-001",
-        "LIMIT-RP-001"
+      "retrievedClauseIds": [],
+      "retrievalStatus": "INSUFFICIENT_EVIDENCE",
+      "retrievalReason": "{\"error\":{\"code\":503,\"message\":\"The service is currently unavailable.\",\"status\":\"UNAVAILABLE\"}}",
+      "topSimilarity": null,
+      "citationCount": 0,
+      "citationSupportPassed": false,
+      "forcedNeedsReview": true,
+      "guardrailReasons": [
+        "{\"error\":{\"code\":503,\"message\":\"The service is currently unavailable.\",\"status\":\"UNAVAILABLE\"}}"
       ],
-      "retrievalStatus": "ENOUGH_EVIDENCE",
-      "retrievalReason": "At least one retrieved policy chunk is above the similarity threshold.",
-      "topSimilarity": 0.8373044244362561,
-      "citationCount": 1,
-      "citationSupportPassed": true,
-      "forcedNeedsReview": false,
-      "guardrailReasons": [],
       "falseApproval": false,
-      "passed": true,
-      "blockers": []
+      "passed": false,
+      "blockers": [
+        "Eval execution failed: {\"error\":{\"code\":503,\"message\":\"The service is currently unavailable.\",\"status\":\"UNAVAILABLE\"}}"
+      ]
     },
     {
       "questionId": "W3-COV-004",

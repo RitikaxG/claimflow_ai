@@ -6,6 +6,7 @@ import Link from "next/link";
 import axios from "axios";
 import { EvalMetricsPanel } from "./eval-metrics-panel";
 import { EvalCaseTable } from "./eval-case-table";
+import { EvalExplanationPanel } from "./eval-explanation-panel";
 
 type EvalRunResponse = {
   evalRun: {
@@ -99,6 +100,7 @@ export function EvalRunDetailScreen() {
         </div>
       </section>
 
+      <EvalExplanationPanel suite={run.suite} />
       <EvalMetricsPanel metrics={run.metricsJson} />
       <EvalCaseTable cases={run.cases} />
     </div>
