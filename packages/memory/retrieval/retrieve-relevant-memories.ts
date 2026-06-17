@@ -21,9 +21,23 @@ function toPrismaJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
+function eligibleMemoryWhere(): Prisma.WorkflowMemoryWhereInput {
+  return {
+    status: {
+      in: ["ACTIVE", "STRENGTHENED", "WEAKENED"],
+    },
+  };
+}
+
 function buildCandidateWhere(
     query : BuildMemoryQuery,
 ) : Prisma.WorkflowMemoryWhereInput| null {
+    const statusWhere = eligibleMemoryWhere();
+
+    if (query.tags.length > 0) {
+        return statusWhere;
+    }
+
     const or: Prisma.WorkflowMemoryWhereInput[] = [];
 
     if(query.claimantId){
@@ -60,9 +74,7 @@ function buildCandidateWhere(
     }
 
     return {
-        status : {
-            in : ["ACTIVE","STRENGTHENED","WEAKENED"]
-        },
+        ...statusWhere,
         OR : or
     };
 }
@@ -212,7 +224,7 @@ export async function retrieveRelevantMemories(input: {
         createdAt: "desc",
       },
     ],
-    take: 100,
+    take: 250,
   });
 
   const scored = candidates
