@@ -9,7 +9,12 @@ type Params = {
     }>;
 };
 
+type ReceivedEventType =
+    | "ADDITIONAL_EVIDENCE_RECEIVED"
+    | "ADDITIONAL_INFORMATION_RECEIVED";
+
 type ReopenEventView = {
+    type : ReceivedEventType;
     createdAt : Date;
     metadata : unknown;
 };
@@ -152,6 +157,30 @@ function getFieldsFromUnknown(value : unknown): string[] {
     return directField ? [directField] : [];
 }
 
+function getDetailedEvidenceLabels(value : unknown): string[] {
+    if(!Array.isArray(value)){
+        return [];
+    }
+
+    return uniqueValues(
+        value
+            .map((item) => {
+                if(!isRecord(item)){
+                    return null;
+                }
+
+                const note = typeof item.note === "string" ? item.note.trim() : "";
+
+                if(!note){
+                    return null;
+                }
+
+                return getLabelFromUnknown(item);
+            })
+            .filter((item) : item is string => item !== null),
+    );
+}
+
 function normalizeFieldKey(value : string): string {
     return value
         .replace(/([a-z0-9])([A-Z])/g,"$1_$2")
@@ -201,20 +230,23 @@ function getRequestedItems(input : {
         ? getLabelsFromUnknown(input.latestDraft.requestedEvidence)
         : [];
 
+    const requestedFieldsFromReason = getFieldsFromUnknown(input.reasonJson);
+    const requestedEvidenceFromReason = getLabelsFromUnknown(input.reasonJson);
+
     const requestedFields =
         requestedFieldsFromDraft.length > 0
             ? requestedFieldsFromDraft
             : requestedFieldRequestsFromDraft.length > 0
                 ? requestedFieldRequestsFromDraft
-                : getFieldsFromUnknown(input.reasonJson).length > 0
-                    ? getFieldsFromUnknown(input.reasonJson)
+                : requestedFieldsFromReason.length > 0
+                    ? requestedFieldsFromReason
                     : getFieldsFromUnknown(input.validationJson);
 
     const requestedEvidence =
         requestedEvidenceFromDraft.length > 0
             ? requestedEvidenceFromDraft
-            : getLabelsFromUnknown(input.reasonJson).length > 0
-                ? getLabelsFromUnknown(input.reasonJson)
+            : requestedEvidenceFromReason.length > 0
+                ? requestedEvidenceFromReason
                 : getLabelsFromUnknown(input.validationJson);
 
     return {
@@ -233,7 +265,13 @@ function getReceivedItems(events : ReopenEventView[]): RequestedItems {
         }
 
         receivedFields.push(...getFieldsFromUnknown(event.metadata.fieldValues));
-        receivedEvidence.push(...getLabelsFromUnknown(event.metadata.evidenceItems));
+
+        if(event.type === "ADDITIONAL_EVIDENCE_RECEIVED"){
+            receivedEvidence.push(...getLabelsFromUnknown(event.metadata.evidenceItems));
+            return;
+        }
+
+        receivedEvidence.push(...getDetailedEvidenceLabels(event.metadata.evidenceItems));
     });
 
     return {
@@ -283,6 +321,7 @@ export async function POST(_request : Request, { params } : Params) {
                             createdAt : "asc",
                         },
                         select : {
+                            type : true,
                             createdAt : true,
                             metadata : true,
                         },
