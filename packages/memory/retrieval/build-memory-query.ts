@@ -171,7 +171,9 @@ function getPolicyId(claimState : MemoryClaimState) : string | null {
         getString(claimState.policyId) ??
         firstStringAtPaths(claimState.extractedJson,[
             ["policyId"],
+            ["policyNumber"],
             ["policy","policyId"],
+            ["policy","policyNumber"],
         ])
     )
 }
