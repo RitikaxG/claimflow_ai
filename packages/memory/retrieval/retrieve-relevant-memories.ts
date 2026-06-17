@@ -33,11 +33,6 @@ function buildCandidateWhere(
     query : BuildMemoryQuery,
 ) : Prisma.WorkflowMemoryWhereInput| null {
     const statusWhere = eligibleMemoryWhere();
-
-    if (query.tags.length > 0) {
-        return statusWhere;
-    }
-
     const or: Prisma.WorkflowMemoryWhereInput[] = [];
 
     if(query.claimantId){
@@ -66,6 +61,12 @@ function buildCandidateWhere(
             fieldPath : {
                 in : query.fieldPaths
             }
+        });
+    }
+
+    if(query.tags.length > 0){
+        or.push({
+            kind : "RECURRING_ERROR_PATTERN",
         });
     }
 
