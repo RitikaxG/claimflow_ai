@@ -177,6 +177,18 @@ function getDetailedEvidenceLabels(value : unknown): string[] {
     );
 }
 
+function isGenericEvidenceLabel(value : string): boolean {
+    const normalized = value.toLowerCase().replace(/[^a-z0-9]+/g,"");
+
+    return [
+        "additionalevidencerequestedbyagent",
+        "additionalevidencerequested",
+        "additionalevidence",
+        "supportingevidence",
+        "evidencerequested",
+    ].includes(normalized);
+}
+
 function normalizeFieldKey(value : string): string {
     return value
         .replace(/([a-z0-9])([A-Z])/g,"$1_$2")
@@ -238,12 +250,24 @@ function getRequestedItems(input : {
                     ? requestedFieldsFromReason
                     : getFieldsFromUnknown(input.validationJson);
 
+    const specificRequestedEvidenceFromDraft = requestedEvidenceFromDraft.filter(
+        (item) => !isGenericEvidenceLabel(item),
+    );
+    const specificRequestedEvidenceFromReason = requestedEvidenceFromReason.filter(
+        (item) => !isGenericEvidenceLabel(item),
+    );
+    const specificRequestedEvidenceFromValidation = getLabelsFromUnknown(
+        input.validationJson,
+    ).filter((item) => !isGenericEvidenceLabel(item));
+
     const requestedEvidence =
-        requestedEvidenceFromDraft.length > 0
-            ? requestedEvidenceFromDraft
-            : requestedEvidenceFromReason.length > 0
-                ? requestedEvidenceFromReason
-                : getLabelsFromUnknown(input.validationJson);
+        requestedFields.length > 0
+            ? specificRequestedEvidenceFromDraft
+            : specificRequestedEvidenceFromDraft.length > 0
+                ? specificRequestedEvidenceFromDraft
+                : specificRequestedEvidenceFromReason.length > 0
+                    ? specificRequestedEvidenceFromReason
+                    : specificRequestedEvidenceFromValidation;
 
     return {
         requestedFields,
