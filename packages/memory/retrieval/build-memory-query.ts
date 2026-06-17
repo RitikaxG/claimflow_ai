@@ -68,6 +68,69 @@ function normalizeTagToken(value: string): string {
     .replace(/^_+|_+$/g, "");
 }
 
+function capitalizeToken(value: string): string {
+  if (value.length === 0) {
+    return value;
+  }
+
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+}
+
+function tokenizeFieldPath(value: string): string[] {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .split(/[^a-zA-Z0-9]+/g)
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+function lowerCamelFromTokens(tokens: string[]): string | null {
+  const [first, ...rest] = tokens;
+
+  if (!first) {
+    return null;
+  }
+
+  return [
+    first.toLowerCase(),
+    ...rest.map((token) => capitalizeToken(token.toLowerCase())),
+  ].join("");
+}
+
+function dottedCamelFromTokens(tokens: string[]): string | null {
+  const [first, ...rest] = tokens;
+
+  if (!first || rest.length === 0) {
+    return null;
+  }
+
+  return `${first.toLowerCase()}.${lowerCamelFromTokens(rest)}`;
+}
+
+function fieldPathAliases(fieldPath: string): string[] {
+  const trimmed = fieldPath.trim();
+
+  if (trimmed.length === 0) {
+    return [];
+  }
+
+  const tokens = tokenizeFieldPath(trimmed);
+  const lowerCamel = lowerCamelFromTokens(tokens);
+  const dottedCamel = dottedCamelFromTokens(tokens);
+  const snakeCase = normalizeTagToken(trimmed);
+
+  return uniqueStrings([
+    trimmed,
+    lowerCamel ?? "",
+    dottedCamel ?? "",
+    snakeCase,
+  ]);
+}
+
+function expandFieldPathAliases(fieldPaths: string[]): string[] {
+  return uniqueStrings(fieldPaths.flatMap((fieldPath) => fieldPathAliases(fieldPath)));
+}
+
 function requiredEvidenceToFieldPaths(requiredEvidence : string[]): string[]{
     return requiredEvidence.flatMap((item) => {
         const trimmed = item.trim();
@@ -108,7 +171,7 @@ function collectFieldPaths(input : {
     missingFields : string[],
     requiredEvidence : string[],
 }) : string[] {
-    return uniqueStrings([
+    return expandFieldPathAliases([
         ...input.missingFields,
         ...(input.missingFields.length > 0 ? ["missingFields"] : []),
         ...requiredEvidenceToFieldPaths(input.requiredEvidence),
