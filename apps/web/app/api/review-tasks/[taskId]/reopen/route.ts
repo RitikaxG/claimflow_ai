@@ -9,12 +9,8 @@ type Params = {
     }>;
 };
 
-type ReceivedEventType =
-    | "ADDITIONAL_EVIDENCE_RECEIVED"
-    | "ADDITIONAL_INFORMATION_RECEIVED";
-
 type ReopenEventView = {
-    type : ReceivedEventType;
+    type : string;
     createdAt : Date;
     metadata : unknown;
 };
