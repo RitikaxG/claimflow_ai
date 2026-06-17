@@ -88,7 +88,9 @@ function findPolicyEntityHint(...sources: unknown[]): StableEntityHint | null {
   for (const source of sources) {
     const policyId = findStringAtPaths(source, [
       ["policyId"],
+      ["policyNumber"],
       ["policy", "policyId"],
+      ["policy", "policyNumber"],
     ]);
 
     if (policyId) {
@@ -221,6 +223,56 @@ function classifyDiff(input: {
         "replace current insuredName from memory",
         "merge near-name claimants without stable identifiers",
         "treat spelling memory as fraud evidence",
+      ],
+      evidenceJson: {
+        reviewDecisionId,
+        fieldPath: diff.fieldPath,
+        changeType: diff.changeType,
+        updateSummary: diff.updateSummary,
+      },
+    };
+  }
+
+  if (
+    normalizedPath === "vehicle.registrationnumber" ||
+    normalizedPath.endsWith(".vehicle.registrationnumber")
+  ) {
+    const entity = explicitEntityHint ?? policyHint ?? claimantHint;
+
+    if (!entity) {
+      return null;
+    }
+
+    return {
+      observationId,
+      sourceType: "REVIEW_DECISION",
+      sourceId: reviewDecisionId,
+      sourcePacketId: null,
+      historicalClaimId: null,
+      observationType: "HUMAN_CORRECTION",
+      entityType: entity.entityType,
+      entityId: entity.entityId,
+      fieldPath: diff.fieldPath,
+      beforeValue: diff.beforeValue,
+      afterValue: diff.afterValue,
+      tags: [
+        "human_verified",
+        "vehicle_registration_number_correction",
+        "field_correction",
+        "missing_field:vehicle_registration_number",
+        "vehicle_registration_number_missing",
+      ],
+      riskLevel: "MEDIUM",
+      shouldCreateMemory: true,
+      recommendedMemoryKind: "HUMAN_CORRECTION",
+      summary: `Reviewer corrected ${diff.fieldPath} during claim review.`,
+      safeUse:
+        "Ask reviewer to verify vehicle.registrationNumber when a future similar claim for this policy or claimant is missing the registration number.",
+      mustNotDo: [
+        "fill vehicle.registrationNumber from memory",
+        "overwrite current extractedJson.vehicle.registrationNumber",
+        "treat memory as vehicle registration evidence",
+        "approve claim based on memory",
       ],
       evidenceJson: {
         reviewDecisionId,
