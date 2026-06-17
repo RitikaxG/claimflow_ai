@@ -91,6 +91,21 @@ function normalizeFieldToken(value: string): string {
     .replace(/^_+|_+$/g, "");
 }
 
+function uniqueStrings(values: string[]): string[] {
+  return Array.from(
+    new Set(values.map((value) => value.trim()).filter(Boolean)),
+  );
+}
+
+function currentFieldAliasValues(query: BuildMemoryQuery): string[] {
+  return uniqueStrings([
+    ...query.missingFields,
+    ...query.requiredEvidence,
+    ...query.fieldPaths,
+    ...query.tags.map((tag) => tag.replace(/^missing_field:/, "")),
+  ]);
+}
+
 function isGenericFieldBucket(fieldPath: string): boolean {
   return GENERIC_FIELD_BUCKETS.has(normalizeComparable(fieldPath));
 }
@@ -162,16 +177,16 @@ function buildRetrievalReason(matchedOn: MemoryMatchSignal[]): string {
     .join(", ")}.`;
 }
 
-function buildMissingFieldTags(missingFields: string[]): string[] {
-  return missingFields.flatMap((field) => {
+function buildMissingFieldTags(values: string[]): string[] {
+  return values.flatMap((field) => {
     const normalized = normalizeTagToken(field);
 
     return [`missing_field:${normalized}`, `${normalized}_missing`];
   });
 }
 
-function buildRequiredEvidenceTags(requiredEvidence: string[]): string[] {
-  return requiredEvidence.flatMap((evidence) => {
+function buildRequiredEvidenceTags(values: string[]): string[] {
+  return values.flatMap((evidence) => {
     const normalized = normalizeTagToken(evidence);
 
     return [`required_evidence:${normalized}`, `${normalized}_required`];
@@ -205,11 +220,11 @@ function scoreRecurringMissingFieldPattern(input: {
   }
 
   const currentMissingFields = new Set(
-    input.query.missingFields.map((field) => normalizeFieldToken(field)),
+    currentFieldAliasValues(input.query).map((field) => normalizeFieldToken(field)),
   );
 
   const matchedPatternFields = patternMissingFields.filter((field) =>
-    currentMissingFields.has(field),
+    currentMissingFields.has(normalizeFieldToken(field)),
   );
 
   if (matchedPatternFields.length === 0) {
@@ -372,10 +387,11 @@ export function scoreMemory(input: {
   }
 
   const memoryTags = getStringArray(memory.tags);
+  const fieldAliasValues = currentFieldAliasValues(query);
 
   const missingFieldMatch = hasAnyTag(
     memoryTags,
-    buildMissingFieldTags(query.missingFields),
+    buildMissingFieldTags(fieldAliasValues),
   );
 
   if (missingFieldMatch) {
@@ -389,7 +405,7 @@ export function scoreMemory(input: {
 
   const requiredEvidenceMatch = hasAnyTag(
     memoryTags,
-    buildRequiredEvidenceTags(query.requiredEvidence),
+    buildRequiredEvidenceTags(fieldAliasValues),
   );
 
   if (requiredEvidenceMatch) {
