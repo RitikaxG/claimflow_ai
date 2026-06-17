@@ -97,12 +97,25 @@ function uniqueStrings(values: string[]): string[] {
   );
 }
 
-function currentFieldAliasValues(query: BuildMemoryQuery): string[] {
+function tagsWithPrefix(tags: string[], prefix: string): string[] {
+  return tags
+    .filter((tag) => tag.startsWith(prefix))
+    .map((tag) => tag.slice(prefix.length));
+}
+
+function currentMissingFieldAliasValues(query: BuildMemoryQuery): string[] {
   return uniqueStrings([
     ...query.missingFields,
+    ...query.fieldPaths,
+    ...tagsWithPrefix(query.tags, "missing_field:"),
+  ]);
+}
+
+function currentRequiredEvidenceAliasValues(query: BuildMemoryQuery): string[] {
+  return uniqueStrings([
     ...query.requiredEvidence,
     ...query.fieldPaths,
-    ...query.tags.map((tag) => tag.replace(/^missing_field:/, "")),
+    ...tagsWithPrefix(query.tags, "required_evidence:"),
   ]);
 }
 
@@ -220,7 +233,9 @@ function scoreRecurringMissingFieldPattern(input: {
   }
 
   const currentMissingFields = new Set(
-    currentFieldAliasValues(input.query).map((field) => normalizeFieldToken(field)),
+    currentMissingFieldAliasValues(input.query).map((field) =>
+      normalizeFieldToken(field),
+    ),
   );
 
   const matchedPatternFields = patternMissingFields.filter((field) =>
@@ -387,11 +402,10 @@ export function scoreMemory(input: {
   }
 
   const memoryTags = getStringArray(memory.tags);
-  const fieldAliasValues = currentFieldAliasValues(query);
 
   const missingFieldMatch = hasAnyTag(
     memoryTags,
-    buildMissingFieldTags(fieldAliasValues),
+    buildMissingFieldTags(currentMissingFieldAliasValues(query)),
   );
 
   if (missingFieldMatch) {
@@ -405,7 +419,7 @@ export function scoreMemory(input: {
 
   const requiredEvidenceMatch = hasAnyTag(
     memoryTags,
-    buildRequiredEvidenceTags(fieldAliasValues),
+    buildRequiredEvidenceTags(currentRequiredEvidenceAliasValues(query)),
   );
 
   if (requiredEvidenceMatch) {
