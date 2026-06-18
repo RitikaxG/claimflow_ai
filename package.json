@@ -9,7 +9,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:generate": "bun --filter @repo/db db:generate",
     "db:migrate": "bun --filter @repo/db db:migrate",
+    "db:deploy": "bun --filter @repo/db db:deploy",
     "db:studio": "bun --filter @repo/db db:studio",
+    "demo:seed": "bun --filter @repo/db demo:seed",
+    "demo:reset": "bun --filter @repo/db demo:reset",
     "eval:week1:export": "bun --filter @repo/evals export:week1",
     "eval:week1": "bun --filter @repo/evals eval:week1",
     "eval:week2:review": "bun --filter @repo/evals eval:week2:review",
@@ -30,7 +33,8 @@
     "eval:week5:memory": "bun --filter @repo/evals eval:week5:memory",
     "gateway:smoke:log": "bun --filter @repo/gateway smoke:log",
     "gateway:smoke:wrapper": "bun --filter @repo/gateway smoke:wrapper",
-    "eval:week6:gateway": "bun --filter @repo/evals eval:week6:gateway"
+    "eval:week6:gateway": "bun --filter @repo/evals eval:week6:gateway",
+    "production:check": "bun run db:generate && bun run check-types && bun run lint && bun run eval:week6:gateway && bun run build"
   },
   "devDependencies": {
     "prettier": "^3.6.0",
