@@ -20,6 +20,9 @@
   "scripts": {
     "db:generate": "prisma generate --schema=./prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
-    "db:studio": "prisma studio"
+    "db:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma",
+    "db:studio": "prisma studio",
+    "demo:seed": "bun --env-file-if-exists=.env scripts/seed-demo.ts",
+    "demo:reset": "bun --env-file-if-exists=.env scripts/reset-demo.ts"
   }
 }

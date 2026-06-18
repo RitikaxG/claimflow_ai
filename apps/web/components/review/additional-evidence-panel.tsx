@@ -179,8 +179,6 @@ function buildEvidenceItems(input : {
 
 export function AdditionalEvidencePanel({ task } : AdditionalEvidencePanelProps) {
     const requestedEvidence = useMemo(() => getRequestedEvidence(task), [task]);
-    const requestedEvidenceKey = requestedEvidence.join("|");
-
     const [selectedLabels,setSelectedLabels] = useState<string[]>(requestedEvidence);
     const [notesByLabel,setNotesByLabel] = useState<Record<string,string>>({});
     const [customLabel,setCustomLabel] = useState("");
@@ -204,7 +202,7 @@ export function AdditionalEvidencePanel({ task } : AdditionalEvidencePanelProps)
 
     useEffect(() => {
         setSelectedLabels(requestedEvidence);
-    }, [requestedEvidenceKey]);
+    }, [requestedEvidence]);
 
     const isBusy = isSubmittingAdditionalEvidence || isReopeningReviewTask;
 
