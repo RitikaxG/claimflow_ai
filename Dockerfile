@@ -14,9 +14,6 @@ RUN DATABASE_URL=postgresql://build:build@localhost:5432/claimflow_ai bun run bu
 FROM oven/bun:1.3.2-slim AS runtime
 
 WORKDIR /app
-RUN apt-get update \\
-  && apt-get install -y --no-install-recommends openssl ca-certificates \\
-  && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production
 COPY --from=build /app /app
 
