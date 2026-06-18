@@ -1,294 +1,400 @@
-# Week 06 Ship Log — AI Gateway, Observability, and Governance
+# Week 06 Bug Fixes — AI Gateway, Observability, and Governance
 
-## Scope
+## 1. Real model calls were invisible outside feature-specific records
 
-Week 06 shipped the production-control and observability layer for ClaimFlow AI.
+### Problem
 
-Weeks 1–5 proved that the product could extract claims, route human review, answer policy questions with RAG, run guarded agent actions, and use workflow memory. However, the real model calls behind those workflows were still difficult to operate as one governed system.
+Extraction, coverage answering, and agent planning each called a model, but there was no shared operational record for comparing their behavior.
 
-Week 06 made model behavior traceable, measurable, and auditable at two levels:
+### Cause
+
+Each feature owned its provider call directly. Model metadata, latency, tokens, cost, retryability, and failures were not governed through one lifecycle.
+
+### Fix
+
+The calls were routed through `callModelThroughGateway()` and persisted as `AiCallLog` rows.
+
+### Result
+
+The main model-backed workflow can now be queried by `runId`, `traceId`, call kind, model, prompt version, status, cost, and latency.
+
+---
+
+## 2. A failed provider call could lose its trace record
+
+### Problem
+
+If logging happened only after a provider response, timeouts and thrown provider errors could disappear from the audit trail.
+
+### Cause
+
+Post-call-only logging assumes the provider returns normally.
+
+### Fix
+
+The gateway creates a `STARTED` row before invoking the provider and updates the same row in success and failure paths.
+
+### Result
+
+Timeouts, provider errors, parse failures, and governance blocks remain visible even when no valid model output exists.
+
+---
+
+## 3. Failure classes were too easy to collapse into one generic error
+
+### Problem
+
+An invalid model response, provider outage, timeout, and policy block require different operational responses.
+
+### Cause
+
+A generic `FAILED` status does not say whether retrying is safe or whether governance intentionally prevented the call.
+
+### Fix
+
+The gateway maps failures into structured status and error types:
 
 ```text
-system-level eval evidence
-→ Is ClaimFlow reliable across known AI failure modes?
-
-single-run trace evidence
-→ What exactly happened in this claim run?
+FAILED     → malformed/invalid response
+RETRYABLE  → timeout or provider error
+BLOCKED    → missing governed metadata or cost policy
 ```
 
-This step was required because a production AI workflow must explain more than its final answer. It must preserve which model and prompt ran, what the call cost, how long it took, how it failed, whether it was retryable, what the agent did next, and where human review remained in control.
+### Result
+
+The workflow and dashboard can distinguish retryable incidents from permanent failures and intentional policy blocks.
 
 ---
 
-## Shipped
+## 4. Latency spikes were initially at risk of being counted as model failures
 
-### 1. Durable AI-call audit trail
+### Problem
 
-Shipped a durable audit record for every governed model call.
+A slow call can still return a valid answer. Marking it failed would corrupt success and error metrics.
 
-For each call, ClaimFlow can now answer:
+### Cause
+
+Latency is an operational warning, while validity is a call outcome. Treating both as one status blurs those meanings.
+
+### Fix
+
+A valid slow response remains:
 
 ```text
-Which claim run did it belong to?
-Which AI capability made the call?
-Which provider, model, prompt, and output schema were used?
-Did it start, succeed, fail, become retryable, or get blocked?
-How long did it take?
-How many tokens did it use and what was the estimated cost?
-Why did it fail, and is retrying safe?
+status: SUCCEEDED
+errorType: LATENCY_SPIKE
+metadata.latencySpike: true
 ```
 
-The log lifecycle is:
+### Result
+
+Reliability metrics remain accurate while slow calls stay visible for performance investigation.
+
+---
+
+## 5. Missing trace IDs could create untraceable AI calls
+
+### Problem
+
+One synthetic case intentionally omitted `traceId`. Persisting the omission would make the call impossible to correlate reliably.
+
+### Cause
+
+Callers cannot always be trusted to supply complete observability metadata.
+
+### Fix
+
+The gateway generates a trace ID when the incoming value is empty and persists the generated value.
+
+### Result
+
+`missing_trace_rate` measures persisted trace loss and can remain at zero even when a caller omitted the value.
+
+---
+
+## 6. Missing model version needed to block before provider execution
+
+### Problem
+
+A model call without `modelVersion` cannot be reproduced or compared safely.
+
+### Cause
+
+Provider and model names alone are not sufficient governance metadata.
+
+### Fix
+
+The gateway records the attempt and returns:
 
 ```text
-STARTED → SUCCEEDED
-STARTED → FAILED
-STARTED → RETRYABLE
-STARTED → BLOCKED
+BLOCKED / MISSING_MODEL_VERSION
 ```
 
-![Week 06 database design](../week-06/images/db-design.png)
+before invoking the synthetic or real provider.
+
+### Result
+
+Ungoverned calls are audit-visible but cannot proceed.
 
 ---
 
-### 2. Governed model-call control layer
+## 7. Gateway logs risked duplicating sensitive source content
 
-Shipped one shared control layer around ClaimFlow's important AI-provider calls.
+### Problem
 
-The gateway records an attempt before calling the provider and then completes the same record with the final outcome. This means even a timeout or provider outage leaves behind evidence that the call was attempted.
+Copying PDF bytes, full emails, retrieved clauses, or complete agent context into `AiCallLog` would increase privacy and storage risk.
 
-Failure classification shipped:
+### Cause
+
+Observability often drifts toward logging entire inputs for convenience.
+
+### Fix
+
+Call sites store compact, purpose-specific metadata:
 
 ```text
-invalid JSON          → FAILED / INVALID_JSON_RESPONSE
-missing model version → BLOCKED / MISSING_MODEL_VERSION
-timeout               → RETRYABLE / MODEL_TIMEOUT
-provider 500          → RETRYABLE / PROVIDER_ERROR
-cost limit exceeded   → BLOCKED / COST_LIMIT_EXCEEDED
-latency spike         → SUCCEEDED with LATENCY_SPIKE warning metadata
+PDF source metadata, not bytes
+email length, not full body
+retrieved IDs/counts, not complete clauses
+agent-state counts, not complete context
 ```
 
-A missing trace ID is generated at the gateway boundary so a governed call does not become untraceable.
+### Result
+
+Calls remain explainable without turning gateway logs into a duplicate sensitive-data store.
 
 ---
 
-### 3. Centralized prompt and schema versioning
+## 8. Deterministic workflow steps could be mislabeled as AI calls
 
-Shipped one governed source for the prompt and output-schema versions used by each AI capability.
+### Problem
 
-The governed capabilities include:
+Logging deterministic routing through the gateway would make provider-call counts, cost, and latency misleading.
+
+### Cause
+
+The agent runner contains both deterministic and model-backed planner paths.
+
+### Fix
+
+Only the model-backed planner path uses the AI gateway. Deterministic actions remain in workflow and agent audit records.
+
+### Result
+
+`AiCallLog` means a provider call actually occurred.
+
+---
+
+## 9. The `cost_spike` synthetic behavior broke TypeScript checking
+
+### Problem
+
+The Week 06 eval runner handled `cost_spike`, but the `GatewaySyntheticBehavior` union did not include that value.
+
+The compiler reported:
 
 ```text
-claim extraction
-policy coverage answering
-model-backed agent planning
-synthetic gateway evaluation
+Type '"cost_spike"' is not comparable to type 'GatewaySyntheticBehavior'.
 ```
 
-This prevents prompt and schema versions from being scattered across call sites and makes regression evidence comparable.
+### Cause
+
+The runner switch and the dataset behavior type had drifted.
+
+### Fix
+
+The synthetic behavior definitions and runner cases were aligned so every supported case is represented by the type system.
+
+### Result
+
+`bun run check-types` no longer fails on the Week 06 runner, and new synthetic behaviors must be added consistently.
 
 ---
 
-### 4. Traceable PDF and email extraction
+## 10. Eval pass rate was confused with intentional failure rates
 
-Shipped gateway control for both PDF and email claim extraction.
+### Problem
 
-Every extraction call is linked to the claim run and its shared trace, allowing the model call to be followed into validation, review, agent, and memory events.
+A healthy synthetic eval showed non-zero error rates, which could look like the eval itself failed.
 
-Sensitive source content is not duplicated into the AI-call audit log. PDF logs retain source metadata rather than bytes, and email logs retain content length rather than the full email body.
+### Cause
 
----
+The suite intentionally produces timeouts, provider errors, invalid JSON, and blocks. These are test inputs, not assertion failures.
 
-### 5. Traceable policy coverage answers
+### Fix
 
-Shipped gateway control for the model-backed part of policy RAG answer generation.
-
-The audit record stores compact retrieval context:
+The reporting model separates:
 
 ```text
-the coverage question
-whether retrieval found sufficient evidence
-why retrieval succeeded or refused
-which policy chunks and clauses supported the call
-how many evidence chunks were used
+eval_pass_rate = assertion correctness
+gateway signal rates = intentionally detected production risks
 ```
 
-When retrieval returns `INSUFFICIENT_EVIDENCE`, generation is skipped and no gateway call is fabricated. Gateway logs represent real provider calls only.
+### Result
+
+The dashboard can show `eval_pass_rate = 100%` alongside non-zero controlled failure rates without contradiction.
 
 ---
 
-### 6. Traceable model-backed agent planning
+## 11. Eval results originally proved behavior only in memory
 
-Shipped gateway control for the model-backed agent planner.
+### Problem
 
-Only the model-backed planner path creates an AI gateway log. Deterministic routing remains visible in agent/workflow records but is not mislabeled as a provider call.
+A runner could return the expected status while failing to persist the `AiCallLog` needed by the product.
 
-The planner log stores a compact context summary rather than duplicating the complete claim state.
+### Cause
 
----
+Asserting only returned function values does not prove the database audit path works.
 
-### 7. Repeatable gateway smoke proof
+### Fix
 
-Shipped a repeatable smoke test covering success, invalid JSON, missing model version, timeout, provider error, and cost blocking.
+Each case reads the persisted log and checks status, error type, trace ID, versions, latency, cost, and dashboard-compatible fields.
 
-The test compares the returned gateway result with the persisted AI-call record. This proves the feature produces durable operational evidence instead of only returning the correct status in memory.
+### Result
 
-![Gateway wrapper smoke-test result](../week-06/images/gateway-smoke-warpper-result.png)
-
----
-
-### 8. Repeatable observability failure dataset
-
-Shipped nine deterministic synthetic gateway cases that reproduce important production failure modes.
-
-Cases cover:
-
-```text
-model timeout
-invalid JSON
-provider error
-cost limit exceeded
-latency spike
-prompt regression
-eval-score regression
-missing trace ID
-missing model version
-```
-
-Synthetic cases are necessary because real provider failures cannot be scheduled reliably for local development, CI, or demos.
+Week 06 proves both gateway behavior and durable observability.
 
 ---
 
-### 9. Executable gateway observability evaluation
+## 12. Trace and workflow visibility was placed too close to extraction details
 
-Shipped an eval that executes every synthetic case through the real gateway, reads the persisted call record, compares actual behavior with the expected result, calculates operational metrics, and produces human-readable and machine-readable reports.
+### Problem
 
-Latest committed result:
+Putting full trace/eval visibility inside the extraction run content made observability look like another extraction panel and overloaded the run screen.
 
-```text
-cases: 9
-passed: 9
-failed: 0
-eval pass rate: 100%
-```
+### Cause
 
----
+The first UI placement did not distinguish doing claim work from inspecting operational evidence.
 
-### 10. Eval dashboard
+### Fix
 
-Shipped persisted eval-run visibility for controlled Week 1–6 evaluation evidence.
-
-The dashboard separates assertion health from intentionally generated failure signals. A healthy observability eval can have a 100% pass rate while also showing timeout, invalid JSON, retryable failure, and blocked-cost rates above zero.
-
-![Week 06 eval dashboard](../week-06/images/eval-dashboard.png)
-
----
-
-### 11. One-run trace dashboard
-
-Shipped a dedicated trace route:
+A clear link from the run page opens the dedicated route:
 
 ```text
 /runs/[runId]/trace
 ```
 
-The trace joins the operational story for one claim:
+### Result
 
-```text
-upload
-→ extraction
-→ gateway call
-→ validation
-→ RAG
-→ memory retrieval
-→ agent proposal
-→ guardrail decision
-→ information request
-→ review event
-→ human decision
-→ memory update
-```
-
-The trace is linked from the run experience rather than embedded as another extraction panel. This keeps claim work and observability evidence related but conceptually separate.
-
-![Week 06 run observability](../week-06/images/week6-observability-1.png)
-
-![Week 06 trace dashboard](../week-06/images/week6-observability-2.png)
+Coverage, memory, eval evidence, and trace evidence remain discoverable while keeping distinct responsibilities.
 
 ---
 
-### 12. Trace-workflow hardening
+## 13. Moving a review to pending could succeed without the requested information
 
-End-to-end trace testing exposed workflow bugs outside the gateway itself. Week 06 hardening covered:
+### Problem
 
-```text
-do not move review to pending when required information is still absent
-validate the specific outstanding requirements, not unrelated fields
-create recurring-field memory from trusted edit-and-approve corrections
-retrieve recurring missing-field memory for future claims
-preserve memory as guidance rather than auto-filled evidence
-```
+After an information-request draft was created, a reviewer could click “move to pending” without providing the actual required field or evidence. The workflow advanced even though the blocking requirement remained unresolved.
 
-These fixes matter to observability because a trace is only useful when it reports a valid workflow. Better logging cannot compensate for an invalid state transition or a missing learning event.
+### Cause
 
----
+The transition checked that an information-request workflow existed, not that the current claim data satisfied its outstanding requirements.
 
-## Eval metrics shipped
+### Fix
 
-```text
-eval_pass_rate
-cost_per_run
-latency_p95
-model_error_rate
-invalid_json_rate
-prompt_version_regression_rate
-missing_trace_rate
-missing_model_version_rate
-retryable_failure_rate
-blocked_by_cost_policy_rate
-```
+The transition was hardened to re-check the requested fields/evidence against the updated claim state before changing review status.
 
-The central distinction is:
+### Result
 
-```text
-eval_pass_rate
-= did the system detect and classify the case as expected?
-
-failure rates
-= which controlled production risks were observed?
-```
+Workflow state can no longer claim that information was received merely because a draft or request record exists.
 
 ---
 
-## Final status
+## 14. Revalidation checked unrelated requirements after the requested field was supplied
 
-Week 06 observability and governance is shipped.
+### Problem
 
-Completed layers:
+When `vehicle.registrationNumber` was the requested missing field and the reviewer supplied it, the transition could still return an error for unrelated historical or non-required items.
+
+### Cause
+
+The completion check was too broad and treated all validation output as part of the active information request.
+
+### Fix
+
+The pending transition validates the specific outstanding requirements captured by the information request, while normal claim validation remains responsible for the complete claim.
+
+### Result
+
+Providing the requested field resolves that request without silently ignoring it or being blocked by unrelated state.
+
+---
+
+## 15. Edit-and-approve corrections did not always create recurring-field memory
+
+### Problem
+
+A first claim could be edited and approved with a missing field supplied, but a later claim with the same missing field returned no recurring memory.
+
+### Cause
+
+The live memory writer did not consistently turn the trusted `extractedJson → correctedJson` field addition into a reusable field-scoped observation, or created it with scope too narrow for recurring retrieval.
+
+### Fix
+
+The review-decision path treats an added/corrected required field as a trusted human-correction observation and preserves its `fieldPath`. Repeated cross-claim corrections can form a recurring-error pattern.
+
+### Result
+
+The fix applies to recurring missing fields generally, not only `vehicle.registrationNumber`.
+
+---
+
+## 16. Recurring memory retrieval was too dependent on exact entity scope
+
+### Problem
+
+A correction from one claim was not useful when the same field was missing in another claim whose stable entity IDs differed or were absent.
+
+### Cause
+
+Entity-scoped episodic memory and cross-claim semantic pattern memory were not cleanly separated in retrieval.
+
+### Fix
+
+Retrieval keeps claimant/policy/vendor history restricted to stable-ID matches, while field-scoped recurring patterns can match the same current missing field across claims.
+
+### Result
+
+ClaimFlow can surface:
 
 ```text
-AI-call persistence
-gateway lifecycle wrapper
-failure classification
-cost and latency recording
-prompt/model/schema versioning
-extraction gateway integration
-coverage-answer gateway integration
-agent-planner gateway integration
-synthetic observability dataset
-repeatable gateway eval runner
-persisted eval evidence
-system-level eval dashboard
-single-run trace dashboard
-trace-workflow safety hardening
+This field has required repeated human correction.
 ```
 
-The production meaning of Week 06 is:
+without leaking another claimant’s value or auto-filling the current claim.
+
+---
+
+## 17. Trace evidence could imply memory was used when it was only retrieved
+
+### Problem
+
+Showing a memory hit beside an agent action could imply causation even when the agent ignored that memory.
+
+### Cause
+
+Retrieval and decision-path usage are separate events.
+
+### Fix
+
+Trace data preserves `MemoryHit.usedByAgent` and the linked agent action when usage occurs.
+
+### Result
+
+The trace distinguishes retrieved memory, agent-used memory, and later human-confirmed or contradicted memory.
+
+---
+
+## Final safety outcome
+
+The Week 06 fixes enforce four boundaries:
 
 ```text
-ClaimFlow AI can show what the AI called,
-why it was allowed or blocked,
-how it performed,
-what happened next,
-and whether the complete workflow remained safe.
+no invisible model calls
+no unclassified operational failures
+no invalid workflow progress without required information
+no use of historical memory as current claim evidence
 ```
+
+Observability was therefore implemented as both telemetry and workflow correctness. The system must log what happened, but it must also prevent an incorrect state from becoming an apparently successful trace.
