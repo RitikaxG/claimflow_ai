@@ -3,15 +3,14 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "export:week1": "bun --env-file ../db/.env export-week1-actuals.ts",
-    "eval:week2:review": "bun --env-file ../db/.env evaluate-week2-review-workflow.ts",
-    "eval:week3:rag": "bun --env-file ../db/.env evaluate-week3-rag.ts",
-    "eval:week1": "bun --env-file ../db/.env evaluate-week1.ts",
+    "export:week1": "bun --env-file-if-exists=../db/.env export-week1-actuals.ts",
+    "eval:week2:review": "bun --env-file-if-exists=../db/.env evaluate-week2-review-workflow.ts",
+    "eval:week3:rag": "bun --env-file-if-exists=../db/.env evaluate-week3-rag.ts",
+    "eval:week1": "bun --env-file-if-exists=../db/.env evaluate-week1.ts",
     "check-types": "tsc --noEmit",
-    "eval:week4:agent": "bun --env-file ../db/.env evaluate-week4-agent-actions.ts",
-    "eval:week5:memory": "bun --env-file ../db/.env evaluate-week5-memory.ts",
-    "eval:week6:gateway": "bun --env-file ../db/.env evaluate-week6-gateway-observability.ts"
-    
+    "eval:week4:agent": "bun --env-file-if-exists=../db/.env evaluate-week4-agent-actions.ts",
+    "eval:week5:memory": "bun --env-file-if-exists=../db/.env evaluate-week5-memory.ts",
+    "eval:week6:gateway": "bun --env-file-if-exists=../db/.env evaluate-week6-gateway-observability.ts"
   },
   "dependencies": {
     "@repo/db": "workspace:*",
