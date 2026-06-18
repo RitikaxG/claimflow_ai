@@ -3,8 +3,13 @@ FROM oven/bun:1.3.2 AS build
 WORKDIR /app
 COPY . .
 RUN bun install --frozen-lockfile
-RUN bun run db:generate
-RUN bun run build
+
+# Prisma's config validates that DATABASE_URL exists even though client
+# generation and the Next.js build do not connect to the database. Use a
+# non-secret placeholder during image construction; Render injects the real
+# Neon DATABASE_URL only when the runtime container starts.
+RUN DATABASE_URL=postgresql://build:build@localhost:5432/claimflow_ai bun run db:generate
+RUN DATABASE_URL=postgresql://build:build@localhost:5432/claimflow_ai bun run build
 
 FROM oven/bun:1.3.2-slim AS runtime
 
