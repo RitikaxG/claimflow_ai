@@ -6,9 +6,10 @@ ClaimFlow AI accepts a claim PDF or email, extracts structured claim data, valid
 
 The project was built to answer a practical question:
 
-> How can extraction, validation, RAG, an agent, memory, human review, evaluation, observability, and governance work as one reliable product—not as separate AI demos?
+> How can AI help claim reviewers process incomplete and complex claims faster—while keeping every recommendation grounded, governed, human-reviewed, and auditable?
 
-The workflow below proves that connection through one claim. Policy RAG finds that the claim requires a police report. Memory recalls that a previous claim with a missing vehicle registration number was resolved safely by drafting an information request. The agent uses that guidance to recommend the same workflow pattern without copying an old registration number into the new claim. A human supplies and verifies the current facts, approves the claim, and leaves an auditable outcome that can improve future guidance.
+Architecturally, the workflow shows how each ClaimFlow AI layer contributes to one governed decision. Extraction converts an unstructured claim into structured JSON, deterministic validation identifies missing fields and evidence, policy RAG retrieves relevant policy clauses, and memory supplies applicable guidance from previously reviewed outcomes. The guarded agent combines this context to recommend and execute one permitted workflow action. Human review verifies the claim information and makes the final decision, while observability, evaluation, and memory feedback keep the complete process traceable, measurable, and continuously improving.
+
 
 ![ClaimFlow AI end-to-end architecture](./docs/images/claimflow-ai-workflow.png)
 
