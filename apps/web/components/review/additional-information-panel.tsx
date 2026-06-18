@@ -382,7 +382,6 @@ export function AdditionalInformationPanel({
   const requestedFields = useMemo(() => getRequestedFields(task), [task]);
   const fieldRequests = useMemo(() => getFieldRequests(task), [task]);
 
-  const requestedEvidenceKey = requestedEvidence.join("|");
   const requestedFieldsKey = requestedFields.join("|");
 
   const [selectedLabels, setSelectedLabels] =
@@ -416,7 +415,7 @@ export function AdditionalInformationPanel({
 
   useEffect(() => {
     setSelectedLabels(requestedEvidence);
-  }, [requestedEvidenceKey]);
+  }, [requestedEvidence]);
 
   useEffect(() => {
     setFieldValues({});
