@@ -128,11 +128,9 @@ export function ReviewMemoryPanel({
     void fetchRunMemories(runId);
   }, [fetchRunMemories, runId]);
 
-  const memories = audit?.memories ?? [];
-
   const reviewMemories = useMemo(() => {
-    return getReviewMemories(memories);
-  }, [memories]);
+    return getReviewMemories(audit?.memories ?? []);
+  }, [audit?.memories]);
 
   const canSubmitFeedback = taskStatus === "IN_REVIEW";
 
