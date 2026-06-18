@@ -1,0 +1,12 @@
+.git
+.github
+.next
+**/.next
+**/node_modules
+node_modules
+.env
+.env.*
+!.env.example
+docs
+sample-data/**/*.pdf
+sample-data/**/eval-results
