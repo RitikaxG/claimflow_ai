@@ -1,216 +1,121 @@
 # ClaimFlow AI
 
-ClaimFlow AI is a document-intake workflow for insurance claims.
+ClaimFlow AI is a production-style agentic document workflow for motor-insurance claims. It turns claim PDFs or email text into structured state, grounds decisions in policy evidence, lets an agent propose constrained actions, keeps humans in control, learns safe workflow memory from review outcomes, and records every model call through an observable AI gateway.
 
-It lets a user upload a claim PDF or paste claim email text, extracts structured claim JSON using Gemini, validates the extracted data with deterministic rules, saves the run in Postgres, and shows a traceable timeline.
+The agent is not an unrestricted chatbot. It operates inside a governed state machine with deterministic validation, tool permissions, guardrails, human review, traceable memory use, and regression evaluations.
 
-## Current Scope
+## Live portfolio path
 
-Supported inputs:
+Deploy the checked-in Render Blueprint, seed the deterministic demo records, then open `/demo`. The demo gives a reviewer three proof paths:
 
-- PDF claim document
-- Pasted email text
+- a completed, policy-grounded claim;
+- a missing-field claim where workflow memory influences prioritization without autofilling data;
+- a retryable model timeout with gateway failure metadata.
 
-Current output:
+Each path links to the claim run and its end-to-end workflow trace. See [deployment instructions](docs/deployment.md).
 
-- Structured claim JSON
-- Model and prompt version
-- Confidence JSON
-- Missing fields
-- Conflicts and warnings
-- Required evidence
-- Final status: `COMPLETED` or `NEEDS_REVIEW`
-- Saved extraction run
-- Timeline events
+## What the system proves
 
-## Tech Stack
+| Layer | Proof |
+|---|---|
+| Structured intake | PDF and email claims become schema-validated JSON and durable workflow state. |
+| Deterministic validation | Missing fields, conflicts, warnings, and required evidence are calculated outside the model. |
+| Policy RAG | Coverage answers retrieve policy clauses and expose supporting evidence. |
+| Agent actions | A planner selects typed tools and writes an auditable rationale. |
+| Guardrails | Unsafe or unsupported actions are blocked before tool execution. |
+| Human review | Reviewers approve, edit, reject, or request information; decisions remain in the audit trail. |
+| Workflow memory | Past corrections can influence future prioritization but cannot silently supply claim facts. |
+| AI gateway | Provider, model, prompt version, trace ID, latency, tokens, cost, status, and failures are logged. |
+| Evaluations | Week 1–6 suites measure extraction, review, RAG, action choice, memory safety, and gateway failures. |
+| Run trace | One screen links document, extraction, RAG, memory, agent, guardrail, follow-up, review, and gateway events. |
 
-- Turborepo
-- Next.js
-- TypeScript
-- Prisma
-- Postgres
-- Zod
-- Gemini API
-- Zustand
+## Architecture
 
-## Workflow
-
-```txt
-PDF / email text
-→ Document row
-→ ExtractionRun row
-→ DOCUMENT_UPLOADED event
-→ Run extraction
-→ Gemini extraction
-→ Zod-parsed structured JSON
-→ extractedJson saved in Postgres
-→ status moves to VALIDATING
-→ Run validation
-→ deterministic rules check missing fields, conflicts, warnings, and evidence
-→ validationJson + missingFieldsJson saved in Postgres
-→ status becomes COMPLETED or NEEDS_REVIEW
-→ validation result + timeline shown in UI
+```text
+PDF / email
+    │
+    ▼
+Document + ExtractionRun ──► AI Gateway ──► Gemini extraction
+    │                           │
+    │                           └── trace, model, prompt, latency, cost, error
+    ▼
+Deterministic validation
+    │
+    ├──► Policy RAG ──► cited coverage evidence
+    ├──► Workflow memory ──► safe historical context
+    ▼
+Agent planner ──► guardrails ──► typed tool action
+    │                                  │
+    └──────── blocked / allowed ◄──────┘
+                       │
+                       ▼
+              Human review + feedback
+                       │
+                       ▼
+              Memory update + full trace
 ```
 
-## Progress
+## Demo flow
 
-### Day 1: Foundation
+1. Open `/demo` and choose **Memory-guided human review**.
+2. Inspect the missing `vehicle.registrationNumber` field.
+3. Open the memory panel and verify the prior correction was retrieved.
+4. Confirm the agent drafted an information request instead of copying an old value.
+5. Open the run trace to inspect prompt/model versions, cost, latency, guardrail decision, memory influence, and review state.
+6. Open `/evals` and inspect the Week 6 deterministic gateway-failure suite.
 
-Implemented:
+## Technology
 
-- Turborepo setup
-- Next.js app
-- Prisma + Postgres
-- Shared Zod schemas
-- DB models:
-  - `documents`
-  - `extraction_runs`
-  - `extraction_events`
+Next.js 16, React 19, TypeScript, Turborepo, Bun, Prisma 7, Postgres + pgvector, Zod, Gemini, and Zustand.
 
-### Day 2: Upload + Run Creation
-
-Implemented:
-
-- PDF upload
-- Email text submission
-- Local PDF storage
-- `POST /api/documents/upload`
-- Run creation with `UPLOADED` status
-- Dashboard recent runs list
-- Run detail timeline
-
-### Day 3: Gemini Extraction
-
-Implemented:
-
-- `@repo/ai` package
-- Gemini client
-- Prompt versioning
-- PDF extraction
-- Email text extraction
-- `POST /api/extraction-runs/[runId]/extract`
-- Manual **Run extraction** button
-- Extracted JSON panel
-- Timeline events:
-  - `EXTRACTION_STARTED`
-  - `MODEL_RESPONSE_RECEIVED`
-  - `EXTRACTION_COMPLETED`
-  - `RUN_FAILED`
-
-### Day 4: Validation Layer
-
-Implemented:
-
-- Deterministic claim validation after extraction
-- `validateClaimExtraction()` shared validation service
-- `POST /api/extraction-runs/[runId]/validate`
-- Manual **Run validation** button
-- Missing fields detection
-- Conflicts and warnings detection
-- Required evidence detection
-- Final status:
-  - `COMPLETED`
-  - `NEEDS_REVIEW`
-- Saved `validationJson` and `missingFieldsJson`
-- Validation summary UI
-- Missing fields UI
-- Conflicts, warnings, and required evidence UI
-- Timeline events:
-  - `VALIDATION_STARTED`
-  - `VALIDATION_COMPLETED`
-  - `MISSING_FIELDS_DETECTED`
-  - `CONFLICTS_DETECTED`
-  - `RUN_COMPLETED`
-  - `RUN_NEEDS_REVIEW`
-
-Day 4 flow:
-
-```txt
-Upload PDF or paste email text
-→ created run
-→ click Run extraction
-→ Gemini extracts structured claim JSON
-→ app saves extractedJson
-→ status moves to VALIDATING
-→ click Run validation
-→ app checks missing fields, conflicts, warnings, and required evidence
-→ app saves validationJson and missingFieldsJson
-→ status becomes COMPLETED or NEEDS_REVIEW
-→ UI explains the result
-→ timeline proves what happened
-```
-
-Tested with synthetic PDFs:
-
-- valid own-damage claim → `COMPLETED`
-- missing policy number → `NEEDS_REVIEW`
-- repair estimate only → `NEEDS_REVIEW`
-- third-party without police report → `NEEDS_REVIEW`
-- theft claim missing FIR → `NEEDS_REVIEW`
-
-## Current Run Lifecycle
-
-Completed lifecycle:
-
-```txt
-UPLOADED
-→ EXTRACTING
-→ VALIDATING
-→ COMPLETED
-```
-
-Needs-review lifecycle:
-
-```txt
-UPLOADED
-→ EXTRACTING
-→ VALIDATING
-→ NEEDS_REVIEW
-```
-
-Failure lifecycle:
-
-```txt
-UPLOADED / FAILED
-→ EXTRACTING / VALIDATING
-→ FAILED
-```
-
-## Environment Variables
-
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/claimflow_ai?sslmode=disable
-GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.5-flash
-```
-
-For local extraction, keep Gemini variables in:
-
-```txt
-apps/web/.env.local
-```
-
-## Run Locally
+## Local setup
 
 ```bash
+cp .env.example packages/db/.env
+docker compose up -d
 bun install
+bun run db:generate
 bun run db:migrate
+bun run demo:seed
 bun run dev
 ```
 
-App runs at:
+Open `http://localhost:3001/demo`. Add `GEMINI_API_KEY` to `apps/web/.env.local` for real extraction. Seeded proof paths do not call the model.
 
-```txt
-http://localhost:3001
+## Quality gates
+
+```bash
+bun run production:check
 ```
 
-## Next Step
+The production gate generates Prisma types, type-checks every workspace, runs lint, executes the Week 6 deterministic gateway eval, and builds the application. CI runs the same core checks for pushes and pull requests. Production builds no longer suppress TypeScript errors.
 
-Week 2:
+## Data and safety
 
-- Add human review queue
-- Show runs that need review
-- Allow reviewer decisions
-- Store reviewer notes and corrections
-- Use reviewer feedback later for memory/rule improvement
+- All checked-in and seeded claims are synthetic.
+- Public seed/reset HTTP endpoints are intentionally absent.
+- Demo records use dedicated deterministic IDs and can be refreshed with `bun run demo:seed` or removed with `bun run demo:reset`.
+- Model and database secrets remain server-side.
+- Memory is advisory context, not a source of truth for missing claim facts.
+- Final claim decisions that require judgment remain human-reviewed.
+
+## Repository map
+
+```text
+apps/web                 Next.js workflow UI and APIs
+packages/ai              Claim extraction model integration
+packages/rag             Policy ingestion, embeddings, and retrieval
+packages/agent           Planner, tools, runner, and guardrails
+packages/memory          Workflow memory creation, retrieval, and updates
+packages/gateway         Model-call governance and observability
+packages/evals           Week 1–6 evaluation runners
+packages/db              Prisma schema, migrations, and demo seed
+sample-data              Synthetic packets and evaluation evidence
+docs                     Architecture, weekly evidence, demo, and deployment docs
+```
+
+## Production boundaries
+
+This portfolio build demonstrates production concerns but is not a licensed claims decision system. Before handling real customer data it would still require authentication and role-based access, tenant isolation, encrypted object storage, PII retention controls, rate limiting, background jobs, provider retry queues, alerting, and an insurer-approved policy/compliance review.
+
+> ClaimFlow AI is a production-style agentic document workflow where the agent acts inside a governed system: grounded by policy retrieval, influenced by safe workflow memory, constrained by guardrails, reviewed by humans, and measured through gateway logs and eval dashboards.
