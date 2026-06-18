@@ -16,9 +16,9 @@ The workflow below proves that connection through one claim. Policy RAG finds th
 
 ## Demo
 
-[![Watch the guarded agent workflow](./docs/week-04/images/next-recommended-action.png)](https://x.com/RitikaxG/status/2061398296137199908?s=20)
+[![Watch the guarded agent workflow](https://x.com/RitikaxG/status/2061398296137199908?s=20)]
 
-[![Watch the memory-guided workflow](./docs/week-05/images/02-memory-retrieval.png)](https://x.com/RitikaxG/status/2065037735145205775?s=20)
+[![Watch the memory-guided workflow](https://x.com/RitikaxG/status/2065037735145205775?s=20)]
 
 ---
 
