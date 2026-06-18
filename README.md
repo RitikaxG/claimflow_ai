@@ -1,443 +1,621 @@
 # ClaimFlow AI
 
-### A governed agentic workflow for motor-insurance claim operations
+**A governed agentic workflow for motor-insurance claim intake, policy-grounded reasoning, human review, safe memory, and end-to-end observability.**
 
-ClaimFlow AI turns an unstructured claim PDF or email into a traceable workflow: it extracts claim data, validates it, retrieves policy evidence, proposes the next safe action, routes uncertainty to a human reviewer, learns from reviewed outcomes, and records every model call for evaluation and audit.
+## Demo
+
+[![Watch the guarded agent workflow](./docs/week-04/images/next-recommended-action.png)](https://x.com/RitikaxG/status/2061398296137199908?s=20)
+
+[![Watch the memory-guided workflow](./docs/week-05/images/02-memory-retrieval.png)](https://x.com/RitikaxG/status/2065037735145205775?s=20)
+
+ClaimFlow AI turns an unstructured claim PDF or email into a traceable workflow. It extracts claim data, validates required fields and evidence, retrieves policy clauses, proposes one safe next action, routes consequential decisions to a human reviewer, learns from trusted review outcomes, and records the complete run for audit and evaluation.
 
 It was built to answer a harder question than “can an LLM read a claim?”:
 
-> Can an AI-assisted claims workflow remain useful when the input is incomplete, the model is uncertain, policy evidence is missing, a past memory conflicts with the current claim, or a provider call fails?
+> Can an AI-assisted claims workflow remain useful when the input is incomplete, policy evidence is weak, a previous memory may be relevant, or a model call fails—without allowing the model to make the final claim decision?
 
-The answer in ClaimFlow is a deliberately constrained form of agentic AI. The model does not approve or reject claims. It operates inside a durable state machine with deterministic validation, retrieved policy evidence, typed tools, guardrails, human review, safe workflow memory, regression evals, and an observable AI gateway.
+![Guarded agent workflow](./docs/week-04/images/agentic-workflow.png)
+![Policy RAG workflow](./docs/week-03/images/rag-workflow.png)
+![Memory architecture](./docs/week-05/images/memory-architecture.png)
 
-## The use case
+---
 
-Motor-insurance claims arrive as PDFs and emails containing policy details, claimant information, vehicle data, incident descriptions, estimates, invoices, and supporting evidence. Before a claim can move forward, an operations team must repeatedly:
+## What ClaimFlow AI does
 
-- turn those documents into structured data;
-- identify missing, conflicting, or low-confidence information;
-- check the current policy wording;
-- request additional information when needed;
-- decide which cases require human attention;
-- preserve why each workflow decision was made.
+ClaimFlow AI supports one connected motor-claim workflow with:
 
-A standalone extraction prompt solves only the first part. A standalone chatbot adds another interface, but it does not create reliable workflow state. ClaimFlow AI was built as the system around the model: the model handles ambiguity, while deterministic software controls state, permissions, evidence, and accountability.
+- PDF and pasted-email claim intake
+- structured claim JSON extraction
+- deterministic field, evidence, conflict, and warning validation
+- explicit `COMPLETED`, `NEEDS_REVIEW`, and `FAILED` extraction states
+- policy retrieval with pgvector
+- grounded coverage assessments with verified citations
+- a guarded single-step agent
+- typed backend tools and deterministic routing
+- human review and corrected claim JSON
+- workflow memory with retrieval, feedback, and lifecycle controls
+- an AI gateway for model, prompt, latency, cost, and failure metadata
+- per-run traces and Week 1–6 evaluation dashboards
 
-## What happens to one claim
+This is not a claim chatbot and not an autonomous approval system. The AI interprets and proposes; deterministic software verifies and constrains; the human reviewer owns the final decision.
 
-The easiest way to understand ClaimFlow AI is to follow one claim from submission to a trusted human outcome.
+---
 
-~~~text
+## Core highlights
+
+- **Schema-shaped extraction** from PDFs and claim emails
+- **Deterministic validation** instead of trusting raw model output
+- **Claim-aware policy RAG** with multi-query retrieval and citation checks
+- **Single safe action per agent step**
+- **Deterministic routing before LangChain**
+- **Registered tools + guardrails** around every agent proposal
+- **Human-in-the-loop review** for correction and final decisions
+- **Safe workflow memory** that cannot overwrite current claim evidence
+- **Auditable memory lifecycle**: create, strengthen, weaken, retire, supersede
+- **Central AI gateway** for governed model calls
+- **Complete run trace** across extraction, RAG, memory, agent, review, and gateway events
+- **Layer-specific evaluations** covering Weeks 1–6
+
+---
+
+## End-to-end claim workflow
+
+The complete product is easiest to understand by following one claim.
+
+```txt
 PDF or email
-  → AI extracts structured claim JSON
-  → deterministic rules validate required fields, evidence, conflicts, and warnings
-  → extraction run becomes COMPLETED, NEEDS_REVIEW, or FAILED
+→ extract structured claim JSON
+→ validate required fields, evidence, conflicts, and warnings
+→ set extraction status: COMPLETED / NEEDS_REVIEW / FAILED
 
-If NEEDS_REVIEW:
-  → reviewer inspects the validation reasons
-  → relevant workflow memory is retrieved
-  → reviewer runs one guarded agent step
-  → deterministic routing handles obvious cases first
-  → otherwise the model proposes exactly one registered tool
-  → guardrails allow or block the proposal
+If NEEDS_REVIEW
+→ show the exact validation reasons
+→ retrieve relevant workflow memory
+→ run one guarded agent step
+→ propose one registered tool
+→ allow or block it through guardrails
 
-If fields or evidence are missing:
-  → draft an information request
-  → review task moves to NEEDS_MORE_INFO
-  → reviewer records the requested value or evidence
-  → review task reopens as PENDING
-  → the updated state is evaluated again
+If a field or evidence item is missing
+→ draft an information request
+→ pause the review in NEEDS_MORE_INFO
+→ record the requested information
+→ reopen the review as PENDING
 
-When policy evidence is needed:
-  → retrieve policy clauses through RAG
-  → check retrieval strength
-  → generate a grounded coverage assessment only when evidence is sufficient
-  → verify every citation
-  → persist the CoverageQuestion for the agent and reviewer
+When policy evidence is needed
+→ retrieve relevant policy clauses
+→ threshold the retrieved evidence
+→ generate a grounded assessment only when evidence is sufficient
+→ verify citations
 
-Final step:
-  → human reviewer approves, edits and approves, rejects, or requests more information
-  → trusted review outcome updates workflow memory
-  → the complete run remains visible in one trace
-~~~
+Final step
+→ human reviewer approves, edits and approves, rejects, or requests more information
+→ trusted review outcome updates memory
+→ one run trace explains the complete workflow
+```
 
-This is not an autonomous claim-decision loop. ClaimFlow advances one safe workflow step at a time, persists the result, and returns control to the reviewer.
+### Two related state machines
 
-### Two different state machines
+ClaimFlow keeps extraction state and human-review state separate.
 
-The extraction run and the human review task have different statuses. Keeping them separate makes the workflow easier to reason about.
-
-| State owner | Important statuses | Meaning |
+| State owner | Important states | Meaning |
 |---|---|---|
-| **Extraction run** | <code>COMPLETED</code>, <code>NEEDS_REVIEW</code>, <code>FAILED</code> | Result of extraction plus deterministic validation. |
-| **Review task** | <code>PENDING</code>, <code>NEEDS_MORE_INFO</code>, <code>IN_REVIEW</code>, <code>APPROVED</code>, <code>EDITED_AND_APPROVED</code>, <code>REJECTED</code> | Human workflow state after review is required. |
+| **Extraction run** | `COMPLETED`, `NEEDS_REVIEW`, `FAILED` | Result of extraction and deterministic validation. |
+| **Review task** | `PENDING`, `NEEDS_MORE_INFO`, `IN_REVIEW`, `APPROVED`, `EDITED_AND_APPROVED`, `REJECTED` | State of the human review workflow. |
 
-A run can remain <code>NEEDS_REVIEW</code> while its review task moves from <code>NEEDS_MORE_INFO</code> to <code>PENDING</code>, then to a final human decision.
+A run can remain `NEEDS_REVIEW` while its review task moves from `NEEDS_MORE_INFO` to `PENDING`, then to a final human decision.
 
-## Guarded agent core
+---
 
-![ClaimFlow guarded agent workflow](docs/week-04/images/agentic-workflow.png)
+## Architecture
 
-This diagram shows the inner Week 4 action loop. The full product path around it—validation, memory retrieval, conditional RAG, human correction, memory learning, and traceability—is connected step by step below.
+ClaimFlow is split into connected AI and workflow layers.
 
-The core loop is:
+- **Document intake**  
+  Persists the source PDF or email, detects duplicate content, and creates an extraction run.
 
-~~~text
-Perceive current claim state
-→ retrieve relevant memory
-→ choose one safe next action
-→ evaluate guardrails
-→ execute one registered backend tool
-→ persist the result
-→ return control to the workflow or reviewer
-~~~
+- **Extraction**  
+  Uses Gemini to convert unstructured content into versioned, structured claim JSON.
 
-The architecture deliberately separates three kinds of authority:
+- **Validation**  
+  Applies deterministic schema and business rules to calculate missing fields, required evidence, conflicts, warnings, and run status.
+
+- **Policy RAG**  
+  Parses and chunks policy documents, stores embeddings in Postgres/pgvector, retrieves relevant clauses, thresholds evidence, generates grounded answers, and verifies citations.
+
+- **Workflow memory**  
+  Retrieves prior corrections and recurring workflow patterns using stable entity, field, and evidence signals.
+
+- **Agent runner**  
+  Builds current context, applies deterministic routing, asks LangChain for one tool only when needed, and records the proposal.
+
+- **Guardrails and tools**  
+  Block unsupported actions and execute only registered backend tools.
+
+- **Human review**  
+  Allows a reviewer to supply missing information, correct claim JSON, and make the final approval or rejection decision.
+
+- **AI gateway**  
+  Records trace ID, provider, model, prompt version, latency, token usage, estimated cost, retryability, and normalized failure type.
+
+- **Trace and evaluations**  
+  Explain one real run and measure system behavior across controlled synthetic cases.
+
+The authority boundary is deliberate:
 
 | Authority | Responsibility |
 |---|---|
-| **Model intelligence** | Extract messy documents, generate policy-grounded explanations, and propose a typed workflow action when deterministic routing is insufficient. |
-| **Deterministic application logic** | Validate schemas and business rules, calculate workflow state, retrieve and threshold policy evidence, verify citations, score memory, enforce guardrails, execute tools, and persist transitions. |
-| **Human reviewer** | Supply missing information, correct extracted data, judge memory relevance, and make the final approval or rejection decision. |
+| **Model** | Interpret documents, generate grounded explanations, or propose a typed tool. |
+| **Application** | Validate, retrieve, threshold, verify, enforce guardrails, execute tools, and persist state. |
+| **Human reviewer** | Correct data and make the final claim decision. |
 
-> Model proposes. Guardrails decide whether the tool may run. Backend executes. Human decides the claim.
+---
 
-## The connected workflow, step by step
+## How one claim moves through ClaimFlow
 
-### 1. Intake turns a PDF or email into claim state
+### 1. Document intake and extraction
 
-ClaimFlow accepts an uploaded PDF or pasted claim email, creates a durable <code>Document</code> and <code>ExtractionRun</code>, and asks Gemini for schema-shaped claim JSON. The source document, raw model output, structured extraction, confidence metadata, model version, prompt version, and timeline events are persisted.
+A reviewer submits a PDF or pastes a claim email. ClaimFlow creates a `Document` and `ExtractionRun`, calls the extraction model, and stores the raw response, structured JSON, confidence metadata, prompt version, model version, and timeline events.
 
-The extraction is a proposal, not accepted truth. Duplicate content is detected by source type and content hash, while soft delete and restore preserve history and avoid unnecessary re-extraction.
+The extraction is the first proposed claim state. It is not treated as accepted truth.
 
-See [Week 1 — document intake and reviewer](docs/week-01/document-intake-reviewer.md).
+See [Week 1 — Document Intake Reviewer](./docs/week-01/document-intake-reviewer.md).
 
-### 2. Deterministic validation creates the first safety boundary
+### 2. Deterministic validation
 
-The extracted JSON is checked against explicit application rules:
+ClaimFlow checks:
 
-- which fields must exist;
-- which evidence is required for the detected claim type;
-- whether fields conflict;
-- whether warnings or low-confidence values require attention;
-- whether the output matches the expected schema.
+- whether required fields exist
+- whether required evidence exists for the claim type
+- whether extracted values conflict
+- whether warnings or low-confidence values require review
+- whether the output matches the expected schema
 
-![Validation findings shown on the run](docs/week-01/images/validation-summary.png)
+![Validation summary](./docs/week-01/images/validation-summary.png)
 
-Validation produces explicit missing fields, required evidence, conflicts, and warnings, then sets the extraction-run status:
+Validation then sets the extraction-run state:
 
-| Status | Meaning | Next step |
-|---|---|---|
-| <code>COMPLETED</code> | Required claim information passed the current rules. | The reviewer may inspect the claim, ask a coverage question, or continue the workflow. |
-| <code>NEEDS_REVIEW</code> | Information, evidence, confidence, or consistency requires human attention. | Inspect reasons, retrieve memory, and run the next guarded action. |
-| <code>FAILED</code> | Extraction or processing could not produce usable workflow state. | Inspect the error and retry or investigate. |
+- `COMPLETED` — required claim information passed the current rules
+- `NEEDS_REVIEW` — missing information, evidence, conflicts, warnings, or uncertainty require attention
+- `FAILED` — extraction or processing could not produce usable workflow state
 
-<code>NEEDS_REVIEW</code> is an explainable workflow boundary, not a model failure.
+`NEEDS_REVIEW` is an explainable review boundary, not a model failure.
 
-### 3. Memory is checked before it influences the agent
+### 3. Relevant memory is retrieved
 
-For a review-bound claim, ClaimFlow retrieves memories using structured signals such as stable claimant, policy, or vendor IDs; the same missing field; the same required evidence; or a recurring error pattern. Similar names alone are not enough.
+Before memory can influence an agent action, ClaimFlow retrieves it using structured matching signals:
 
-![Relevant memory retrieved for the current claim](docs/week-05/images/02-memory-retrieval.png)
+- claimant, policy, or vendor identity
+- the same missing field
+- the same required evidence
+- a recurring extraction or validation pattern
+- memory status, risk, confidence, and provenance
 
-A memory may tell the reviewer that a previous claim had the same missing <code>vehicle.registrationNumber</code> and that the safe response was to request it. It may improve routing or request specificity, but it must not copy an old value into the new claim.
+![Memory retrieval in the claim workflow](./docs/week-05/images/02-memory-retrieval.png)
 
-When the agent step builds its context, it loads:
+A previous correction can suggest that `vehicle.registrationNumber` should be requested again. It cannot supply the previous registration value or treat an old claim as evidence for the current claim.
 
-- current extracted and validation JSON;
-- unresolved missing fields and evidence;
-- review-task state;
-- latest policy-retrieval status and coverage decision;
-- duplicate and retry signals;
-- previous agent actions;
-- relevant workflow memories and their <code>mustNotDo</code> rules.
-
-Retrieval and use are recorded separately through <code>MemoryHit</code>, so “memory was relevant” does not automatically mean “the agent used it.”
+Retrieval and agent use are tracked separately through `MemoryHit`.
 
 > Memory is workflow context, not claim evidence.
 
-See [Week 5 — memory flow, evidence, and lifecycle](docs/week-05/memory-flow-evidence.md).
+See [Week 5 — Memory Flow Evidence](./docs/week-05/memory-flow-evidence.md).
 
-### 4. One guarded agent step chooses the next safe action
+### 4. One guarded agent step runs
 
-The run page recommends an agent step when the claim needs workflow progress. ClaimFlow first applies deterministic routing:
+The run page recommends the next agent action when workflow progress is required.
 
-1. If human review is already final, return <code>no_action</code>.
-2. If high-risk memory requires escalation, route to a human.
-3. If a required field or evidence item is missing, propose <code>draft_information_request</code>.
-4. Otherwise, LangChain may propose exactly one registered tool.
+The agent context contains:
 
-Registered tools include policy retrieval, information-request drafting, review-task creation, human escalation, non-final decision-support notes, clarification, and no action.
+- current claim and validation state
+- unresolved fields and evidence
+- review-task status
+- latest policy-retrieval status and coverage decision
+- duplicate and retry signals
+- previous agent actions
+- relevant memory and its safety instructions
 
-Every proposal is persisted before execution. Guardrails then allow or block it. They block unsupported actions such as approving or rejecting a claim, sending an email, deleting a claim, bypassing review, mutating a finalized review, or drafting unsupported decision notes.
+ClaimFlow handles obvious cases deterministically before calling LangChain:
 
-The model never executes arbitrary code or calls an unregistered tool. The backend remains authoritative.
+```txt
+final review state
+→ no_action
 
-See [Week 4 — guarded agentic workflow](docs/week-04/agentic-workflow.md).
+high-risk memory
+→ escalate_to_human
 
-### 5. Missing information follows a durable request-and-reopen loop
+missing required field or evidence
+→ draft_information_request
 
-When validation shows a missing field or evidence item, the deterministic agent route proposes an information-request draft. Memory can make the request more specific, but it cannot provide the missing value.
+otherwise
+→ ask the model to propose exactly one registered tool
+```
 
-![Information request drafted by the allowed tool](docs/week-04/images/information-request-drafted.png)
+![Agent action suggested](./docs/week-04/images/agent-action-suggested.png)
 
-After guardrail approval:
+The proposal then passes through guardrails. ClaimFlow blocks actions such as approving or rejecting a claim, sending an email, deleting a claim, bypassing review, mutating a finalized review, or producing unsupported decision notes.
 
-~~~text
+See [Week 4 — Guarded Agentic Workflow](./docs/week-04/agentic-workflow.md).
+
+### 5. Missing information follows a request-and-reopen loop
+
+For a missing field or evidence item, the allowed tool creates a durable information-request draft.
+
+![Information request drafted](./docs/week-04/images/information-request-drafted.png)
+
+```txt
 draft_information_request
 → persist FollowupDraft
-→ deterministic mark_needs_more_info post-action
-→ ReviewTask becomes NEEDS_MORE_INFO
-~~~
+→ mark review as NEEDS_MORE_INFO
+→ wait for the requested information
+```
 
-The draft lists the exact requested fields and evidence. It is a review artifact; ClaimFlow does not claim to send the email automatically.
+The review-task page shows the requested fields or evidence and whether memory was used by the agent. The draft is not automatically sent as an email.
 
-On the review-task page, the reviewer can see the request, whether retrieved memory was used by the agent, and the information still required. The workflow cannot advance merely by clicking a state button: the requested field value or evidence must be recorded.
+The review cannot advance until the requested information is recorded.
 
-~~~text
-Reviewer provides requested information
-→ ADDITIONAL_INFORMATION_RECEIVED / ADDITIONAL_EVIDENCE_RECEIVED
-→ resolved item is removed from the agent context
-→ ReviewTask reopens as PENDING
-~~~
+```txt
+requested information received
+→ record field value and/or evidence
+→ remove the resolved item from future agent context
+→ reopen review as PENDING
+```
 
-![Review reopens after requested information is recorded](docs/week-04/images/review-reopened.png)
+![Review reopened](./docs/week-04/images/review-reopened.png)
 
-The original extraction is not silently overwritten. The reviewer later applies the corrected value through the edit-and-approve path.
+The original extraction is not silently changed. The reviewer applies the final corrected value through edit-and-approve.
 
-### 6. Policy RAG is a conditional evidence path, not a mandatory linear step
+### 6. Policy RAG supplies current policy evidence
 
-RAG has two valid entry points:
+RAG is a conditional evidence path, not a mandatory step before every agent action.
 
-1. **Coverage page:** a reviewer can ask a claim-specific coverage question for a <code>COMPLETED</code> or <code>NEEDS_REVIEW</code> run.
-2. **Agent tool:** when missing information no longer takes precedence and policy evidence is needed, the agent can propose <code>retrieve_policy_clauses</code>.
+It has two entry points:
 
-This means the agent does not retrieve policy clauses while an obvious required field or evidence item is still unresolved. The information-request path runs first. Once the claim state is ready, RAG can ground coverage reasoning.
+1. A reviewer can open the Coverage page for a `COMPLETED` or `NEEDS_REVIEW` run.
+2. The agent can select the read-only `retrieve_policy_clauses` tool when missing information no longer takes precedence.
 
-![ClaimFlow policy RAG architecture](docs/week-03/images/rag-workflow.png)
+Both use the same retrieval core:
 
-Both entry points use the same retrieval core:
-
-~~~text
+```txt
 coverage question + current claim context
-→ claim-aware query plan
-→ query embeddings
-→ pgvector search over PolicyChunk
-→ merge and rank retrieved clauses
-→ retrieval threshold check
-~~~
+→ build claim-aware query plan
+→ embed queries
+→ search PolicyChunk with pgvector
+→ merge and rank clauses
+→ evaluate retrieval strength
+```
 
-From there, the two product paths differ:
+![Policy RAG architecture](./docs/week-03/images/rag-workflow.png)
+
+The two entry points produce different workflow artifacts:
 
 | Entry point | Result |
 |---|---|
-| **Agent tool** | The read-only <code>retrieve_policy_clauses</code> tool returns retrieval status and policy matches in the agent tool output. It does not make or persist a final claim decision. |
-| **Coverage page** | If evidence is sufficient, ClaimFlow generates a grounded coverage assessment, verifies citations, and persists a <code>CoverageQuestion</code>. If evidence is insufficient, generation is skipped and the result is forced to <code>NEEDS_REVIEW</code>. |
+| **Agent tool** | Returns retrieval status and relevant policy matches in the tool output. It does not create a final claim decision. |
+| **Coverage page** | Generates a grounded assessment only when evidence is sufficient, verifies citations, and persists a `CoverageQuestion`. |
 
-The Coverage-page path is:
+If retrieval is insufficient, answer generation is skipped and the safe result is `NEEDS_REVIEW`. If citations are unsupported, guardrails also force review.
 
-~~~text
-INSUFFICIENT_EVIDENCE
-→ skip answer generation
-→ persist NEEDS_REVIEW coverage result
+Reviewed corrected JSON takes precedence over stale original extraction when coverage context is built.
 
-ENOUGH_EVIDENCE
-→ generate answer from retrieved clauses
-→ validate citations against retrieved text
-→ persist CoverageQuestion
-~~~
+![Policy evidence cited by the coverage assessment](./docs/week-03/images/coverage-page-3.png)
 
-The query plan can retrieve general, coverage, evidence, exclusion, and limit clauses. Reviewed and approved corrected JSON takes precedence over stale original extraction when coverage context is built.
+See [Week 3 — Policy RAG Architecture](./docs/week-03/policy-rag-architecture.md).
 
-A saved <code>CoverageQuestion</code> contains retrieval status, retrieved matches, grounded answer, citations, confidence, and the non-binding coverage assessment. Its latest retrieval status and decision become part of future agent context and are visible to the human reviewer.
+### 7. Human review makes the final decision
 
-![Exact policy clauses cited by the coverage assessment](docs/week-03/images/coverage-page-3.png)
+After requested information is received, the reviewer starts review with:
 
-If retrieval is weak or a citation is unsupported, ClaimFlow returns <code>NEEDS_REVIEW</code> instead of inventing policy support. RAG supplies policy evidence; it does not approve or reject the claim.
+- extracted or corrected claim JSON
+- validation findings
+- requested information and evidence
+- memory guidance
+- agent rationale and tool result
+- policy clauses and coverage assessment, when available
 
-See [Week 3 — policy RAG architecture](docs/week-03/policy-rag-architecture.md).
+The reviewer can:
 
-### 7. Human review owns correction and the final decision
+- approve as-is
+- edit and approve
+- reject
+- request more information
 
-After requested information arrives, the review task is reopened. The reviewer starts review with:
+For a missing-field claim, the reviewer adds the received value to corrected claim JSON and submits `EDIT_AND_APPROVE`. The review task becomes `EDITED_AND_APPROVED`.
 
-- extracted or corrected claim JSON;
-- validation findings;
-- requested information and evidence;
-- relevant memory guidance;
-- agent rationale and tool output;
-- retrieved policy clauses and coverage assessment, when available.
+The agent can route, retrieve, draft, or escalate. Only the human reviewer can approve or reject the claim.
 
-The reviewer can approve as-is, edit and approve, reject, or request more information. In the missing-field example, the reviewer adds the received value to corrected claim JSON and submits <code>EDIT_AND_APPROVE</code>. The final task state becomes <code>EDITED_AND_APPROVED</code>.
+### 8. Human outcomes update memory
 
-The agent can route, retrieve, draft, or escalate. Only a human reviewer can make the final claim decision.
+Memory confidence does not change merely because a memory was retrieved or displayed. It changes after a trusted human outcome.
 
-### 8. The trusted review outcome updates memory
-
-A retrieved memory is not strengthened merely because it appeared in the UI or agent context. Confidence changes only after a trusted human outcome.
-
-![ClaimFlow memory update loop](docs/week-05/images/memory-update-loop.png)
+![Memory update loop](./docs/week-05/images/memory-update-loop.png)
 
 A review outcome can:
 
-- create a new memory from a useful human correction;
-- strengthen a memory confirmed by the reviewer;
-- weaken a memory contradicted by the outcome;
-- retire repeatedly contradicted memory;
-- supersede an older same-scope memory;
-- generalize repeated episodic lessons into a conservative semantic pattern.
+- create memory from a useful correction
+- strengthen confirmed memory
+- weaken contradicted memory
+- retire repeatedly contradicted memory
+- supersede older same-scope memory
+- generalize repeated episodic lessons into a conservative semantic pattern
 
-The reviewer can mark whether memory guidance was relevant. ClaimFlow then compares extracted JSON with corrected JSON and records auditable <code>MemoryUpdate</code> rows.
+The reviewer can mark whether the memory was relevant. ClaimFlow compares extracted JSON with corrected JSON and records the update with its source trail.
 
-### 9. The run trace explains the entire claim
+### 9. The run trace connects every subsystem
 
-The trace page joins the complete story for one extraction run:
+The trace page explains the complete claim in workflow order:
 
-~~~text
+```txt
 document intake
-→ extraction and validation events
-→ AI gateway calls
+→ extraction and validation
+→ gateway calls
 → memory retrieval and agent use
-→ proposed action and guardrail decision
+→ agent proposal and guardrail decision
 → tool execution and information request
 → received information and review reopening
 → policy retrieval and coverage answer
-→ human review outcome
+→ human decision
 → memory update
-~~~
+```
 
-![One-run trace summary and gateway visibility](docs/week-06/images/trace-workflow-1.png)
+![Run trace summary](./docs/week-06/images/trace-workflow-1.png)
 
-The final trace evidence connects the human edit-and-approve outcome to memory strengthening:
+![Review outcome and memory update trace](./docs/week-06/images/trace-workflow-9.png)
 
-![Review outcome and memory update in the trace](docs/week-06/images/trace-workflow-9.png)
+The trace answers “what happened in this claim?” The eval dashboard answers “does the system behave reliably across controlled cases?”
 
-The trace is the per-claim explanation. The eval dashboard is the system-wide reliability view across controlled Week 1–6 cases.
+See [Week 6 — Observability Flow Evidence](./docs/week-06/observability-flow-evidence.md).
 
-See [Week 6 — gateway observability and complete trace evidence](docs/week-06/observability-flow-evidence.md).
+---
 
-## Where the agentic AI is
+## Frontend product views
 
-ClaimFlow implements a guarded, single-step agent loop rather than an open-ended autonomous ReAct loop.
+### Run detail and validation
 
-| Agent stage | ClaimFlow implementation |
-|---|---|
-| **Perceive** | Load extraction, validation, unresolved information, review state, latest RAG state, previous actions, and relevant memory. |
-| **Reason** | Run deterministic routing first; call the model only when workflow interpretation is useful. |
-| **Plan** | Produce exactly one typed action with rationale and tool arguments. |
-| **Act** | Execute only a registered backend tool after guardrail approval. |
-| **Observe** | Persist proposal, guardrail result, tool output, state transition, memory use, and gateway trace. |
-| **Pause** | Return control to the product workflow or reviewer instead of autonomously pursuing a final decision. |
+The run page shows structured extraction, validation findings, missing fields, required evidence, conflicts, warnings, and the next recommended action.
 
-## Evaluations: test workflow behavior, not just model output
+![Run detail](./docs/week-01/images/run-detail-1.png)
+![Validation findings](./docs/week-01/images/conflicts.png)
 
-Each layer has synthetic failure cases and a repeatable runner:
+### Coverage assessment
 
-| Layer | What the eval proves | Key safety signal |
-|---|---|---|
-| Extraction + validation | Structured output and final workflow status match expectations. | Incomplete claims do not silently complete. |
-| Human review | Risky packets create the correct task, priority, events, and decision state. | Review routing remains correct. |
-| Policy RAG | Required clauses are retrieved and citations support the answer. | False approval rate stays at zero. |
-| Agent + guardrails | The expected tool is selected and unsafe proposals are blocked. | Unsafe action rate stays at zero. |
-| Workflow memory | Relevant memory is retrieved and updated without replacing evidence. | Source-of-truth violations stay at zero. |
-| Gateway observability | Timeouts, invalid JSON, cost blocks, and metadata failures are classified and persisted. | Missing trace rate stays at zero. |
+The Coverage page shows the saved decision-support assessment, retrieval status, confidence, cited clauses, and retrieval trace.
 
-The synthetic eval dashboard answers “does the system behave reliably across controlled cases?” The run trace answers “what happened in this particular claim?”
+![Coverage assessment](./docs/week-03/images/coverage-page-2.png)
+![Supporting retrieval trace](./docs/week-03/images/coverage-page-4.png)
 
-See [evaluation design and results](docs/evaluations.md) and the [synthetic datasets](sample-data/README.md).
+### Agent and information request
 
-## Detailed documentation
+The Agent Step page shows the proposed action, rationale, selected tool, guardrail result, and resulting workflow artifact.
 
-| Capability | Authoritative walkthrough |
-|---|---|
-| Intake, extraction, validation, and initial review boundary | [Week 1 — Document Intake Reviewer](docs/week-01/document-intake-reviewer.md) |
-| Policy ingestion, vector retrieval, thresholds, citations, and coverage UI | [Week 3 — Policy RAG Architecture](docs/week-03/policy-rag-architecture.md) |
-| Single-step agent, registered tools, guardrails, information request, and review loop | [Week 4 — Guarded Agentic Workflow](docs/week-04/agentic-workflow.md) |
-| Memory retrieval, safe agent context, feedback, lifecycle, and semantic patterns | [Week 5 — Memory Flow Evidence](docs/week-05/memory-flow-evidence.md) |
-| AI gateway, final schema, one-run trace, and Week 1–6 proof | [Week 6 — Observability Flow Evidence](docs/week-06/observability-flow-evidence.md) |
+![Agent action](./docs/week-04/images/agent-action-suggested.png)
+![Information request](./docs/week-04/images/information-request-drafted.png)
 
-## What the product proves
+### Memory guidance and audit
 
-- **AI output can become durable product state** without being blindly trusted.
-- **RAG can support a consequential workflow** with retrieved clauses and verifiable citations.
-- **An agent can take useful action without owning the final decision**, using typed tools and explicit authority boundaries.
-- **Human feedback can become safe operational memory** rather than an unbounded prompt history.
-- **Model calls can be governed as production dependencies**, with version, trace, latency, cost, status, and failure metadata.
-- **Evaluations can measure workflow safety**, not merely prompt quality.
-- **One trace can connect the complete system**, from the uploaded document through extraction, retrieval, memory, agent action, guardrail decision, follow-up, review, and model calls.
+The product shows why memory matched, how it may be used safely, what it must not do, whether the agent used it, and how the reviewer rated it.
 
-## Demo paths
+![Reviewer memory guidance](./docs/week-05/images/03-memory-guidance-for-reviewer.png)
+![Memory audit](./docs/week-05/images/05-memory-audit-1.png)
 
-After deployment and seeding, open `/demo`. The deterministic demo records do not call the model and provide three reviewer-friendly paths:
+### Run trace and eval dashboard
 
-1. **Policy-grounded completed claim** — inspect structured intake and cited policy evidence.
-2. **Memory-guided human review** — see a missing field retrieve prior guidance, then verify that the agent requests information instead of copying an old value.
-3. **Retryable model timeout** — inspect normalized gateway failure metadata and the connected workflow trace.
+The run trace explains one claim. The eval dashboard summarizes reliability across extraction, review, RAG, agent, memory, and gateway cases.
 
-For the memory path, open the run, inspect the missing `vehicle.registrationNumber`, retrieve memory, confirm the drafted information request, then open the trace to follow the claim across every layer. The eval dashboard at `/evals` provides the system-wide reliability view.
+![Run trace](./docs/week-06/images/trace-workflow-1.png)
+![Evaluation dashboard](./docs/week-06/images/eval-dashboard.png)
+
+---
+
+## Key features
+
+### Intake and extraction
+
+- PDF and pasted-email intake
+- structured claim schema
+- raw and parsed model output persistence
+- model, prompt, and schema version tracking
+- duplicate-content detection
+- soft delete and restore
+
+### Validation and review routing
+
+- deterministic required-field checks
+- claim-type evidence requirements
+- conflict, warning, and confidence checks
+- explicit run states and review reasons
+- durable review queue
+
+### Policy RAG
+
+- policy parsing and clause-aware chunking
+- embeddings stored in Postgres with pgvector
+- claim-aware multi-query planning
+- coverage, evidence, exclusion, and limit retrieval intents
+- retrieval thresholds
+- grounded answer generation
+- citation verification
+- persisted coverage questions and retrieval traces
+
+### Guarded agent
+
+- current-state context builder
+- deterministic routing before model planning
+- exactly one tool per agent step
+- registered backend tool execution
+- proposal, block, execution, and failure logs
+- final-state protection
+
+### Workflow memory
+
+- episodic and semantic workflow lessons
+- structured entity, field, evidence, and pattern matching
+- relevance scoring and provenance
+- safe-use and `mustNotDo` instructions
+- separate retrieval and agent-use audit
+- create, strengthen, weaken, retire, and supersede lifecycle
+
+### Gateway and observability
+
+- trace IDs across model-backed work
+- provider, model, prompt, and schema metadata
+- latency, token, and estimated-cost tracking
+- normalized failure classification
+- cost and metadata governance
+- per-run workflow trace
+- Week 1–6 evaluation dashboard
+
+---
+
+## Repository structure
+
+```txt
+claimflow_ai/
+├── apps/
+│   └── web/              # Next.js workflow UI and APIs
+├── packages/
+│   ├── ai/               # Extraction and model-backed generation
+│   ├── agent/            # Context, routing, planner, tools, guardrails, runner
+│   ├── db/               # Prisma schema, migrations, and deterministic demo seed
+│   ├── evals/            # Week 1–6 evaluation runners and reports
+│   ├── gateway/          # Governed model calls and AiCallLog persistence
+│   ├── memory/           # Memory writing, retrieval, scoring, audit, lifecycle
+│   ├── rag/              # Policy ingestion, embeddings, retrieval, citations
+│   └── shared/           # Shared schemas and types
+├── sample-data/          # Synthetic packets, gold expectations, eval reports
+├── docs/                 # Architecture, evidence, demos, and ship logs
+├── Dockerfile
+├── docker-compose.yml
+└── render.yaml
+```
+
+---
 
 ## Technology
 
 | Area | Stack |
 |---|---|
 | Web application | Next.js 16, React 19, TypeScript, Zustand |
-| Monorepo/runtime | Turborepo, Bun |
+| Monorepo and runtime | Turborepo, Bun |
 | Data | Postgres, Prisma 7, pgvector |
-| AI | Gemini, LangChain structured tool-calling, Zod schemas |
-| Reliability | Typed tools, deterministic rules, guardrails, eval runners, AI gateway tracing |
+| AI | Gemini, LangChain tool-calling, Zod schemas |
+| Reliability | Deterministic rules, typed tools, guardrails, eval runners, AI gateway |
+| Deployment | Docker and Render blueprint |
 
-## Repository map
+---
 
-```text
-apps/web        Workflow UI, APIs, review queue, traces, and eval dashboards
-packages/ai     Claim extraction and model-backed AI integration
-packages/rag    Policy loading, chunking, embeddings, retrieval, and citations
-packages/agent  State builder, router, planner, typed tools, runner, and guardrails
-packages/memory Memory writing, retrieval, scoring, audit hits, and update lifecycle
-packages/gateway Governed model calls, AiCallLog persistence, cost and failure metadata
-packages/evals  Week 1–6 evaluation runners and report generation
-packages/db     Prisma schema, migrations, and deterministic demo seed
-sample-data     Synthetic claim packets, failure cases, gold expectations, and reports
-docs            Architecture decisions, implementation evidence, demos, and ship logs
-```
+## Local development
 
-## Run locally
-
-Prerequisites: Bun, Docker, and a Gemini API key for real model-backed extraction.
+### 1. Create the environment file
 
 ```bash
 cp .env.example packages/db/.env
+```
+
+Add the required database URL and Gemini API key values described in `.env.example`.
+
+### 2. Start Postgres
+
+```bash
 docker compose up -d
+```
+
+### 3. Install dependencies
+
+```bash
 bun install
+```
+
+### 4. Generate Prisma and run migrations
+
+```bash
 bun run db:generate
 bun run db:migrate
+```
+
+### 5. Seed the deterministic demo
+
+```bash
 bun run demo:seed
+```
+
+### 6. Start the application
+
+```bash
 bun run dev
 ```
 
-Open `http://localhost:3001/demo`. Add `GEMINI_API_KEY` to `apps/web/.env.local` when you want to run real extraction; the seeded proof paths work without model calls.
+Open `http://localhost:3001/demo`.
 
-Run the production quality gate with:
+The seeded demo paths do not call the model. Add `GEMINI_API_KEY` to `apps/web/.env.local` when running real extraction from the web application.
+
+---
+
+## Proof of implementation
+
+### Production quality gate
 
 ```bash
 bun run production:check
 ```
 
-It generates Prisma types, type-checks the workspaces, runs lint, executes the deterministic Week 6 gateway eval, and builds the application. Individual Week 1–6 commands and committed reports are listed in [docs/evaluations.md](docs/evaluations.md).
+This command generates Prisma types, type-checks the workspaces, runs lint, executes the deterministic Week 6 gateway evaluation, and builds the application.
 
-For a public deployment, follow [docs/deployment.md](docs/deployment.md).
+### Evaluation coverage
+
+| Week | Capability | What is measured |
+|---|---|---|
+| Week 1 | Extraction + validation | Structured output and final run state |
+| Week 2 | Human review | Routing, priority, events, and decision state |
+| Week 3 | Policy RAG | Retrieval quality, citations, abstention, false approval |
+| Week 4 | Agent + guardrails | Tool selection, blocking, final-state safety |
+| Week 5 | Workflow memory | Retrieval, safe use, feedback, and lifecycle |
+| Week 6 | Gateway observability | Trace completeness, failures, retries, cost, metadata |
+
+![Week 1–6 evaluation dashboard](./docs/week-06/images/eval-dashboard.png)
+
+See [evaluation design and results](./docs/evaluations.md) and the [synthetic datasets](./sample-data/README.md).
+
+---
+
+## Detailed documentation
+
+| Capability | Walkthrough |
+|---|---|
+| Intake, extraction, validation, and initial review boundary | [Week 1 — Document Intake Reviewer](./docs/week-01/document-intake-reviewer.md) |
+| Policy ingestion, retrieval, thresholds, citations, and Coverage UI | [Week 3 — Policy RAG Architecture](./docs/week-03/policy-rag-architecture.md) |
+| Agent context, tools, guardrails, information request, and review loop | [Week 4 — Guarded Agentic Workflow](./docs/week-04/agentic-workflow.md) |
+| Memory retrieval, agent use, feedback, lifecycle, and patterns | [Week 5 — Memory Flow Evidence](./docs/week-05/memory-flow-evidence.md) |
+| Gateway, final schema, complete run trace, and Week 1–6 proof | [Week 6 — Observability Flow Evidence](./docs/week-06/observability-flow-evidence.md) |
+
+---
 
 ## Safety and production boundaries
 
 - All checked-in and seeded claims are synthetic.
 - Model and database secrets remain server-side.
-- Memory is advisory workflow context, never source-of-truth evidence.
-- The agent cannot make or bypass the final human review decision.
-- Public seed/reset HTTP endpoints are intentionally absent.
-- Demo records use deterministic IDs and can be refreshed with `bun run demo:seed` or removed with `bun run demo:reset`.
+- Extraction is validated before it becomes trusted workflow state.
+- Weak retrieval or unsupported citations force human review.
+- Memory is advisory context and cannot overwrite claim data.
+- The agent cannot approve, reject, delete, send email, or bypass review.
+- Final claim decisions remain human-owned.
+- Public seed and reset HTTP endpoints are intentionally absent.
 
-This is a production-style portfolio system, not a licensed claims adjudication platform. Real customer deployment would additionally require authentication and role-based access, tenant isolation, encrypted object storage, PII retention controls, rate limiting, background jobs and retry queues, alerting, and insurer-approved legal/compliance review.
+Real insurer deployment would additionally require authentication and role-based access, tenant isolation, encrypted object storage, PII retention controls, background jobs and retry queues, rate limiting, alerting, and insurer-approved legal and compliance review.
 
 ---
 
-**ClaimFlow AI demonstrates agentic AI as a governed workflow system: grounded by current policy evidence, informed by safe memory, constrained by tools and guardrails, accountable to human review, and measurable through traces and evals.**
+## Status
+
+- Document intake and extraction: **implemented**
+- Deterministic validation: **implemented**
+- Human review workflow: **implemented**
+- Policy RAG and citation checks: **implemented**
+- Guarded agent and tools: **implemented**
+- Workflow memory and lifecycle: **implemented**
+- AI gateway and run trace: **implemented**
+- Week 1–6 evaluations: **implemented**
+- Docker and Render deployment configuration: **implemented**
+
+---
+
+**ClaimFlow AI demonstrates agentic AI as a governed product workflow: grounded by current policy evidence, informed by safe memory, constrained by registered tools and guardrails, accountable to human review, and measurable through traces and evaluations.**
