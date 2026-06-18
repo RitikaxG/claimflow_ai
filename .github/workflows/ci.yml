@@ -36,6 +36,8 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run db:generate
       - run: bun run db:deploy
+      - name: Verify idempotent demo seed and reset
+        run: bun run demo:seed && bun run demo:seed && bun run demo:reset && bun run demo:seed
       - run: bun run check-types
       - run: bun run lint
       - run: bun run eval:week6:gateway
