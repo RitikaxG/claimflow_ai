@@ -17,9 +17,9 @@ Architecturally, the workflow shows how each ClaimFlow AI layer contributes to o
 
 ## Demo
 
-[![Watch the guarded agent workflow](https://x.com/RitikaxG/status/2061398296137199908?s=20)]
+Agentic Workflow : https://x.com/RitikaxG/status/2061398296137199908?s=20
 
-[![Watch the memory-guided workflow](https://x.com/RitikaxG/status/2065037735145205775?s=20)]
+Memory Layer : https://x.com/RitikaxG/status/2065037735145205775?s=20
 
 ---
 
