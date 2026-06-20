@@ -48,7 +48,7 @@ export function ClaimCoverageScreen() {
         </Link>
 
         <span className="rounded-full border border-blue-100 bg-[var(--cf-blue-soft)] px-3 py-1 text-xs font-medium text-[var(--cf-blue)]">
-          Claim-specific coverage
+          Policy RAG step
         </span>
       </div>
 
@@ -61,38 +61,38 @@ export function ClaimCoverageScreen() {
 
       <section className="rounded-2xl border border-[var(--cf-border)] bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-[var(--cf-navy)]">
-          Coverage assessment
+          What this step does
         </h2>
 
-        <p className="mt-1 text-sm text-[var(--cf-muted)]">
-          Ask coverage questions for this claim. The answer uses the extracted or human-corrected claim context plus retrieved policy clauses.
+        <p className="mt-2 text-sm leading-6 text-[var(--cf-muted)]">
+          This page answers coverage questions for the current claim using retrieved policy clauses and the claim facts already extracted or corrected by a reviewer. It does not approve the claim; it gives policy-grounded evidence that can support the review decision.
         </p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">
-              Document
+              Uses
             </p>
-            <p className="mt-1 truncate text-sm font-medium text-[var(--cf-navy)]">
-              {selectedRun.document.filename}
+            <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">
+              Claim facts + policy clauses
             </p>
           </div>
 
           <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">
-              Source
+              Produces
             </p>
             <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">
-              {selectedRun.document.sourceType}
+              Coverage answer with evidence
             </p>
           </div>
 
           <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">
-              Schema
+              Boundary
             </p>
             <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">
-              {selectedRun.schemaVersion}
+              No automatic approval
             </p>
           </div>
         </div>
