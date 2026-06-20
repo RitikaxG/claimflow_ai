@@ -13,8 +13,6 @@ import { MissingFieldsCard } from "./missing-fields-card";
 import { ConflictsCard } from "./conflicts-card";
 import { NeedsReviewCallout } from "./needs-review-callout";
 import { SourceDocumentCard } from "./source-document-card";
-import { RunCoverageCtaCard } from "./run-coverage-cta-card";
-import { RunAgentStepCtaCard } from "./run-agent-step-cta-card";
 import { NextRecommendedActionCard } from "./next-recommended-action-card";
 import { RunMemoryPanel } from "./run-memory-panel";
 import { RunTraceCtaCard } from "./run-trace-cta-card";
@@ -60,7 +58,7 @@ export function RunDetailScreen() {
       />
 
       <section className="rounded-2xl border border-blue-100 bg-[var(--cf-blue-soft)] p-4 text-sm leading-6 text-[var(--cf-slate)]">
-        This screen is the control center for one claim. Use it to inspect the source document, extraction result, validation findings, coverage answer, memory guidance, agent action, review task, and trace.
+        This is the control center for one claim. Use the navigation below to open review, coverage, memory, agent, and trace views for the same run.
       </section>
 
       <RunNavigationCard
@@ -94,15 +92,6 @@ export function RunDetailScreen() {
       <MissingFieldsCard missingFieldsJson={selectedRun.missingFieldsJson} />
 
       <ConflictsCard validationJson={selectedRun.validationJson} />
-
-      <RunCoverageCtaCard runId={selectedRun.id} status={selectedRun.status} />
-
-      <RunAgentStepCtaCard
-        runId={selectedRun.id}
-        reviewTaskStatus={selectedRun.reviewTask?.status ?? null}
-        latestActionType={selectedRun.agentActionLogs?.[0]?.action ?? null}
-        latestActionStatus={selectedRun.agentActionLogs?.[0]?.status ?? null}
-      />
 
       <RunTimeline
         events={selectedRun.events}
