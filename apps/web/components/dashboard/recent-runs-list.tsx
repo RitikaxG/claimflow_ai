@@ -55,11 +55,11 @@ export function RecentRunsList() {
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-[var(--cf-navy)]">Claims</h2>
           <p className="mt-1 text-sm text-[var(--cf-muted)]">
-            Open a claim to continue through review, coverage, memory, agent action, and trace.
+            Open a run to continue through extraction, validation, review, coverage, memory, agent action, and trace.
           </p>
         </div>
-        <Link href="/review" className="text-sm font-semibold text-[var(--cf-blue)] hover:underline">
-          View review queue
+        <Link href="/review" className="rounded-lg border border-[var(--cf-border-strong)] bg-white px-3 py-2 text-sm font-semibold text-[var(--cf-navy)] hover:border-[var(--cf-blue)] hover:text-[var(--cf-blue)]">
+          Review queue
         </Link>
       </div>
 
@@ -86,47 +86,50 @@ export function RecentRunsList() {
       ) : null}
 
       {runs.length > 0 ? (
-        <div className="divide-y divide-[var(--cf-border)]">
-          {runs.map((run) => (
-            <article key={run.id} className="p-5 transition hover:bg-white">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="min-w-0 space-y-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <RunStatusBadge status={run.status} />
-                    <span className="rounded-full border border-[var(--cf-border)] bg-[var(--cf-panel-muted)] px-2.5 py-1 text-xs font-medium text-[var(--cf-muted)]">
-                      {sourceLabel(run.document.sourceType)}
-                    </span>
-                    <span className="text-xs text-[var(--cf-muted)]">{formatDate(run.createdAt)}</span>
-                  </div>
-                  <h3 className="truncate text-base font-semibold text-[var(--cf-navy)]">
-                    {run.document.filename}
-                  </h3>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3 text-sm font-semibold">
-                  <Link href={`/runs/${run.id}`} className="rounded-lg bg-[var(--cf-navy)] px-4 py-2 text-white hover:bg-slate-800">
-                    Open run
-                  </Link>
-                  <Link href={`/runs/${run.id}/trace`} className="rounded-lg border border-[var(--cf-border-strong)] bg-white px-4 py-2 text-[var(--cf-navy)] hover:border-[var(--cf-navy)]">
-                    Trace
-                  </Link>
-                  <button
-                    type="button"
-                    disabled={deletingDocumentId === run.document.id}
-                    onClick={() =>
-                      handleDeleteDocument({
-                        documentId: run.document.id,
-                        filename: run.document.filename,
-                      })
-                    }
-                    className="text-red-700 hover:underline disabled:cursor-not-allowed disabled:text-slate-400"
-                  >
-                    {deletingDocumentId === run.document.id ? "Deleting..." : "Delete"}
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="cf-table-header text-xs uppercase tracking-wide">
+              <tr>
+                <th className="px-5 py-3 font-semibold">Claim</th>
+                <th className="px-5 py-3 font-semibold">Source</th>
+                <th className="px-5 py-3 font-semibold">Status</th>
+                <th className="px-5 py-3 font-semibold">Created</th>
+                <th className="px-5 py-3 font-semibold">Open</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--cf-border)] bg-white">
+              {runs.map((run) => (
+                <tr key={run.id} className="hover:bg-[var(--cf-panel-muted)]">
+                  <td className="max-w-[420px] px-5 py-4">
+                    <p className="truncate font-semibold text-[var(--cf-navy)]">{run.document.filename}</p>
+                    <p className="mt-1 font-mono text-xs text-[var(--cf-muted)]">{run.id}</p>
+                  </td>
+                  <td className="px-5 py-4 text-[var(--cf-slate)]">{sourceLabel(run.document.sourceType)}</td>
+                  <td className="px-5 py-4"><RunStatusBadge status={run.status} /></td>
+                  <td className="px-5 py-4 text-[var(--cf-muted)]">{formatDate(run.createdAt)}</td>
+                  <td className="whitespace-nowrap px-5 py-4">
+                    <div className="flex items-center gap-3 font-semibold">
+                      <Link href={`/runs/${run.id}`} className="text-[var(--cf-blue)] hover:underline">Run</Link>
+                      <Link href={`/runs/${run.id}/trace`} className="text-[var(--cf-slate)] hover:text-[var(--cf-blue)] hover:underline">Trace</Link>
+                      <button
+                        type="button"
+                        disabled={deletingDocumentId === run.document.id}
+                        onClick={() =>
+                          handleDeleteDocument({
+                            documentId: run.document.id,
+                            filename: run.document.filename,
+                          })
+                        }
+                        className="text-red-700 hover:underline disabled:cursor-not-allowed disabled:text-slate-400"
+                      >
+                        {deletingDocumentId === run.document.id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : null}
     </section>
