@@ -1,4 +1,5 @@
 import { ReviewTaskDetailScreen } from "../../../components/review/review-task-detail-screen";
+import { ReviewProductCopyCleanup } from "../../../components/review/review-product-copy-cleanup";
 
 type Params = {
     params : Promise<{
@@ -11,6 +12,7 @@ export default async function ReviewTaskDetailPage({ params } : Params){
 
     return (
         <div className="review-task-product-screen">
+            <ReviewProductCopyCleanup />
             <ReviewTaskDetailScreen taskId={taskId} />
         </div>
     );
