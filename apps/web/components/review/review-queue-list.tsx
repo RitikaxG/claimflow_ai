@@ -56,7 +56,7 @@ export function ReviewQueueList() {
       <div className="border-b border-[var(--cf-border)] p-5">
         <h2 className="text-xl font-semibold text-[var(--cf-navy)]">Review tasks</h2>
         <p className="mt-1 text-sm text-[var(--cf-muted)]">
-          Tasks created from validation issues, missing fields, conflicts, low confidence, or required evidence.
+          Human review tasks created when a claim has missing fields, required evidence, conflicts, warnings, or low confidence.
         </p>
       </div>
 
@@ -77,44 +77,49 @@ export function ReviewQueueList() {
       ) : null}
 
       {reviewTasks.length > 0 ? (
-        <div className="divide-y divide-[var(--cf-border)]">
-          {reviewTasks.map((task) => {
-            const counts = getReviewReasonCounts(task.reasonJson);
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="cf-table-header text-xs uppercase tracking-wide">
+              <tr>
+                <th className="px-5 py-3 font-semibold">Claim</th>
+                <th className="px-5 py-3 font-semibold">Status</th>
+                <th className="px-5 py-3 font-semibold">Priority</th>
+                <th className="px-5 py-3 font-semibold">Missing</th>
+                <th className="px-5 py-3 font-semibold">Conflicts</th>
+                <th className="px-5 py-3 font-semibold">Warnings</th>
+                <th className="px-5 py-3 font-semibold">Evidence</th>
+                <th className="px-5 py-3 font-semibold">Created</th>
+                <th className="px-5 py-3 font-semibold">Open</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--cf-border)] bg-white">
+              {reviewTasks.map((task) => {
+                const counts = getReviewReasonCounts(task.reasonJson);
 
-            return (
-              <article key={task.id} className="p-5">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div className="min-w-0 space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <ReviewTaskStatusBadge status={task.status} />
-                      <span className="rounded-full border border-[var(--cf-border)] bg-[var(--cf-panel-muted)] px-2.5 py-1 text-xs font-medium text-[var(--cf-muted)]">
-                        Priority: {task.priority}
-                      </span>
-                      <span className="text-xs text-[var(--cf-muted)]">{formatDate(task.createdAt)}</span>
-                    </div>
-                    <h3 className="truncate text-base font-semibold text-[var(--cf-navy)]">
-                      {task.run.document.filename}
-                    </h3>
-                    <div className="flex flex-wrap gap-3 text-xs text-[var(--cf-muted)]">
-                      <span>Missing: {counts.missingFieldsCount}</span>
-                      <span>Conflicts: {counts.conflictsCount}</span>
-                      <span>Warnings: {counts.warningsCount}</span>
-                      <span>Evidence: {counts.requiredEvidenceCount}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 text-sm font-semibold">
-                    <Link href={`/review/${task.id}`} className="rounded-lg bg-[var(--cf-navy)] px-4 py-2 text-white hover:bg-slate-800">
-                      Open review
-                    </Link>
-                    <Link href={`/runs/${task.run.id}`} className="rounded-lg border border-[var(--cf-border-strong)] bg-white px-4 py-2 text-[var(--cf-navy)] hover:border-[var(--cf-navy)]">
-                      Open run
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+                return (
+                  <tr key={task.id} className="hover:bg-[var(--cf-panel-muted)]">
+                    <td className="max-w-[360px] px-5 py-4">
+                      <p className="truncate font-semibold text-[var(--cf-navy)]">{task.run.document.filename}</p>
+                      <p className="mt-1 font-mono text-xs text-[var(--cf-muted)]">{task.run.id}</p>
+                    </td>
+                    <td className="px-5 py-4"><ReviewTaskStatusBadge status={task.status} /></td>
+                    <td className="px-5 py-4 text-[var(--cf-slate)]">{task.priority}</td>
+                    <td className="px-5 py-4 font-semibold text-[var(--cf-amber)]">{counts.missingFieldsCount}</td>
+                    <td className="px-5 py-4 font-semibold text-[var(--cf-red)]">{counts.conflictsCount}</td>
+                    <td className="px-5 py-4 font-semibold text-[var(--cf-amber)]">{counts.warningsCount}</td>
+                    <td className="px-5 py-4 font-semibold text-[var(--cf-slate)]">{counts.requiredEvidenceCount}</td>
+                    <td className="px-5 py-4 text-[var(--cf-muted)]">{formatDate(task.createdAt)}</td>
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <div className="flex items-center gap-3 font-semibold">
+                        <Link href={`/review/${task.id}`} className="text-[var(--cf-blue)] hover:underline">Review</Link>
+                        <Link href={`/runs/${task.run.id}`} className="text-[var(--cf-slate)] hover:text-[var(--cf-blue)] hover:underline">Run</Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       ) : null}
     </section>
