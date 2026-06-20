@@ -38,22 +38,21 @@ export function EvalDashboardScreen() {
     <div className="space-y-6">
       <header className="space-y-4">
         <div>
-          <p className="text-sm font-medium text-gray-500">Week 6 · Eval dashboard</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-gray-950">
+          <p className="text-sm font-medium text-[var(--cf-muted)]">Eval dashboard</p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[var(--cf-navy)]">
             ClaimFlow AI evals
           </h1>
-          <p className="mt-2 max-w-3xl text-sm text-gray-600">
-            Production proof across extraction, review, RAG, agent actions, memory,
-            and AI gateway observability.
+          <p className="mt-2 max-w-3xl text-sm text-[var(--cf-muted)]">
+            Quality evidence across extraction, review routing, policy RAG, agent actions, memory, and gateway observability.
           </p>
         </div>
 
         <nav className="flex gap-3 text-sm">
-          <Link href="/dashboard" className="rounded-lg border border-gray-200 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm">
-            Dashboard
+          <Link href="/dashboard" className="rounded-lg border border-[var(--cf-border)] bg-white px-4 py-2 font-medium text-[var(--cf-slate)] shadow-sm">
+            Claims
           </Link>
-          <Link href="/review" className="rounded-lg border border-gray-200 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm">
-            Review Queue
+          <Link href="/review" className="rounded-lg border border-[var(--cf-border)] bg-white px-4 py-2 font-medium text-[var(--cf-slate)] shadow-sm">
+            Review
           </Link>
         </nav>
       </header>
@@ -64,7 +63,7 @@ export function EvalDashboardScreen() {
         </div>
       ) : null}
 
-      {!data && !error ? <p className="text-sm text-gray-500">Loading evals...</p> : null}
+      {!data && !error ? <p className="text-sm text-[var(--cf-muted)]">Loading evals...</p> : null}
 
       {data ? (
         <div className="grid gap-5 lg:grid-cols-2">
