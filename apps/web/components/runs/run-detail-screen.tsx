@@ -52,7 +52,16 @@ export function RunDetailScreen() {
 
   return (
     <div className="space-y-6">
-      <RunHeader runId={selectedRun.id} status={selectedRun.status} />
+      <RunHeader
+        runId={selectedRun.id}
+        status={selectedRun.status}
+        title={selectedRun.document.filename}
+        sourceType={selectedRun.document.sourceType}
+      />
+
+      <section className="rounded-2xl border border-blue-100 bg-[var(--cf-blue-soft)] p-4 text-sm leading-6 text-[var(--cf-slate)]">
+        This screen is the control center for one claim. Use it to inspect the source document, extraction result, validation findings, coverage answer, memory guidance, agent action, review task, and trace.
+      </section>
 
       <RunNavigationCard
         runId={selectedRun.id}
