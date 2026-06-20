@@ -42,53 +42,56 @@ export function ClaimCoverageScreen() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href={`/runs/${selectedRun.id}`}
-          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          className="text-sm font-semibold text-[var(--cf-blue)] hover:underline"
         >
           ← Back to run detail
         </Link>
 
-        <span className="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
+        <span className="rounded-full border border-blue-100 bg-[var(--cf-blue-soft)] px-3 py-1 text-xs font-medium text-[var(--cf-blue)]">
           Claim-specific coverage
         </span>
       </div>
 
-      <RunHeader runId={selectedRun.id} status={selectedRun.status} />
+      <RunHeader
+        runId={selectedRun.id}
+        status={selectedRun.status}
+        title={selectedRun.document.filename}
+        sourceType={selectedRun.document.sourceType}
+      />
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Claim Coverage Assessment
+      <section className="rounded-2xl border border-[var(--cf-border)] bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-[var(--cf-navy)]">
+          Coverage assessment
         </h2>
 
-        <p className="mt-1 text-sm text-gray-500">
-          Ask coverage questions for this specific extraction run. The system
-          uses the extracted or reviewer-corrected claim context plus retrieved
-          policy clauses.
+        <p className="mt-1 text-sm text-[var(--cf-muted)]">
+          Ask coverage questions for this claim. The answer uses the extracted or human-corrected claim context plus retrieved policy clauses.
         </p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <div className="rounded-xl bg-gray-50 p-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+          <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">
               Document
             </p>
-            <p className="mt-1 truncate text-sm font-medium text-gray-800">
+            <p className="mt-1 truncate text-sm font-medium text-[var(--cf-navy)]">
               {selectedRun.document.filename}
             </p>
           </div>
 
-          <div className="rounded-xl bg-gray-50 p-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+          <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">
               Source
             </p>
-            <p className="mt-1 text-sm font-medium text-gray-800">
+            <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">
               {selectedRun.document.sourceType}
             </p>
           </div>
 
-          <div className="rounded-xl bg-gray-50 p-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+          <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">
               Schema
             </p>
-            <p className="mt-1 text-sm font-medium text-gray-800">
+            <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">
               {selectedRun.schemaVersion}
             </p>
           </div>
