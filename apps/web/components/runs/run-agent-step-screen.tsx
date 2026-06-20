@@ -59,14 +59,14 @@ export function RunAgentStepScreen() {
           </Link>
 
           <p className="mt-4 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--cf-muted)]">
-            Agent workflow
+            Agent step
           </p>
           <h1 className="mt-2 max-w-4xl break-words text-2xl font-semibold text-[var(--cf-navy)]">
             {selectedRun.document.filename}
           </h1>
 
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--cf-muted)]">
-            Run one guarded workflow step for this claim and inspect the proposed action, guardrail result, draft output, and audit logs.
+            This step decides the next safe workflow action for the claim. It uses validation results, policy evidence, memory guidance, and review state, then proposes one guarded action for a human to inspect.
           </p>
         </div>
 
@@ -79,6 +79,27 @@ export function RunAgentStepScreen() {
           {isRunningAgentStep ? "Running..." : "Run agent step"}
         </button>
       </div>
+
+      <section className="rounded-2xl border border-[var(--cf-border)] bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-[var(--cf-navy)]">What this step does</h2>
+        <p className="mt-2 text-sm leading-6 text-[var(--cf-muted)]">
+          The agent does not approve or reject the claim. It reads the current claim state, checks what is missing, uses retrieved policy and memory context, and creates a traceable next-step recommendation such as drafting an information request.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">Reads</p>
+            <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">Run state + review status</p>
+          </div>
+          <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">Uses</p>
+            <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">Policy + memory context</p>
+          </div>
+          <div className="rounded-xl bg-[var(--cf-panel-muted)] p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cf-muted)]">Produces</p>
+            <p className="mt-1 text-sm font-medium text-[var(--cf-navy)]">Guarded next action</p>
+          </div>
+        </div>
+      </section>
 
       {successMessage ? (
         <div className="rounded-2xl border border-green-100 bg-green-50 p-4 text-sm text-green-700">
