@@ -1,5 +1,6 @@
 import { prisma } from "@repo/db";
 import Link from "next/link";
+import { AppShellButton, ClaimFlowAppShell } from "../../components/claimflow-app-shell";
 
 export const dynamic = "force-dynamic";
 
@@ -8,16 +9,19 @@ const demoRuns = [
     id: "demo_run_complete",
     title: "Grounded claim completed",
     description: "Successful extraction, deterministic validation, policy evidence, gateway metadata, and a complete trace.",
+    accent: "border-[var(--cf-green)]",
   },
   {
     id: "demo_run_review",
     title: "Memory-guided human review",
     description: "A missing registration number retrieves safe workflow memory, triggers a guarded action, and stays in human review.",
+    accent: "border-[var(--cf-indigo)]",
   },
   {
     id: "demo_run_failure",
     title: "Safe model failure",
     description: "A synthetic provider timeout is classified as retryable and remains visible in the run-level trace.",
+    accent: "border-[var(--cf-red)]",
   },
 ];
 
@@ -37,61 +41,67 @@ export default async function DemoPage() {
   const statusById = new Map(availableRuns.map((run) => [run.id, run.status]));
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="mx-auto max-w-5xl space-y-8">
-        <header className="space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-wider text-indigo-600">Portfolio demo</p>
-          <h1 className="text-4xl font-semibold tracking-tight text-gray-950">ClaimFlow AI proof paths</h1>
-          <p className="max-w-3xl text-base leading-7 text-gray-600">
-            Explore three deterministic claims that prove the governed agentic workflow without spending model tokens or depending on a live provider response.
-          </p>
-          <nav className="flex flex-wrap gap-3 text-sm">
-            <Link href="/dashboard" className="rounded-lg bg-gray-950 px-4 py-2 font-medium text-white">Open dashboard</Link>
-            <Link href="/review" className="rounded-lg border border-gray-200 bg-white px-4 py-2 font-medium text-gray-700">Open review queue</Link>
-            <Link href="/evals" className="rounded-lg border border-gray-200 bg-white px-4 py-2 font-medium text-gray-700">Open eval dashboard</Link>
-          </nav>
-        </header>
+    <ClaimFlowAppShell
+      active="demo"
+      eyebrow="Portfolio proof paths"
+      title="Open seeded claims that prove the full workflow."
+      description="Use deterministic demo runs to explain ClaimFlow without depending on live model latency, provider availability, or manually created data."
+      actions={
+        <>
+          <AppShellButton href="/dashboard">Create live run</AppShellButton>
+          <AppShellButton href="/evals" variant="secondary">View evals</AppShellButton>
+        </>
+      }
+    >
+      {availableRuns.length === 0 ? (
+        <div className="rounded-[2rem] border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900 shadow-sm">
+          Demo data has not been seeded. Run <code className="rounded bg-amber-100 px-1.5 py-0.5 font-semibold">bun run demo:seed</code> once against the deployed database.
+        </div>
+      ) : null}
 
-        {availableRuns.length === 0 ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-            Demo data has not been seeded. Run <code>bun run demo:seed</code> once against the deployed database.
-          </div>
-        ) : null}
-
-        <section className="grid gap-5 md:grid-cols-3">
-          {demoRuns.map((run) => {
-            const status = statusById.get(run.id);
-            return (
-              <article key={run.id} className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                <div className="mb-4">
-                  <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">{status ?? "NOT SEEDED"}</span>
+      <section className="grid gap-5 md:grid-cols-3">
+        {demoRuns.map((run) => {
+          const status = statusById.get(run.id);
+          return (
+            <article key={run.id} className={`cf-card flex flex-col rounded-[2rem] border-t-4 p-5 ${run.accent}`}>
+              <div className="mb-4">
+                <span className="rounded-full bg-[var(--cf-panel-muted)] px-3 py-1 text-xs font-bold text-[var(--cf-slate)]">{status ?? "NOT SEEDED"}</span>
+              </div>
+              <h2 className="text-lg font-semibold text-[var(--cf-navy)]">{run.title}</h2>
+              <p className="mt-2 flex-1 text-sm leading-6 text-[var(--cf-muted)]">{run.description}</p>
+              {status ? (
+                <div className="mt-5 flex flex-wrap gap-3 text-sm font-bold">
+                  <Link href={`/runs/${run.id}`} className="rounded-full bg-[var(--cf-navy)] px-4 py-2 text-white">Open run</Link>
+                  <Link href={`/runs/${run.id}/trace`} className="rounded-full border border-[var(--cf-border)] px-4 py-2 text-[var(--cf-slate)]">Open trace</Link>
                 </div>
-                <h2 className="text-lg font-semibold text-gray-950">{run.title}</h2>
-                <p className="mt-2 flex-1 text-sm leading-6 text-gray-600">{run.description}</p>
-                {status ? (
-                  <div className="mt-5 flex gap-3 text-sm font-medium">
-                    <Link href={`/runs/${run.id}`} className="text-indigo-700 underline underline-offset-4">Open run</Link>
-                    <Link href={`/runs/${run.id}/trace`} className="text-gray-700 underline underline-offset-4">Open trace</Link>
-                  </div>
-                ) : null}
-              </article>
-            );
-          })}
-        </section>
+              ) : null}
+            </article>
+          );
+        })}
+      </section>
 
-        <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">Week 6 gateway eval</p>
-          <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-3xl font-semibold text-gray-950">{latestEval ? `${Math.round(latestEval.passRate * 100)}%` : "Not seeded"}</p>
-              <p className="mt-1 text-sm text-gray-600">
-                {latestEval ? `${latestEval.passedCases} of ${latestEval.totalCases} deterministic failure cases passed.` : "Seed the demo database to show evaluation evidence."}
-              </p>
-            </div>
-            <Link href={latestEval ? `/evals/${latestEval.id}` : "/evals"} className="text-sm font-medium text-indigo-700 underline underline-offset-4">View evaluation evidence</Link>
+      <section className="cf-card rounded-[2rem] p-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--cf-purple)]">Trace and eval proof</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--cf-navy)]">Week 6 gateway observability eval</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--cf-muted)]">
+              This block makes quality evidence visible from the demo page instead of hiding it in docs.
+            </p>
           </div>
-        </section>
-      </div>
-    </main>
+          <div className="rounded-3xl bg-[var(--cf-panel-muted)] p-5 text-right">
+            <p className="text-3xl font-semibold text-[var(--cf-navy)]">{latestEval ? `${Math.round(latestEval.passRate * 100)}%` : "Not seeded"}</p>
+            <p className="mt-1 text-sm text-[var(--cf-muted)]">
+              {latestEval ? `${latestEval.passedCases} of ${latestEval.totalCases} deterministic failure cases passed.` : "Seed the demo database to show evaluation evidence."}
+            </p>
+          </div>
+        </div>
+        <div className="mt-5">
+          <Link href={latestEval ? `/evals/${latestEval.id}` : "/evals"} className="rounded-full bg-[var(--cf-blue)] px-5 py-2.5 text-sm font-bold text-white shadow-sm">
+            View evaluation evidence
+          </Link>
+        </div>
+      </section>
+    </ClaimFlowAppShell>
   );
 }
