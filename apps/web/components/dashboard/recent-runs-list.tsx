@@ -96,7 +96,7 @@ export function RecentRunsList() {
       {runs.length > 0 ? (
         <div className="grid gap-4 p-5 xl:grid-cols-2">
           {runs.map((run) => (
-            <article key={run.id} className="rounded-3xl border border-[var(--cf-border)] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/8">
+            <article key={run.id} className="rounded-3xl border border-[var(--cf-border)] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--cf-muted)]">
