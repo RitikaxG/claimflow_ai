@@ -2,20 +2,22 @@
 @import "@repo/tailwind-config";
 
 :root {
-  --cf-bg: #f7f8fb;
+  --cf-bg: #f5f7fb;
   --cf-panel: #ffffff;
-  --cf-panel-muted: #f4f6f8;
-  --cf-navy: #102033;
-  --cf-navy-soft: #1d334d;
+  --cf-panel-muted: #f8fafc;
+  --cf-navy: #0f2742;
+  --cf-navy-soft: #17375c;
   --cf-blue: #2563eb;
+  --cf-blue-soft: #eff6ff;
   --cf-cyan: #0891b2;
   --cf-amber: #d97706;
+  --cf-amber-soft: #fff7ed;
   --cf-green: #15803d;
   --cf-red: #b91c1c;
   --cf-purple: #6d28d9;
   --cf-indigo: #4338ca;
   --cf-slate: #334155;
-  --cf-border: #e3e7ee;
+  --cf-border: #e2e8f0;
   --cf-border-strong: #cbd5e1;
   --cf-text: #172033;
   --cf-muted: #667085;
@@ -28,7 +30,9 @@ html {
 body {
   min-height: 100vh;
   color: var(--cf-text);
-  background: var(--cf-bg);
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.035), transparent 16rem),
+    var(--cf-bg);
 }
 
 ::selection {
@@ -37,13 +41,15 @@ body {
 
 .cf-page-shell {
   min-height: 100vh;
-  background: var(--cf-bg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 18rem),
+    var(--cf-bg);
 }
 
 .cf-card {
   border: 1px solid var(--cf-border);
   background: var(--cf-panel);
-  box-shadow: 0 8px 24px rgba(16, 32, 51, 0.04);
+  box-shadow: 0 10px 28px rgba(15, 39, 66, 0.055);
 }
 
 .cf-card-muted {
@@ -51,9 +57,13 @@ body {
   background: var(--cf-panel-muted);
 }
 
-.cf-page-heading {
-  border-bottom: 1px solid var(--cf-border);
-  background: rgba(255, 255, 255, 0.78);
+.cf-section-accent {
+  border-left: 3px solid var(--cf-blue);
+}
+
+.cf-table-header {
+  background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+  color: var(--cf-muted);
 }
 
 .cf-focus-ring {
