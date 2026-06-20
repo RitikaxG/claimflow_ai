@@ -9,5 +9,9 @@ type Params = {
 export default async function ReviewTaskDetailPage({ params } : Params){
     const { taskId } = await params;
 
-    return <ReviewTaskDetailScreen taskId={taskId} />;
+    return (
+        <div className="review-task-product-screen">
+            <ReviewTaskDetailScreen taskId={taskId} />
+        </div>
+    );
 }
