@@ -1,125 +1,114 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ClaimFlowLogo } from "../components/claimflow-app-shell";
 
-const journey = [
-  ["Intake", "Upload a claim PDF or paste a claim email."],
-  ["Extract", "Convert unstructured text into schema-shaped claim JSON."],
-  ["Validate", "Find missing fields, required evidence, conflicts, and warnings."],
-  ["Ground", "Use policy RAG to retrieve relevant coverage clauses."],
-  ["Guide", "Use safe workflow memory without copying old claim facts."],
-  ["Review", "Keep approval, correction, rejection, and info requests human-owned."],
-  ["Trace", "Inspect gateway calls, agent actions, review events, and evals."],
+const pillars = [
+  ["EX", "Structured extraction", "Claim PDFs and emails become schema-shaped JSON with source, model, prompt, and run state preserved."],
+  ["VA", "Validation boundary", "Missing fields, evidence, conflicts, warnings, and confidence issues become explicit workflow state."],
+  ["RG", "Policy-grounded RAG", "Coverage answers are grounded in retrieved policy clauses instead of free-form guessing."],
+  ["HR", "Human review", "Approval, rejection, correction, and missing-information handling stay with the reviewer."],
 ];
 
-const valueCards = [
-  {
-    title: "Not a chatbot",
-    body: "The UI follows a claim through a governed workflow. The model interprets and proposes; deterministic code validates and constrains.",
-  },
-  {
-    title: "Policy-grounded",
-    body: "Coverage answers come from retrieved policy clauses, with weak evidence routed to review instead of confident guessing.",
-  },
-  {
-    title: "Human controlled",
-    body: "The reviewer owns approval, rejection, correction, and missing-information decisions. The agent cannot silently finalize a claim.",
-  },
-  {
-    title: "Auditable",
-    body: "Original extraction, corrected JSON, memory feedback, gateway metadata, traces, and evals remain visible as evidence.",
-  },
+const workflow = ["Intake", "Extract", "Validate", "RAG", "Memory", "Agent", "Review", "Trace"];
+
+const screens = [
+  ["Claims dashboard", "/dashboard", "Create claim runs and open each case from a table."],
+  ["Review queue", "/review", "Inspect tasks created by validation findings."],
+  ["Guided demo", "/demo", "Use seeded claims for a predictable walkthrough."],
+  ["Evals", "/evals", "Show measurement and reliability evidence."],
 ];
 
-const proofLinks = [
-  ["Open claims", "/dashboard", "Create a live claim run from PDF or email text."],
-  ["Open review", "/review", "Review tasks created by validation failures."],
-  ["Seeded demo", "/demo", "Use deterministic proof paths for portfolio walkthroughs."],
-  ["Evals", "/evals", "Show quality and observability evidence."],
-];
+const stack = ["Next.js", "TypeScript", "Prisma", "Postgres", "pgvector", "Gemini", "RAG", "Memory", "Agent", "Evals"];
+
+function SectionEyebrow({ children }: { children: ReactNode }) {
+  return <p className="text-center text-xs font-semibold uppercase tracking-[0.28em] text-[var(--cf-blue)] sm:text-sm">{children}</p>;
+}
+
+function Badge({ children }: { children: ReactNode }) {
+  return <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--cf-blue-soft)] text-sm font-bold text-[var(--cf-blue)]">{children}</div>;
+}
 
 export default function HomePage() {
   return (
-    <main className="cf-page-shell min-h-screen">
-      <header className="border-b border-[var(--cf-border)] bg-white/92 backdrop-blur">
+    <main className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)]">
+      <header className="sticky top-0 z-50 border-b border-[var(--cf-border)] bg-white/90 backdrop-blur">
         <div className="h-1 bg-gradient-to-r from-[var(--cf-navy)] via-[var(--cf-blue)] to-[var(--cf-amber)]" />
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-4 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
           <ClaimFlowLogo />
           <nav className="flex flex-wrap gap-2 text-sm">
-            <Link href="/dashboard" className="rounded-full bg-[var(--cf-blue-soft)] px-3 py-1.5 font-semibold text-[var(--cf-blue)] ring-1 ring-blue-100">Claims</Link>
-            <Link href="/review" className="rounded-full px-3 py-1.5 font-medium text-[var(--cf-muted)] hover:bg-[var(--cf-panel-muted)] hover:text-[var(--cf-navy)]">Review</Link>
-            <Link href="/demo" className="rounded-full px-3 py-1.5 font-medium text-[var(--cf-muted)] hover:bg-[var(--cf-panel-muted)] hover:text-[var(--cf-navy)]">Demo</Link>
-            <Link href="/evals" className="rounded-full px-3 py-1.5 font-medium text-[var(--cf-muted)] hover:bg-[var(--cf-panel-muted)] hover:text-[var(--cf-navy)]">Evals</Link>
+            <a href="#architecture" className="rounded-full px-3 py-1.5 font-medium text-[var(--cf-muted)] hover:bg-[var(--cf-panel-muted)] hover:text-[var(--cf-navy)]">Architecture</a>
+            <a href="#product" className="rounded-full px-3 py-1.5 font-medium text-[var(--cf-muted)] hover:bg-[var(--cf-panel-muted)] hover:text-[var(--cf-navy)]">Product</a>
+            <Link href="/dashboard" className="rounded-full bg-[var(--cf-blue-soft)] px-3 py-1.5 font-semibold text-[var(--cf-blue)] ring-1 ring-blue-100">Open claims</Link>
           </nav>
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-6xl gap-10 px-5 py-16 md:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--cf-blue)]">Motor insurance · governed AI workflow</p>
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-[var(--cf-navy)] md:text-6xl">
-            Turn an incomplete claim into a policy-grounded, human-reviewed case.
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--cf-muted)]">
-            ClaimFlow AI shows how extraction, validation, RAG, memory, a guarded agent, human review, observability, and evals can work as one reliable product instead of separate AI demos.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/dashboard" className="rounded-lg bg-[var(--cf-navy)] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[var(--cf-navy-soft)]">
-              Open claims dashboard
-            </Link>
-            <Link href="/demo" className="rounded-lg border border-[var(--cf-border-strong)] bg-white px-5 py-3 text-sm font-semibold text-[var(--cf-navy)] hover:border-[var(--cf-blue)] hover:text-[var(--cf-blue)]">
-              Use seeded demo
-            </Link>
+      <section className="px-5 pb-12 pt-12 sm:px-8 lg:px-12 lg:pb-16 lg:pt-16">
+        <div className="mx-auto max-w-7xl rounded-[32px] border border-[var(--cf-border)] bg-[#f9fcff] px-6 py-14 shadow-[0_16px_60px_rgba(15,39,66,0.07)] sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-5xl text-center">
+            <div className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">• Motor-claim AI workflow demo</div>
+            <h1 className="mx-auto mt-8 max-w-5xl text-4xl font-black tracking-tight text-[var(--cf-navy)] sm:text-5xl lg:text-6xl lg:leading-tight">Turn incomplete claims into policy-grounded, human-reviewed cases</h1>
+            <p className="mx-auto mt-6 max-w-4xl text-lg leading-8 text-[var(--cf-muted)] sm:text-xl sm:leading-9">ClaimFlow AI connects extraction, validation, policy retrieval, workflow memory, agent actions, human review, traces, and evals into one auditable product loop.</p>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/dashboard" className="rounded-[18px] bg-[var(--cf-navy)] px-8 py-4 text-base font-semibold text-white shadow-[0_16px_30px_rgba(15,39,66,0.18)] transition hover:bg-[var(--cf-navy-soft)]">Open claims dashboard</Link>
+              <Link href="/demo" className="rounded-[18px] border border-[var(--cf-border-strong)] bg-white px-8 py-4 text-base font-semibold text-[var(--cf-navy)] transition hover:border-[var(--cf-blue)] hover:text-[var(--cf-blue)]">Use seeded demo</Link>
+            </div>
+            <div className="mx-auto mt-12 flex max-w-5xl flex-wrap items-center justify-center gap-3">
+              {stack.map((item) => <span key={item} className="rounded-full border border-[var(--cf-border)] bg-white px-4 py-2 text-sm font-medium text-[var(--cf-muted)]">{item}</span>)}
+            </div>
           </div>
-        </div>
 
-        <div className="cf-card rounded-3xl p-5">
-          <div className="border-b border-[var(--cf-border)] pb-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cf-muted)]">Product flow</p>
-            <h2 className="mt-2 text-xl font-semibold text-[var(--cf-navy)]">One claim, end to end</h2>
-          </div>
-          <div className="mt-5 space-y-4">
-            {journey.map(([title, body], index) => (
-              <div key={title} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <span className="grid h-7 w-7 place-items-center rounded-full bg-[var(--cf-blue-soft)] text-xs font-semibold text-[var(--cf-blue)] ring-1 ring-blue-100">
-                    {index + 1}
-                  </span>
-                  {index < journey.length - 1 ? <span className="mt-2 h-full w-px bg-[var(--cf-border)]" /> : null}
-                </div>
-                <div className="pb-1">
-                  <p className="text-sm font-semibold text-[var(--cf-navy)]">{title}</p>
-                  <p className="mt-1 text-sm leading-6 text-[var(--cf-muted)]">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 pb-16">
-        <div className="border-t border-[var(--cf-border)] pt-10">
-          <h2 className="text-2xl font-semibold tracking-tight text-[var(--cf-navy)]">What ClaimFlow provides</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {valueCards.map((card) => (
-              <article key={card.title} className="cf-card rounded-2xl p-5">
-                <h3 className="text-base font-semibold text-[var(--cf-navy)]">{card.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-[var(--cf-muted)]">{card.body}</p>
+          <div className="mx-auto mt-14 grid max-w-7xl gap-6 lg:grid-cols-2">
+            {pillars.map(([badge, title, body]) => (
+              <article key={title} className="rounded-[28px] border border-[var(--cf-border)] bg-white p-7 shadow-sm sm:p-8">
+                <Badge>{badge}</Badge>
+                <h2 className="mt-6 text-2xl font-bold tracking-tight text-[var(--cf-navy)]">{title}</h2>
+                <p className="mt-4 text-base leading-8 text-[var(--cf-muted)]">{body}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 pb-20">
-        <div className="grid gap-4 rounded-3xl border border-[var(--cf-border)] bg-white p-6 md:grid-cols-4">
-          {proofLinks.map(([title, href, body]) => (
-            <Link key={title} href={href} className="rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-panel-muted)] p-4 transition hover:border-[var(--cf-blue)] hover:bg-white">
-              <p className="text-sm font-semibold text-[var(--cf-blue)]">{title}</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--cf-muted)]">{body}</p>
-            </Link>
-          ))}
+      <section id="architecture" className="px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+        <div className="mx-auto max-w-7xl rounded-[32px] border border-[var(--cf-border)] bg-white px-6 py-14 shadow-sm sm:px-8 lg:px-12">
+          <SectionEyebrow>Workflow architecture</SectionEyebrow>
+          <h2 className="mx-auto mt-6 max-w-5xl text-center text-3xl font-black tracking-tight text-[var(--cf-navy)] sm:text-4xl lg:text-5xl">One claim moves through every AI and control layer</h2>
+          <div className="mt-12 rounded-[30px] border border-[var(--cf-border)] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-6 shadow-sm sm:p-8 lg:p-10">
+            <div className="grid gap-4 xl:grid-cols-8">
+              {workflow.map((item, index) => (
+                <div key={item} className="relative rounded-[22px] border border-[var(--cf-border)] bg-white p-5 shadow-sm">
+                  <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--cf-blue)]">{String(index + 1).padStart(2, "0")}</div>
+                  <div className="mt-4 text-lg font-bold text-[var(--cf-navy)]">{item}</div>
+                  {index < workflow.length - 1 ? <div className="pointer-events-none hidden xl:block"><div className="absolute right-[-20px] top-1/2 h-[2px] w-10 -translate-y-1/2 bg-gradient-to-r from-blue-200 to-transparent" /><div className="absolute right-[-10px] top-1/2 -translate-y-1/2 text-blue-400">→</div></div> : null}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
+
+      <section id="product" className="px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+        <div className="mx-auto max-w-7xl rounded-[32px] border border-[var(--cf-border)] bg-[#f9fcff] px-6 py-14 shadow-sm sm:px-8 lg:px-12">
+          <SectionEyebrow>Product screens</SectionEyebrow>
+          <h2 className="mx-auto mt-6 max-w-5xl text-center text-3xl font-black tracking-tight text-[var(--cf-navy)] sm:text-4xl lg:text-5xl">Every screen exists to explain the claim workflow</h2>
+          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+            {screens.map(([title, href, body]) => (
+              <Link key={title} href={href} className="rounded-[28px] border border-[var(--cf-border)] bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--cf-blue)] sm:p-8">
+                <h3 className="text-xl font-bold text-[var(--cf-navy)]">{title}</h3>
+                <p className="mt-4 text-base leading-8 text-[var(--cf-muted)]">{body}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-[var(--cf-border)] bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
+          <ClaimFlowLogo />
+          <p className="text-sm text-[var(--cf-muted)]">Portfolio demonstration. Auth is intentionally omitted so the workflow is immediately visible.</p>
+        </div>
+      </footer>
     </main>
   );
 }
