@@ -19,29 +19,33 @@ export function EmailTextCard() {
   };
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="space-y-1">
-        <h2 className="text-lg font-semibold text-gray-950">Paste email text</h2>
-        <p className="text-sm text-gray-600">
-          Useful for testing the intake workflow without uploading a file.
-        </p>
+    <section className="cf-card rounded-[2rem] p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--cf-amber)]">Fast demo path</p>
+          <h2 className="text-xl font-semibold text-[var(--cf-navy)]">Paste claim email</h2>
+          <p className="text-sm leading-6 text-[var(--cf-muted)]">
+            Useful for portfolio demos where you want to create a motor claim run without uploading a file.
+          </p>
+        </div>
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-50 text-lg">✉</span>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <textarea
           value={contentText}
           onChange={(event) => setContentText(event.target.value)}
-          placeholder="Paste claim email or claim form text..."
-          rows={7}
-          className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-950 placeholder:text-gray-400 caret-gray-950 outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+          placeholder="Paste a claimant email, accident summary, missing evidence note, or motor claim form text..."
+          rows={8}
+          className="cf-focus-ring w-full resize-none rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-panel-muted)] px-4 py-3 text-sm leading-6 text-[var(--cf-text)] placeholder:text-slate-400 focus:border-[var(--cf-blue)]"
         />
 
         <button
           type="submit"
           disabled={contentText.trim().length < 20 || isSubmittingEmail}
-          className="w-full rounded-lg bg-gray-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-400"
+          className="cf-focus-ring w-full rounded-2xl bg-[var(--cf-navy)] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-slate-900/15 transition hover:bg-[var(--cf-navy-soft)] disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
         >
-          {isSubmittingEmail ? "Submitting..." : "Create run from email text"}
+          {isSubmittingEmail ? "Creating claim run..." : "Create run from email text"}
         </button>
       </form>
     </section>
