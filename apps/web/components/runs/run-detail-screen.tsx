@@ -18,6 +18,7 @@ import { RunAgentStepCtaCard } from "./run-agent-step-cta-card";
 import { NextRecommendedActionCard } from "./next-recommended-action-card";
 import { RunMemoryPanel } from "./run-memory-panel";
 import { RunTraceCtaCard } from "./run-trace-cta-card";
+import { RunNavigationCard } from "./run-navigation-card";
 
 export function RunDetailScreen() {
   const params = useParams<{ runId: string }>();
@@ -53,6 +54,11 @@ export function RunDetailScreen() {
     <div className="space-y-6">
       <RunHeader runId={selectedRun.id} status={selectedRun.status} />
 
+      <RunNavigationCard
+        runId={selectedRun.id}
+        reviewTaskId={selectedRun.reviewTask?.id ?? null}
+      />
+
       <div className="grid gap-6 lg:grid-cols-2">
         <DocumentMetadataCard document={selectedRun.document} />
         <RunStatusCard run={selectedRun} />
@@ -63,7 +69,6 @@ export function RunDetailScreen() {
         status={selectedRun.status}
         reviewTaskStatus={selectedRun.reviewTask?.status ?? null}
       />
-
 
       <NextRecommendedActionCard run={selectedRun} />
 
