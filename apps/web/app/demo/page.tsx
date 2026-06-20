@@ -54,7 +54,7 @@ export default async function DemoPage() {
       }
     >
       {availableRuns.length === 0 ? (
-        <div className="rounded-[2rem] border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900 shadow-sm">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900 shadow-sm">
           Demo data has not been seeded. Run <code className="rounded bg-amber-100 px-1.5 py-0.5 font-semibold">bun run demo:seed</code> once against the deployed database.
         </div>
       ) : null}
@@ -63,7 +63,7 @@ export default async function DemoPage() {
         {demoRuns.map((run) => {
           const status = statusById.get(run.id);
           return (
-            <article key={run.id} className={`cf-card flex flex-col rounded-[2rem] border-t-4 p-5 ${run.accent}`}>
+            <article key={run.id} className={`cf-card flex flex-col rounded-2xl border-t-4 p-5 ${run.accent}`}>
               <div className="mb-4">
                 <span className="rounded-full bg-[var(--cf-panel-muted)] px-3 py-1 text-xs font-bold text-[var(--cf-slate)]">{status ?? "NOT SEEDED"}</span>
               </div>
@@ -71,8 +71,8 @@ export default async function DemoPage() {
               <p className="mt-2 flex-1 text-sm leading-6 text-[var(--cf-muted)]">{run.description}</p>
               {status ? (
                 <div className="mt-5 flex flex-wrap gap-3 text-sm font-bold">
-                  <Link href={`/runs/${run.id}`} className="rounded-full bg-[var(--cf-navy)] px-4 py-2 text-white">Open run</Link>
-                  <Link href={`/runs/${run.id}/trace`} className="rounded-full border border-[var(--cf-border)] px-4 py-2 text-[var(--cf-slate)]">Open trace</Link>
+                  <Link href={`/runs/${run.id}`} className="rounded-lg bg-[var(--cf-navy)] px-4 py-2 text-white">Open run</Link>
+                  <Link href={`/runs/${run.id}/trace`} className="rounded-lg border border-[var(--cf-border)] px-4 py-2 text-[var(--cf-slate)]">Open trace</Link>
                 </div>
               ) : null}
             </article>
@@ -80,16 +80,16 @@ export default async function DemoPage() {
         })}
       </section>
 
-      <section className="cf-card rounded-[2rem] p-6">
+      <section className="cf-card rounded-2xl p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--cf-purple)]">Trace and eval proof</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--cf-navy)]">Week 6 gateway observability eval</h2>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--cf-navy)]">Gateway observability eval</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--cf-muted)]">
-              This block makes quality evidence visible from the demo page instead of hiding it in docs.
+              Quality evidence is visible from the demo page instead of hidden in docs.
             </p>
           </div>
-          <div className="rounded-3xl bg-[var(--cf-panel-muted)] p-5 text-right">
+          <div className="rounded-2xl bg-[var(--cf-panel-muted)] p-5 text-right">
             <p className="text-3xl font-semibold text-[var(--cf-navy)]">{latestEval ? `${Math.round(latestEval.passRate * 100)}%` : "Not seeded"}</p>
             <p className="mt-1 text-sm text-[var(--cf-muted)]">
               {latestEval ? `${latestEval.passedCases} of ${latestEval.totalCases} deterministic failure cases passed.` : "Seed the demo database to show evaluation evidence."}
@@ -97,7 +97,7 @@ export default async function DemoPage() {
           </div>
         </div>
         <div className="mt-5">
-          <Link href={latestEval ? `/evals/${latestEval.id}` : "/evals"} className="rounded-full bg-[var(--cf-blue)] px-5 py-2.5 text-sm font-bold text-white shadow-sm">
+          <Link href={latestEval ? `/evals/${latestEval.id}` : "/evals"} className="rounded-lg bg-[var(--cf-blue)] px-5 py-2.5 text-sm font-bold text-white shadow-sm">
             View evaluation evidence
           </Link>
         </div>
