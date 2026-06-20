@@ -1,11 +1,21 @@
+import { AppShellButton, ClaimFlowAppShell } from "../../components/claimflow-app-shell";
 import { EvalDashboardScreen } from "../../components/evals/eval-dashboard-screen";
 
 export default function EvalsPage() {
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-8">
-      <div className="mx-auto max-w-6xl">
-        <EvalDashboardScreen />
-      </div>
-    </main>
+    <ClaimFlowAppShell
+      active="evals"
+      eyebrow="Evaluation and observability proof"
+      title="Show that ClaimFlow measures AI workflow quality."
+      description="The eval dashboard is presented as evidence for gateway behavior, trace visibility, and workflow reliability across deterministic synthetic cases."
+      actions={
+        <>
+          <AppShellButton href="/demo">Guided demo</AppShellButton>
+          <AppShellButton href="/dashboard" variant="secondary">Claim ops</AppShellButton>
+        </>
+      }
+    >
+      <EvalDashboardScreen />
+    </ClaimFlowAppShell>
   );
 }
