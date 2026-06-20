@@ -49,14 +49,14 @@ export function RunMemoryDetailScreen() {
           </Link>
 
           <p className="mt-4 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--cf-muted)]">
-            Memory audit
+            Memory step
           </p>
           <h1 className="mt-2 max-w-4xl break-words text-2xl font-semibold text-[var(--cf-navy)]">
             {isFetchingRun ? "Loading claim..." : claimName}
           </h1>
 
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--cf-muted)]">
-            Review memory hits, match reasons, safe-use constraints, agent usage, and update history for this claim.
+            This step retrieves safe workflow guidance from previous reviewed outcomes. It can suggest how to handle a similar missing-field or evidence pattern, but it must not copy old claimant facts into the current claim.
           </p>
         </div>
 
@@ -114,7 +114,7 @@ export function RunMemoryDetailScreen() {
         </div>
 
         <p className="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
-          Memory is not claim evidence. It can guide review routing and verification, but it must not overwrite extracted JSON, policy citations, or human decisions.
+          Memory is process guidance, not claim evidence. It can influence routing and verification, but policy citations, extracted facts, and human decisions remain the source of truth.
         </p>
       </section>
 
