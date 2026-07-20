@@ -75,44 +75,33 @@ export async function POST(_request: Request, { params }: Params) {
       },
     });
 
-  if (existingHitCount > 0) {
-    const audit = await getRunMemoryAudit(runId);
-
-    return NextResponse.json({
-      runId,
-      alreadyRetrieved: true,
-      retrieval: {
-        memories: [],
-        totalCandidates: 0,
-        writtenHitCount: 0,
-      },
-      audit,
-    });
-  }
-
   const retrieval = await retrieveRelevantMemories({
     runId,
     writeHits: true,
     limit: 5,
   });
 
-  await prisma.extractionEvent.create({
-    data: {
-      runId,
-      type: ExtractionEventType.MEMORY_RETRIEVED,
-      message: `Retrieved ${retrieval.memories.length} relevant workflow memories.`,
-      metadata: toPrismaJson({
-        totalCandidates: retrieval.totalCandidates,
-        writtenHitCount: retrieval.writtenHitCount,
-        memoryIds: retrieval.memories.map((memory) => memory.memoryId),
-      }),
-    },
-  });
+  if (retrieval.writtenHitCount > 0) {
+    await prisma.extractionEvent.create({
+      data: {
+        runId,
+        type: ExtractionEventType.MEMORY_RETRIEVED,
+        message: `Retrieved ${retrieval.writtenHitCount} new relevant workflow memories.`,
+        metadata: toPrismaJson({
+          totalCandidates: retrieval.totalCandidates,
+          writtenHitCount: retrieval.writtenHitCount,
+          memoryIds: retrieval.memories.map((memory) => memory.memoryId),
+        }),
+      },
+    });
+  }
 
   const audit = await getRunMemoryAudit(runId);
 
   return NextResponse.json({
     runId,
+    alreadyRetrieved:
+      existingHitCount > 0 && retrieval.writtenHitCount === 0,
     retrieval,
     audit,
   });

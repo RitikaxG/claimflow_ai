@@ -1,7 +1,8 @@
 import { prisma } from "@repo/db";
 import { diffCorrectedJson, type CorrectedJsonDiff } from "./diff-corrected-json";
 import { createMemoryFromObservation } from "./create-memory-from-observation";
-import { getString, isRecord } from "../utils/json";
+import { buildMemoryQuery } from "../retrieval/build-memory-query";
+import { getString, getStringArray, isRecord } from "../utils/json";
 import type { MemoryObservation } from "../types";
 
 export type StableEntityHint = {
@@ -25,6 +26,114 @@ const DEFAULT_MUST_NOT_DO = [
   "treat memory as source-of-truth evidence",
   "approve or reject a future claim based only on memory",
 ];
+
+const FINAL_REVIEW_DECISIONS = new Set([
+  "APPROVE_AS_IS",
+  "EDIT_AND_APPROVE",
+  "REJECT",
+]);
+
+function normalizeMemoryTagToken(value: string): string {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function describeProfile(value: string): string {
+  return value.replace(/[_+]+/g, " ");
+}
+
+function describeValidationPattern(value: string): string {
+  const labels: Record<string, string> = {
+    conflicts: "validation conflicts",
+    evidence_required: "required evidence",
+    missing_fields: "missing information",
+    review_signals: "review signals",
+  };
+
+  const parts = value
+    .split("+")
+    .map((part) => labels[part] ?? describeProfile(part));
+
+  if (parts.length <= 1) {
+    return parts[0] ?? "the review workflow";
+  }
+
+  return `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}`;
+}
+
+function buildCompletedReviewWorkflowObservation(input: {
+  reviewDecisionId: string;
+  runId: string;
+  decision: string;
+  extractedJson: unknown;
+  validationJson: unknown;
+  missingFieldsJson: unknown;
+}): MemoryObservation {
+  const query = buildMemoryQuery({
+    runId: input.runId,
+    claimState: {
+      runId: input.runId,
+      extractedJson: input.extractedJson,
+      validationJson: input.validationJson,
+      missingFields: getStringArray(input.missingFieldsJson),
+    },
+  });
+
+  const claimDescriptor = describeProfile(
+    query.claimType ?? query.lossType ?? "claim",
+  );
+
+  return {
+    observationId: `RDEC-${input.reviewDecisionId}-workflow-outcome`,
+    sourceType: "REVIEW_DECISION",
+    sourceId: input.reviewDecisionId,
+    sourcePacketId: null,
+    historicalClaimId: null,
+    observationType: "PRIOR_REVIEW_DECISION",
+    entityType: "WORKFLOW",
+    entityId: input.reviewDecisionId,
+    fieldPath: "workflow.reviewOutcome",
+    beforeValue: null,
+    afterValue: input.decision,
+    tags: [
+      ...query.tags,
+      "human_verified",
+      "completed_review",
+      "workflow_guidance",
+      `review_outcome:${normalizeMemoryTagToken(input.decision)}`,
+    ],
+    riskLevel: "LOW",
+    shouldCreateMemory: true,
+    recommendedMemoryKind: "PRIOR_REVIEW_DECISION",
+    summary:
+      query.validationPattern === "clean"
+        ? `A human reviewer completed a ${claimDescriptor} case without validation gaps.`
+        : `A human reviewer completed a ${claimDescriptor} case after resolving ${describeValidationPattern(
+            query.validationPattern,
+          )}.`,
+    safeUse:
+      "Use this only to compare workflow shape and surface checks a reviewer may want to repeat. Verify every current claim fact, document, and policy requirement independently.",
+    mustNotDo: [
+      ...DEFAULT_MUST_NOT_DO,
+      "copy facts, field values, or evidence from the prior claim",
+      "infer policy coverage or a final decision from the prior outcome",
+      "skip current-claim validation because a prior workflow looked similar",
+    ],
+    evidenceJson: {
+      reviewDecisionId: input.reviewDecisionId,
+      runId: input.runId,
+      reviewOutcome: input.decision,
+      claimType: query.claimType,
+      lossType: query.lossType,
+      evidenceProfile: query.evidenceProfile,
+      validationPattern: query.validationPattern,
+      safetyClassification: "WORKFLOW_GUIDANCE_ONLY",
+    },
+  };
+}
 
 function sanitizeFieldPathForId(fieldPath: string): string {
   return fieldPath.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -451,6 +560,22 @@ export async function createMemoryFromReviewDecision(
       : findVendorEntityHint(decision.correctedJson, run.extractedJson);
 
   const observations: MemoryObservation[] = [];
+
+  if (FINAL_REVIEW_DECISIONS.has(decision.decision)) {
+    observations.push(
+      buildCompletedReviewWorkflowObservation({
+        reviewDecisionId: decision.id,
+        runId: run.id,
+        decision: decision.decision,
+        // Retrieval must describe the workflow state that required human work,
+        // not only the clean state after the reviewer supplied the missing data.
+        extractedJson: run.extractedJson ?? decision.correctedJson,
+        validationJson:
+          run.validationJson ?? decision.correctedValidationJson,
+        missingFieldsJson: run.missingFieldsJson,
+      }),
+    );
+  }
 
   if (decision.decision === "EDIT_AND_APPROVE" && decision.correctedJson) {
     const diffs = diffCorrectedJson(run.extractedJson, decision.correctedJson);

@@ -1,32 +1,32 @@
 export const EVAL_SUITES = [
   {
     suite: "WEEK1_EXTRACTION",
-    title: "Week 1 Extraction",
-    description: "Structured claim extraction and validation failures.",
+    title: "Claim intake and preparation",
+    description: "Reliable claim facts, completeness checks, and clear validation outcomes.",
   },
   {
     suite: "WEEK2_REVIEW",
-    title: "Week 2 Review Workflow",
-    description: "Human review routing, review task creation, and reviewer decisions.",
+    title: "Human review workflow",
+    description: "Reliable review routing, reviewer tasks, and final decision outcomes.",
   },
   {
     suite: "WEEK3_RAG",
-    title: "Week 3 Policy RAG",
-    description: "Policy retrieval, citation support, refusal, and false approval checks.",
+    title: "Policy guidance",
+    description: "Grounded policy answers, supporting evidence, and safe uncertainty handling.",
   },
   {
     suite: "WEEK4_AGENT",
-    title: "Week 4 Agent Actions",
-    description: "Agent tool routing, guardrails, unsafe action blocking, and post-actions.",
+    title: "Guarded AI assistance",
+    description: "Safe next-step guidance, action boundaries, and human approval controls.",
   },
   {
     suite: "WEEK5_MEMORY",
-    title: "Week 5 Workflow Memory",
-    description: "Memory write, retrieval, safety, update, and semantic pattern checks.",
+    title: "Similar-claim guidance",
+    description: "Relevant past workflow guidance, safety boundaries, and reviewer feedback.",
   },
   {
     suite: "WEEK6_GATEWAY_OBSERVABILITY",
-    title: "Week 6 Gateway Observability",
-    description: "AI gateway failures, cost, latency, trace, model, and prompt governance.",
+    title: "AI reliability and observability",
+    description: "Visible failures, operational limits, and reviewable workflow history.",
   },
 ] as const;

@@ -1,8 +1,4 @@
-import {
-  ExtractionEventType,
-  Prisma,
-  prisma,
-} from "@repo/db";
+import { ExtractionEventType, Prisma, prisma } from "@repo/db";
 import { applyMemoryConfidenceUpdate } from "@repo/memory";
 import { NextResponse } from "next/server";
 import { getRunMemoryAudit } from "../../../../../../../lib/memory/get-run-memory-audit";
@@ -36,6 +32,10 @@ function getOptionalString(value: unknown): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export async function POST(request: Request, { params }: Params) {
   const { runId, memoryId } = await params;
 
@@ -52,26 +52,58 @@ export async function POST(request: Request, { params }: Params) {
   if (relevance !== "CONFIRMED_RELEVANT" && relevance !== "IRRELEVANT") {
     return NextResponse.json(
       {
-        error:
-          "relevance must be either CONFIRMED_RELEVANT or IRRELEVANT.",
+        error: "relevance must be either CONFIRMED_RELEVANT or IRRELEVANT.",
       },
       { status: 400 },
     );
   }
 
-  const memoryHitId = getOptionalString(body.memoryHitId);
+  let memoryHitId = getOptionalString(body.memoryHitId);
   const reviewDecisionId = getOptionalString(body.reviewDecisionId);
   const note = getOptionalString(body.note);
 
-  const memory = await prisma.workflowMemory.findUnique({
+  let resolvedMemoryId = memoryId;
+  let memory = await prisma.workflowMemory.findUnique({
     where: {
-      id: memoryId,
+      id: resolvedMemoryId,
     },
     select: {
       id: true,
       status: true,
+      confidence: true,
     },
   });
+
+  // Some retrieved-memory payloads historically used the MemoryHit id in the
+  // route. Resolve that scoped hit to its canonical WorkflowMemory id instead
+  // of returning a misleading 404.
+  if (!memory) {
+    const routeMemoryHit = await prisma.memoryHit.findFirst({
+      where: {
+        id: memoryId,
+        runId,
+      },
+      select: {
+        id: true,
+        memoryId: true,
+      },
+    });
+
+    if (routeMemoryHit) {
+      resolvedMemoryId = routeMemoryHit.memoryId;
+      memoryHitId ??= routeMemoryHit.id;
+      memory = await prisma.workflowMemory.findUnique({
+        where: {
+          id: resolvedMemoryId,
+        },
+        select: {
+          id: true,
+          status: true,
+          confidence: true,
+        },
+      });
+    }
+  }
 
   if (!memory) {
     return NextResponse.json(
@@ -92,7 +124,7 @@ export async function POST(request: Request, { params }: Params) {
       },
     });
 
-    if (!hit || hit.memoryId !== memoryId) {
+    if (!hit || hit.memoryId !== resolvedMemoryId) {
       return NextResponse.json(
         { error: "Memory hit does not belong to this memory." },
         { status: 400 },
@@ -107,11 +139,68 @@ export async function POST(request: Request, { params }: Params) {
     }
   }
 
+  if (memoryHitId) {
+    const previousUpdates = await prisma.memoryUpdate.findMany({
+      where: {
+        memoryId: resolvedMemoryId,
+        runId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 20,
+      select: {
+        id: true,
+        updateType: true,
+        beforeStatus: true,
+        afterStatus: true,
+        metadata: true,
+      },
+    });
+
+    const existingFeedback = previousUpdates.find((update) => {
+      if (!isRecord(update.metadata)) return false;
+      return (
+        update.metadata.source === "reviewer_memory_feedback_ui" &&
+        update.metadata.memoryHitId === memoryHitId
+      );
+    });
+
+    if (existingFeedback) {
+      const recordedRelevance = isRecord(existingFeedback.metadata)
+        ? existingFeedback.metadata.relevance
+        : null;
+
+      if (recordedRelevance !== relevance) {
+        return NextResponse.json(
+          { error: "Feedback has already been recorded for this guidance." },
+          { status: 409 },
+        );
+      }
+
+      return NextResponse.json({
+        memoryId: resolvedMemoryId,
+        duplicate: true,
+        feedback: {
+          memoryId: resolvedMemoryId,
+          changed: false,
+          beforeStatus: existingFeedback.beforeStatus ?? memory.status,
+          afterStatus: existingFeedback.afterStatus ?? memory.status,
+          beforeConfidence: memory.confidence,
+          afterConfidence: memory.confidence,
+          updateType: existingFeedback.updateType,
+          memoryUpdateId: existingFeedback.id,
+        },
+        audit: await getRunMemoryAudit(runId),
+      });
+    }
+  }
+
   const updateType =
     relevance === "CONFIRMED_RELEVANT" ? "STRENGTHENED" : "WEAKENED";
 
   const feedback = await applyMemoryConfidenceUpdate({
-    memoryId,
+    memoryId: resolvedMemoryId,
     updateType,
     runId: runId ?? null,
     reviewDecisionId: reviewDecisionId ?? null,
@@ -130,7 +219,7 @@ export async function POST(request: Request, { params }: Params) {
         type: ExtractionEventType.MEMORY_FEEDBACK_RECORDED,
         message: `Reviewer marked workflow memory as ${relevance}.`,
         metadata: toPrismaJson({
-          memoryId,
+          memoryId: resolvedMemoryId,
           memoryHitId: memoryHitId ?? null,
           relevance,
           updateType: feedback.updateType,
@@ -145,7 +234,7 @@ export async function POST(request: Request, { params }: Params) {
   }
 
   return NextResponse.json({
-    memoryId,
+    memoryId: resolvedMemoryId,
     feedback,
     audit: runId ? await getRunMemoryAudit(runId) : null,
   });

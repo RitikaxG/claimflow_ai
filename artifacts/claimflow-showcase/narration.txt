@@ -1,0 +1,17 @@
+Claims work rarely fails because teams lack data. It slows down because the story is scattered. ClaimFlow brings that story into one clear, reviewable journey.
+
+A reviewer creates an account, signs in, and starts a claim from the material already received: one PDF, or the original email.
+
+ClaimFlow extracts the facts, organizes the claim, and validates completeness. Missing fields and required evidence become visible immediately, without exposing raw extraction details to the reviewer.
+
+When policy context is needed, the reviewer can ask a claim-specific coverage question. Retrieval grounds the answer in relevant policy evidence and keeps the source available for review.
+
+When the next step is unclear, the agent recommends it. Every tool call is guarded, recorded, and kept behind human approval. A request for missing information can be prepared, returned to the reviewer, matched to the submitted source, and added to the claim.
+
+Similar completed reviews provide workflow memory—not claim evidence. Reviewers can rate that guidance, improving future retrieval.
+
+The reviewer can edit the prepared facts and approve, while the final decision always stays human.
+
+From intake through validation, retrieval, agent action, memory, review, and resolution, ClaimFlow preserves the full trace. Operations teams can inspect the pipeline and evaluation reports for grounding, safety, and quality.
+
+ClaimFlow AI. Move every claim forward with clarity.

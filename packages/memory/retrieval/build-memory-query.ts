@@ -14,8 +14,11 @@ export type BuildMemoryQuery = {
     fieldPaths : string[],
     tags : string[],
 
+    claimType : string | null,
     lossType : string | null,
     damageType : string | null,
+    evidenceProfile : string,
+    validationPattern : string,
 
     canWriteHits : boolean,
 }
@@ -167,6 +170,70 @@ function collectRiskSignalTags(validationJson : unknown): string[]{
     )
 }
 
+function hasNonEmptyValueAtPaths(value: unknown, paths: string[][]): boolean {
+  return paths.some((path) => {
+    const found = getNestedValues(value, path);
+
+    if (Array.isArray(found)) {
+      return found.length > 0;
+    }
+
+    if (typeof found === "string") {
+      return found.trim().length > 0;
+    }
+
+    return isRecord(found) && Object.keys(found).length > 0;
+  });
+}
+
+function buildEvidenceProfile(requiredEvidence: string[]): string {
+  if (requiredEvidence.length === 0) {
+    return "evidence_complete";
+  }
+
+  return uniqueStrings(requiredEvidence.map(normalizeTagToken))
+    .sort()
+    .join("+");
+}
+
+function buildValidationPattern(input: {
+  missingFields: string[];
+  requiredEvidence: string[];
+  validationJson: unknown;
+}): string {
+  const pattern: string[] = [];
+
+  if (input.missingFields.length > 0) {
+    pattern.push("missing_fields");
+  }
+
+  if (input.requiredEvidence.length > 0) {
+    pattern.push("evidence_required");
+  }
+
+  if (
+    hasNonEmptyValueAtPaths(input.validationJson, [
+      ["conflicts"],
+      ["fieldConflicts"],
+      ["validationConflicts"],
+    ])
+  ) {
+    pattern.push("conflicts");
+  }
+
+  if (
+    hasNonEmptyValueAtPaths(input.validationJson, [
+      ["warnings"],
+      ["validationWarnings"],
+      ["riskSignals"],
+    ])
+  ) {
+    pattern.push("review_signals");
+  }
+
+  return pattern.length > 0 ? pattern.sort().join("+") : "clean";
+}
+
 function collectFieldPaths(input : {
     missingFields : string[],
     requiredEvidence : string[],
@@ -182,8 +249,11 @@ function collectFieldPaths(input : {
 function collectTags(input : {
     missingFields : string[],
     requiredEvidence : string[],
+    claimType : string | null,
     lossType : string | null,
     damageType : string | null,
+    evidenceProfile : string,
+    validationPattern : string,
     validationJson : unknown,
 }) : string[] {
     const missingFieldTags = input.missingFields.flatMap((field) => {
@@ -202,6 +272,10 @@ function collectTags(input : {
         ? [`loss_type:${normalizeTagToken(input.lossType)}`]
         : [];
 
+    const claimTypeTags = input.claimType
+        ? [`claim_type:${normalizeTagToken(input.claimType)}`]
+        : [];
+
     const damageTypeTags = input.damageType
         ? [`damage_type:${normalizeTagToken(input.damageType)}`]
         : [];
@@ -209,8 +283,11 @@ function collectTags(input : {
     return uniqueStrings([
         ...missingFieldTags,
         ...requiredEvidenceTags,
+        ...claimTypeTags,
         ...lossTypeTags,
         ...damageTypeTags,
+        `evidence_profile:${input.evidenceProfile}`,
+        `validation_pattern:${input.validationPattern}`,
         ...collectRiskSignalTags(input.validationJson),
     ]);
 }
@@ -262,6 +339,29 @@ function getLossType(claimState : MemoryClaimState) : string | null {
     ]);
 }
 
+function getClaimType(claimState: MemoryClaimState): string | null {
+  const explicitClaimType = firstStringAtPaths(claimState.extractedJson, [
+    ["claimType"],
+    ["claim", "claimType"],
+    ["claim", "type"],
+    ["policy", "claimType"],
+    ["policy", "productType"],
+    ["insuranceType"],
+  ]);
+
+  if (explicitClaimType) {
+    return explicitClaimType;
+  }
+
+  const hasVehicleDetails = hasNonEmptyValueAtPaths(claimState.extractedJson, [
+    ["vehicle"],
+    ["vehicleRegistrationNumber"],
+    ["registrationNumber"],
+  ]);
+
+  return hasVehicleDetails ? "motor_claim" : null;
+}
+
 function getDamageType(claimState : MemoryClaimState) : string | null {
     return firstStringAtPaths(claimState.extractedJson,[
         ["damageType"],
@@ -280,8 +380,15 @@ export function buildMemoryQuery(input : {
     const runId = input.runId ?? claimState.runId ?? null;
     const missingFields = collectMissingFields(claimState);
     const requiredEvidence = collectRequiredEvidence(claimState);
+    const claimType = getClaimType(claimState);
     const lossType = getLossType(claimState);
     const damageType = getDamageType(claimState);
+    const evidenceProfile = buildEvidenceProfile(requiredEvidence);
+    const validationPattern = buildValidationPattern({
+        missingFields,
+        requiredEvidence,
+        validationJson: claimState.validationJson,
+    });
 
     const fieldPaths = collectFieldPaths({
         missingFields,
@@ -291,8 +398,11 @@ export function buildMemoryQuery(input : {
     const tags = collectTags({
         missingFields,
         requiredEvidence,
+        claimType,
         lossType,
         damageType,
+        evidenceProfile,
+        validationPattern,
         validationJson: claimState.validationJson,
     });
 
@@ -305,8 +415,11 @@ export function buildMemoryQuery(input : {
         requiredEvidence,   
         fieldPaths,
         tags,
+        claimType,
         lossType,
         damageType,
+        evidenceProfile,
+        validationPattern,
         canWriteHits: input.canWriteHits ?? false,
     }
 }

@@ -102,12 +102,12 @@ export type ExtractionRunRecord = {
     followupDrafts? : FollowupDraftRecord[],
 };
 
-type UploadResponse = {
+export type ClaimIntakeResponse = {
     duplicate? : boolean,
     restored? : boolean,
     message? : string,
     document : DocumentRecord,
-    run : ExtractionRunRecord | null,
+    run : { id : string } | null,
     event? : ExtractionEventRecord,
 };
 
@@ -298,6 +298,11 @@ export type RunMemoryAuditResponse = {
   };
 };
 
+export type RunMemoryRetrievalOutcome = {
+  status: "matches" | "none";
+  totalCandidates: number | null;
+};
+
 type MemoryFeedbackInput = {
   memoryId: string;
   memoryHitId?: string;
@@ -337,6 +342,7 @@ type DashboardStore = {
     reviewTaskActionInFlight : ReviewTaskAction | null,
 
     runMemoriesByRunId: Record<string, RunMemoryAuditResponse>;
+    runMemoryRetrievalOutcomeByRunId: Record<string, RunMemoryRetrievalOutcome>;
     isFetchingRunMemories: boolean;
     isRetrievingRunMemories: boolean;
     memoryFeedbackInFlightId: string | null;
@@ -353,12 +359,12 @@ type DashboardStore = {
     requestMoreInfoReviewTask : (taskId : string, input : ReviewActionInput) => Promise<void>;
     editAndApproveReviewTask : (taskId : string, input : EditAndApproveInput) => Promise<void>;
     
-    uploadPdf : (file : File) => Promise<void>;
-    submitEmailText : (contentText : string) => Promise<void>;
+    uploadPdf : (file : File) => Promise<ClaimIntakeResponse | null>;
+    submitEmailText : (contentText : string) => Promise<ClaimIntakeResponse | null>;
     clearMessages : () => void;
     
-    extractRun : (runId : string) => Promise<void>;
-    validateRun : (runId : string) => Promise<void>;
+    extractRun : (runId : string) => Promise<boolean>;
+    validateRun : (runId : string) => Promise<boolean>;
     runAgentStep : (runId : string) => Promise<void>;
     submitAdditionalEvidence : (runId : string, input : AdditionalEvidenceInput) => Promise<void>;
     submitAdditionalInformation: (
@@ -418,6 +424,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     deletingDocumentId : null,
 
     runMemoriesByRunId: {},
+    runMemoryRetrievalOutcomeByRunId: {},
     isFetchingRunMemories: false,
     isRetrievingRunMemories: false,
     memoryFeedbackInFlightId: null,
@@ -500,13 +507,36 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         try {
             const res = await axios.post<{
                 alreadyRetrieved?: boolean;
+                retrieval?: {
+                    memories?: unknown[];
+                    totalCandidates?: number;
+                };
                 audit: RunMemoryAuditResponse;
             }>(`/api/extraction-runs/${runId}/memories/retrieve`);
+
+            const retrievedCount = res.data.alreadyRetrieved
+                ? res.data.audit.memories.length
+                : Array.isArray(res.data.retrieval?.memories)
+                  ? res.data.retrieval.memories.length
+                  : res.data.audit.memories.length;
+            const totalCandidates =
+                res.data.alreadyRetrieved
+                    ? res.data.audit.memories.length
+                    : typeof res.data.retrieval?.totalCandidates === "number"
+                    ? res.data.retrieval.totalCandidates
+                    : null;
 
             set((state) => ({
             runMemoriesByRunId: {
                 ...state.runMemoriesByRunId,
                 [runId]: res.data.audit,
+            },
+            runMemoryRetrievalOutcomeByRunId: {
+                ...state.runMemoryRetrievalOutcomeByRunId,
+                [runId]: {
+                    status: retrievedCount > 0 ? "matches" : "none",
+                    totalCandidates,
+                },
             },
             isRetrievingRunMemories: false,
             successMessage: res.data.alreadyRetrieved
@@ -550,7 +580,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
                 }
                 : state.runMemoriesByRunId,
             memoryFeedbackInFlightId: null,
-            successMessage: "Memory feedback recorded.",
+            successMessage: "Similar-claim feedback saved.",
             }));
 
             await get().fetchRun(runId);
@@ -569,19 +599,23 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             formData.append("sourceType","PDF");
             formData.append("file",file);
 
-            const res = await axios.post<UploadResponse>("api/documents/upload",formData);
+            const res = await axios.post<ClaimIntakeResponse>("api/documents/upload",formData);
 
             set({
                 isUploadingPdf : false,
-                successMessage : res.data.message ?? "PDF uploaded. Extraction run created.",
+                successMessage : "PDF added to a new claim.",
             });
 
             await get().fetchRuns();
+
+            return res.data;
         }catch(error){
             set({
                 error : getErrorMessage(error, "Failed to upload PDF."),
                 isUploadingPdf : false,
             });
+
+            return null;
         }
     },
 
@@ -593,19 +627,23 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             formData.append("sourceType","EMAIL_TEXT");
             formData.append("contentText", contentText);
 
-            const res = await axios.post<UploadResponse>("api/documents/upload",formData);
+            const res = await axios.post<ClaimIntakeResponse>("api/documents/upload",formData);
 
             set({
                 isSubmittingEmail : false,
-                successMessage : res.data.message ?? "Email text submitted. Extraction run created."
+                successMessage : "Email added to a new claim."
             });
 
             await get().fetchRuns();
+
+            return res.data;
         }catch(error){
             set({
                 error : getErrorMessage(error, "Failed to submit email text."),
                 isSubmittingEmail : false,
             });
+
+            return null;
         }
     },
 
@@ -621,11 +659,13 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             set({
                 isExtractingRun : false,
-                successMessage : "Extraction Completed. Structured JSON saved.",
+                successMessage : "Claim facts organized.",
             })
 
             await get().fetchRun(runId);
             await get().fetchRuns();
+
+            return true;
         } catch(error){
             set({
                 error : getErrorMessage(error, "Failed to run extraction."),
@@ -633,6 +673,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             });
 
             await get().fetchRun(runId);
+
+            return false;
         }
     },
 
@@ -648,12 +690,14 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             set({
                 isValidatingRun: false,
-                successMessage : "Validation completed."
+                successMessage : "Readiness checks completed."
             });
 
             await get().fetchRun(runId);
             await get().fetchRuns();
             await get().fetchReviewTasks();
+
+            return true;
         } catch(error){
             set({
                 error : getErrorMessage(error, "Failed to validate run."),
@@ -661,6 +705,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             })
 
             await get().fetchRun(runId);
+
+            return false;
         }
     },
 
@@ -718,7 +764,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         });
 
         try{
-            const res = await axios.delete<DeleteDocumentResponse>(
+            await axios.delete<DeleteDocumentResponse>(
                 `/api/documents/${documentId}`,
                 {
                     data : {
@@ -729,7 +775,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             set({
                 deletingDocumentId: null,
-                successMessage : res.data.message ?? "Document soft deleted successfully."
+                successMessage : "Claim source archived."
             });
 
             await get().fetchRuns();
@@ -761,7 +807,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             set({
                 selectedReviewTask : res.data.reviewTask,
                 reviewTaskActionInFlight : null,
-                successMessage : "Review task started.",
+                successMessage : "Human review started.",
             })
 
             await get().fetchReviewTasks();
@@ -792,7 +838,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             set({
                 selectedReviewTask : res.data.reviewTask,
                 reviewTaskActionInFlight : null,
-                successMessage : "Review task approved.",
+                successMessage : "Claim approved.",
             })
 
             await get().fetchReviewTasks();
@@ -824,7 +870,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             set({
                 selectedReviewTask : res.data.reviewTask,
                 reviewTaskActionInFlight : null,
-                successMessage : "Review task rejected.",
+                successMessage : "Claim rejected.",
             })
 
             await get().fetchReviewTasks();
@@ -856,7 +902,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             set({
                 selectedReviewTask : res.data.reviewTask,
                 reviewTaskActionInFlight : null,
-                successMessage : "Requested more information for review task.",
+                successMessage : "Information request recorded.",
             })
 
             await get().fetchReviewTasks();
@@ -886,7 +932,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
             set({
                 selectedReviewTask : res.data.reviewTask,
                 reviewTaskActionInFlight : null,
-                successMessage : "Corrected JSON approved.",
+                successMessage : "Corrections reviewed and approved.",
             });
 
             await get().fetchReviewTasks();
@@ -911,7 +957,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             set({
                 isRunningAgentStep : false,
-                successMessage : "Agent step completed.",
+                successMessage : "Guided next step prepared.",
             })
 
             await get().fetchRun(runId);
@@ -966,7 +1012,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
             set({
                 isReopeningReviewTask : false,
-                successMessage : "Review reopened to PENDING. Start review again to continue human verification.",
+                successMessage : "Review reopened. Start the review to continue human verification.",
             });
 
             await get().fetchReviewTask(taskId);

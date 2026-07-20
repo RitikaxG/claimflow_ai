@@ -153,10 +153,28 @@ export async function createMemoryFromObservation(
     );
 
     if (existingMemory) {
+      // Rebuild-safe refresh: preserve lifecycle/confidence/feedback while
+      // bringing deterministic workflow profile tags in sync with the source
+      // review. This is important when retrieval profiling evolves.
+      await tx.workflowMemory.update({
+        where: {
+          id: existingMemory.id,
+        },
+        data: {
+          ...buildSourceLinks(observation),
+          riskLevel: observation.riskLevel,
+          summary: observation.summary,
+          safeUse: observation.safeUse,
+          mustNotDo: observation.mustNotDo,
+          tags: observation.tags,
+          evidenceJson: toPrismaJson(buildEvidenceJson(observation)),
+        },
+      });
+
       return {
         memoryId: existingMemory.id,
         skipped: true,
-        reason: "MEMORY_ALREADY_EXISTS",
+        reason: "MEMORY_ALREADY_EXISTS_PROFILE_REFRESHED",
       };
     }
 

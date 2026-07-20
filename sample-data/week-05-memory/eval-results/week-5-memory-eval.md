@@ -1,6 +1,6 @@
 # Week 5 Memory Eval Report
 
-Generated at: 2026-06-16T08:17:02.404Z
+Generated at: 2026-07-19T10:02:00.387Z
 
 ## Executive Summary
 
@@ -90,11 +90,11 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 
 **Actual retrieval result**
 
-- Total candidates: `2`
+- Total candidates: `4`
 - Retrieved seed IDs: `WMEM-SEED-W5-001`, `WMEM-SEED-W5-004`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`
-- Hit logging: `{"runId":"<runtime-id>","hitCount":2,"writtenHitCount":2,"retrievedSeedIds":["WMEM-SEED-W5-001","WMEM-SEED-W5-004"]}`
+- Hit logging: `{"runId":"<runtime-id>","hitCount":3,"writtenHitCount":3,"retrievedSeedIds":["WMEM-SEED-W5-001","WMEM-SEED-W5-004","UNKNOWN_SEED"]}`
 
 **Check results**
 
@@ -129,7 +129,7 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 
 **Actual retrieval result**
 
-- Total candidates: `1`
+- Total candidates: `3`
 - Retrieved seed IDs: `WMEM-SEED-W5-002`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`
@@ -167,7 +167,7 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 
 **Actual retrieval result**
 
-- Total candidates: `0`
+- Total candidates: `2`
 - Retrieved seed IDs: `none`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`
@@ -337,7 +337,7 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 
 **Actual retrieval result**
 
-- Total candidates: `1`
+- Total candidates: `3`
 - Retrieved seed IDs: `WMEM-SEED-W5-005`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`
@@ -375,7 +375,7 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 
 **Actual retrieval result**
 
-- Total candidates: `2`
+- Total candidates: `4`
 - Retrieved seed IDs: `WMEM-SEED-W5-003`, `WMEM-SEED-W5-007`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`
@@ -413,7 +413,7 @@ Checks whether the right memory is retrieved for a future claim and irrelevant m
 
 **Actual retrieval result**
 
-- Total candidates: `2`
+- Total candidates: `4`
 - Retrieved seed IDs: `WMEM-SEED-W5-003`, `WMEM-SEED-W5-007`
 - Unexpected retrieved seed IDs: `none`
 - Precision passed: `true`

@@ -1,0 +1,17 @@
+[
+  {"image":"01-landing.png","title":"One clear claim journey","subtitle":"AI-assisted motor claims review, with people in control","duration":6},
+  {"image":"02-sign-up.png","title":"Create a secure workspace","subtitle":"A guided start for authorized review teams","duration":5},
+  {"image":"03-sign-in.png","title":"Return to protected work","subtitle":"Claims, evidence and decisions stay together","duration":4},
+  {"image":"04-dashboard.png","title":"See the work that matters","subtitle":"Needs attention, waiting and ready for review—at a glance","duration":5},
+  {"image":"05-new-claim-email.png","title":"Start from the source","subtitle":"Upload one PDF or paste the original claim email","duration":6},
+  {"image":"06-preparing-claim.png","title":"ClaimFlow prepares the case","subtitle":"Facts are extracted, organized and checked","duration":6},
+  {"image":"07-validation.png","title":"Validation makes gaps visible","subtitle":"Missing fields and required evidence become clear next steps","duration":7},
+  {"image":"08-policy-guidance.png","title":"Ask policy-grounded questions","subtitle":"RAG answers from relevant policy evidence—not guesswork","duration":7},
+  {"image":"09-guarded-action.png","title":"The agent recommends the next step","subtitle":"Tool calls are guarded, recorded and held for human approval","duration":8},
+  {"image":"10-review-handoff.png","title":"Close the information loop","subtitle":"Requested details return to the reviewer with source context","duration":7},
+  {"image":"11-memory-feedback.png","title":"Learn from completed reviews","subtitle":"Relevant workflow memory helps—and never becomes claim evidence","duration":7},
+  {"image":"12-resolution.png","title":"Edit and approve with confidence","subtitle":"The final decision remains a human action","duration":6},
+  {"image":"13-trace.png","title":"Trace every meaningful event","subtitle":"From intake to decision, the full claim story stays reviewable","duration":8},
+  {"image":"14-evals.png","title":"Operate with measurable quality","subtitle":"Evaluation reports surface grounding, safety and workflow performance","duration":5},
+  {"image":"15-outro.png","title":"ClaimFlow AI","subtitle":"Move every claim forward with clarity","duration":3}
+]

@@ -22,7 +22,7 @@ export async function GET(_request: Request, { params }: Params) {
   });
 
   if (!evalRun) {
-    return NextResponse.json({ error: "Eval run not found." }, { status: 404 });
+    return NextResponse.json({ error: "Quality report not found." }, { status: 404 });
   }
 
   return NextResponse.json({ evalRun });

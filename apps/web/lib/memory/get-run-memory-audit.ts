@@ -1,4 +1,8 @@
 import { prisma } from "@repo/db";
+import {
+  getWorkflowMemoryDisplayKey,
+  retrieveRelevantMemories,
+} from "@repo/memory";
 
 export type RunMemoryAuditItem = {
   memoryId: string;
@@ -163,7 +167,17 @@ function chooseDisplayHit<
 export async function getRunMemoryAudit(
   runId: string,
 ): Promise<RunMemoryAudit> {
-  const hits = await prisma.memoryHit.findMany({
+  const currentRetrieval = await retrieveRelevantMemories({
+    runId,
+    limit: 25,
+    writeHits: false,
+  });
+
+  const selectedMemoryIds = new Set(
+    currentRetrieval.memories.map((memory) => memory.memoryId),
+  );
+
+  const allHits = await prisma.memoryHit.findMany({
     where: {
       runId,
     },
@@ -185,15 +199,28 @@ export async function getRunMemoryAudit(
     },
   });
 
-  const hitsByMemoryId = new Map<string, typeof hits>();
+  const selectedDisplayKeys = new Set(
+    allHits
+      .filter((hit) => selectedMemoryIds.has(hit.memoryId))
+      .map((hit) => getWorkflowMemoryDisplayKey(hit.memory)),
+  );
+
+  // Keep historical hits in the database for traceability, but only surface
+  // groups that remain relevant to the claim's current validated profile.
+  const hits = allHits.filter((hit) =>
+    selectedDisplayKeys.has(getWorkflowMemoryDisplayKey(hit.memory)),
+  );
+
+  const hitsByDisplayKey = new Map<string, typeof hits>();
 
   hits.forEach((hit) => {
-    const currentHits = hitsByMemoryId.get(hit.memoryId) ?? [];
+    const displayKey = getWorkflowMemoryDisplayKey(hit.memory);
+    const currentHits = hitsByDisplayKey.get(displayKey) ?? [];
     currentHits.push(hit);
-    hitsByMemoryId.set(hit.memoryId, currentHits);
+    hitsByDisplayKey.set(displayKey, currentHits);
   });
 
-  const memories = Array.from(hitsByMemoryId.values()).map(
+  const memories = Array.from(hitsByDisplayKey.values()).map(
     (memoryHits): RunMemoryAuditItem => {
       const displayHit = chooseDisplayHit(memoryHits);
 

@@ -2,6 +2,7 @@ import { MemoryClaimStateSchema, RelevantMemorySchema, type MemoryClaimState, ty
 import { getStringArray } from "../utils/json";
 import { buildMemoryQuery, type BuildMemoryQuery } from "./build-memory-query";
 import { scoreMemory, type WorkflowMemoryLike } from "./score-memory"
+import { getWorkflowMemoryDisplayKey } from "./workflow-memory-fingerprint";
 import { Prisma, prisma } from "@repo/db";
 
 export type RetrieveRelevantMemoriesResult = {
@@ -68,6 +69,18 @@ function buildCandidateWhere(
         or.push({
             kind : "RECURRING_ERROR_PATTERN",
         });
+    }
+
+    if (
+      query.claimType ||
+      query.lossType ||
+      query.evidenceProfile ||
+      query.validationPattern
+    ) {
+      or.push({
+        kind: "PRIOR_REVIEW_DECISION",
+        entityType: "WORKFLOW",
+      });
     }
 
     if(or.length === 0){
@@ -155,21 +168,39 @@ function toRelevantMemory(input : {
 async function writeMemoryHits(input : {
     runId : string,
     scoredMemories : ScoredMemory[]
-}): Promise<Map<string,string>> {
+}): Promise<{
+    hitIdsByMemoryId: Map<string, string>;
+    writtenHitCount: number;
+}> {
     const hitIdsByMemoryId = new Map<string, string>();
+    let writtenHitCount = 0;
 
     await prisma.$transaction(async (tx) => {
         for(const scored of input.scoredMemories){
-            const hit = await tx.memoryHit.create({
-                data : {
-                    memoryId : scored.memory.id,
-                    runId : input.runId,
-                    score : scored.score,
-                    matchedOn: toPrismaJson(scored.matchedOn),
-                    retrievalReason: scored.retrievalReason,
-                    usedByAgent: false,
-                }
+            const existingHit = await tx.memoryHit.findFirst({
+                where: {
+                    memoryId: scored.memory.id,
+                    runId: input.runId,
+                },
+                orderBy: {
+                    createdAt: "asc",
+                },
             });
+
+            const hit = existingHit ?? await tx.memoryHit.create({
+              data: {
+                memoryId: scored.memory.id,
+                runId: input.runId,
+                score: scored.score,
+                matchedOn: toPrismaJson(scored.matchedOn),
+                retrievalReason: scored.retrievalReason,
+                usedByAgent: false,
+              },
+            });
+
+            if (!existingHit) {
+              writtenHitCount += 1;
+            }
 
             await tx.workflowMemory.update({
                 where : {
@@ -183,7 +214,10 @@ async function writeMemoryHits(input : {
             hitIdsByMemoryId.set(scored.memory.id,hit.id);
         }
     })
-    return hitIdsByMemoryId;
+    return {
+      hitIdsByMemoryId,
+      writtenHitCount,
+    };
 }
 
 export async function retrieveRelevantMemories(input: {
@@ -228,7 +262,7 @@ export async function retrieveRelevantMemories(input: {
     take: 250,
   });
 
-  const scored = candidates
+  const eligibleScored = candidates
     .map((memory) => {
       const score = scoreMemory({
         memory,
@@ -241,7 +275,20 @@ export async function retrieveRelevantMemories(input: {
       };
     })
     .filter((item) => item.isEligible)
-    .sort((left, right) => right.score - left.score)
+    .sort((left, right) => right.score - left.score);
+
+  const seenDisplayKeys = new Set<string>();
+  const scored = eligibleScored
+    .filter((item) => {
+      const displayKey = getWorkflowMemoryDisplayKey(item.memory);
+
+      if (seenDisplayKeys.has(displayKey)) {
+        return false;
+      }
+
+      seenDisplayKeys.add(displayKey);
+      return true;
+    })
     .slice(0, input.limit ?? 5)
     .map(
       (item): ScoredMemory => ({
@@ -253,22 +300,24 @@ export async function retrieveRelevantMemories(input: {
     );
 
   const shouldWriteHits = Boolean(input.writeHits && input.runId);
-  const hitIdsByMemoryId = shouldWriteHits
+  const hitWrite = shouldWriteHits
     ? await writeMemoryHits({
         runId: input.runId!,
         scoredMemories: scored,
       })
-    : new Map<string, string>();
+    : {
+        hitIdsByMemoryId: new Map<string, string>(),
+        writtenHitCount: 0,
+      };
 
   return {
     memories: scored.map((item) =>
       toRelevantMemory({
         scored: item,
-        memoryHitId: hitIdsByMemoryId.get(item.memory.id) ?? null,
+        memoryHitId: hitWrite.hitIdsByMemoryId.get(item.memory.id) ?? null,
       }),
     ),
     totalCandidates: candidates.length,
-    writtenHitCount: hitIdsByMemoryId.size,
+    writtenHitCount: hitWrite.writtenHitCount,
   };
 }
-

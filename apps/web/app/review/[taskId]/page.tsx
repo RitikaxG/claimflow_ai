@@ -1,5 +1,4 @@
-import { ReviewTaskDetailScreen } from "../../../components/review/review-task-detail-screen";
-import { ReviewProductCopyCleanup } from "../../../components/review/review-product-copy-cleanup";
+import { HumanDecisionExperience } from "../../../components/review/human-decision-experience";
 
 type Params = {
     params : Promise<{
@@ -10,10 +9,5 @@ type Params = {
 export default async function ReviewTaskDetailPage({ params } : Params){
     const { taskId } = await params;
 
-    return (
-        <div className="review-task-product-screen">
-            <ReviewProductCopyCleanup />
-            <ReviewTaskDetailScreen taskId={taskId} />
-        </div>
-    );
+    return <HumanDecisionExperience taskId={taskId} />;
 }

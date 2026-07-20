@@ -7,6 +7,8 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false
+      - key: AUTH_SECRET
+        generateValue: true
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL

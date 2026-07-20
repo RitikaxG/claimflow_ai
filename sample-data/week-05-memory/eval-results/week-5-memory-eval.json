@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-16T08:17:02.404Z",
+  "generatedAt": "2026-07-19T10:02:00.387Z",
   "datasetRoot": "/Users/ritikagupta/Desktop/Devops/claimflow-ai/sample-data/week-05-memory",
   "summary": {
     "totalPackets": 15,
@@ -43,7 +43,7 @@
         ]
       },
       "actual": {
-        "totalCandidates": 2,
+        "totalCandidates": 4,
         "writtenHitCount": 0,
         "retrievedSeedIds": [
           "WMEM-SEED-W5-001",
@@ -55,12 +55,13 @@
         ],
         "precisionPassed": true,
         "hitLogging": {
-          "runId": "cmqgdcc470001way8ufv7y7st",
-          "hitCount": 2,
-          "writtenHitCount": 2,
+          "runId": "cmrrmmh4500018vy84s3mr3xh",
+          "hitCount": 3,
+          "writtenHitCount": 3,
           "retrievedSeedIds": [
             "WMEM-SEED-W5-001",
-            "WMEM-SEED-W5-004"
+            "WMEM-SEED-W5-004",
+            "UNKNOWN_SEED"
           ]
         }
       },
@@ -99,7 +100,7 @@
         ]
       },
       "actual": {
-        "totalCandidates": 1,
+        "totalCandidates": 3,
         "writtenHitCount": 0,
         "retrievedSeedIds": [
           "WMEM-SEED-W5-002"
@@ -144,7 +145,7 @@
         ]
       },
       "actual": {
-        "totalCandidates": 0,
+        "totalCandidates": 2,
         "writtenHitCount": 0,
         "retrievedSeedIds": [],
         "unexpectedRetrievedSeedIds": [],
@@ -197,7 +198,7 @@
         ]
       },
       "actual": {
-        "memoryId": "cmqgdccir0004way8a8jfz5j5",
+        "memoryId": "cmrrmmh6p00058vy8hi40pxcg",
         "skipped": false,
         "reason": "MEMORY_CREATED",
         "kind": "HUMAN_CORRECTION",
@@ -262,7 +263,7 @@
         ]
       },
       "actual": {
-        "memoryId": "cmqgdcctg0006way8befcaodq",
+        "memoryId": "cmrrmmh7b00078vy8stu9a1me",
         "skipped": false,
         "reason": "MEMORY_CREATED",
         "kind": "PRIOR_REJECTION",
@@ -326,7 +327,7 @@
         ]
       },
       "actual": {
-        "memoryId": "cmqgdccxp0008way8vmjtobm7",
+        "memoryId": "cmrrmmh7r00098vy81k0a8zt8",
         "skipped": false,
         "reason": "MEMORY_CREATED",
         "kind": "RECURRING_ERROR_PATTERN",
@@ -383,7 +384,7 @@
         ]
       },
       "actual": {
-        "totalCandidates": 1,
+        "totalCandidates": 3,
         "writtenHitCount": 0,
         "retrievedSeedIds": [
           "WMEM-SEED-W5-005"
@@ -430,7 +431,7 @@
         ]
       },
       "actual": {
-        "totalCandidates": 2,
+        "totalCandidates": 4,
         "writtenHitCount": 0,
         "retrievedSeedIds": [
           "WMEM-SEED-W5-003",
@@ -481,7 +482,7 @@
         ]
       },
       "actual": {
-        "totalCandidates": 2,
+        "totalCandidates": 4,
         "writtenHitCount": 0,
         "retrievedSeedIds": [
           "WMEM-SEED-W5-003",
@@ -879,16 +880,16 @@
         }
       },
       "actual": {
-        "memoryId": "cmqgdcde7000away8qtnhmi9o",
+        "memoryId": "cmrrmmh9r000b8vy8xhkfa67i",
         "updateResult": {
-          "memoryId": "cmqgdcde7000away8qtnhmi9o",
+          "memoryId": "cmrrmmh9r000b8vy8xhkfa67i",
           "changed": true,
           "beforeStatus": "ACTIVE",
           "afterStatus": "STRENGTHENED",
           "beforeConfidence": 0.7,
           "afterConfidence": 0.75,
           "updateType": "STRENGTHENED",
-          "memoryUpdateId": "cmqgdcdgf000bway8etx0jevb"
+          "memoryUpdateId": "cmrrmmha7000c8vy8m9k1mey0"
         },
         "afterStatus": "STRENGTHENED",
         "afterConfidence": 0.75,
@@ -938,16 +939,16 @@
         }
       },
       "actual": {
-        "memoryId": "cmqgdcdht000cway8amy3nkh6",
+        "memoryId": "cmrrmmham000d8vy8hcd73p13",
         "updateResult": {
-          "memoryId": "cmqgdcdht000cway8amy3nkh6",
+          "memoryId": "cmrrmmham000d8vy8hcd73p13",
           "changed": true,
           "beforeStatus": "ACTIVE",
           "afterStatus": "RETIRED",
           "beforeConfidence": 0.7,
           "afterConfidence": 0.6,
           "updateType": "RETIRED",
-          "memoryUpdateId": "cmqgdcdje000dway8lhqaswk4"
+          "memoryUpdateId": "cmrrmmhas000e8vy8uacyf0yb"
         },
         "afterStatus": "RETIRED",
         "afterConfidence": 0.6,
@@ -1002,14 +1003,14 @@
       },
       "actual": {
         "sourceMemoryIds": [
-          "cmqgdcdmh000eway89618uabj",
-          "cmqgdcdmw000fway8sivwwqmv",
-          "cmqgdcdn1000gway8mx115gvo"
+          "cmrrmmhb3000f8vy8p7uuqws8",
+          "cmrrmmhb6000g8vy8ocwa10ww",
+          "cmrrmmhb8000h8vy8ve95wpnk"
         ],
         "candidatesFound": 1,
         "patternsCreated": 1,
         "patternsStrengthened": 0,
-        "patternMemoryId": "cmqgdcdqa000hway8c3z1fs5k",
+        "patternMemoryId": "cmrrmmhbl000i8vy8870jzuo5",
         "patternKind": "RECURRING_ERROR_PATTERN",
         "patternEntityType": "FIELD_PATH",
         "patternEntityId": "eval_policy_number",

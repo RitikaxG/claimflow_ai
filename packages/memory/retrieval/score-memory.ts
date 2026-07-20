@@ -34,7 +34,10 @@ export const MEMORY_SCORE = {
   EXACT_VENDOR: 25,
   EXACT_CLAIMANT: 20,
 
-  SAME_LOSS_TYPE: 10,
+  SAME_CLAIM_TYPE: 15,
+  SAME_LOSS_TYPE: 15,
+  EVIDENCE_PROFILE_MATCH: 20,
+  VALIDATION_PATTERN_MATCH: 25,
   HIGH_RISK_MEMORY: 10,
   HUMAN_VERIFIED_MEMORY: 10,
   CONFIRMED_MEMORY: 10,
@@ -69,6 +72,22 @@ const ENTITY_RISK_MEMORY_KINDS = new Set([
   "PRIOR_REJECTION",
   "CLAIMANT_PATTERN",
   "VENDOR_PATTERN",
+]);
+
+const BROAD_WORKFLOW_MATCH_TYPES = new Set<MemoryMatchSignal["type"]>([
+  "SAME_CLAIM_TYPE",
+  "SAME_LOSS_TYPE",
+  "EVIDENCE_PROFILE_MATCH",
+  "VALIDATION_PATTERN_MATCH",
+]);
+
+const STRONG_WORKFLOW_GAP_MATCH_TYPES = new Set<
+  MemoryMatchSignal["type"]
+>([
+  "SAME_FIELD",
+  "MISSING_FIELD_MATCH",
+  "REQUIRED_EVIDENCE_MATCH",
+  "PATTERN_FULL_MATCH",
 ]);
 
 function normalizeComparable(value: string): string {
@@ -165,6 +184,36 @@ function hasSameLossType(input: {
   const lossTypeTag = `loss_type:${normalizeTagToken(input.query.lossType)}`;
 
   return hasTag(input.memoryTags, lossTypeTag);
+}
+
+function hasSameProfileValue(input: {
+  memoryTags: string[];
+  prefix: string;
+  value: string | null;
+}): boolean {
+  if (!input.value) {
+    return false;
+  }
+
+  return hasTag(input.memoryTags, `${input.prefix}:${input.value}`);
+}
+
+function hasConflictingProfileValue(input: {
+  memoryTags: string[];
+  prefix: string;
+  value: string | null;
+}): boolean {
+  if (!input.value) {
+    return false;
+  }
+
+  const storedValues = tagsWithPrefix(input.memoryTags, `${input.prefix}:`)
+    .map(normalizeTagToken);
+
+  return (
+    storedValues.length > 0 &&
+    !storedValues.includes(normalizeTagToken(input.value))
+  );
 }
 
 function pushSignal(input: {
@@ -269,6 +318,47 @@ function scoreRecurringMissingFieldPattern(input: {
 
 function hasWorkflowMatch(matchedOn: MemoryMatchSignal[]): boolean {
   return matchedOn.some((signal) => WORKFLOW_MATCH_TYPES.has(signal.type));
+}
+
+function hasBroadWorkflowMatch(input: {
+  memory: WorkflowMemoryLike;
+  matchedOn: MemoryMatchSignal[];
+}): boolean {
+  if (!isGeneralizedWorkflowMemory(input.memory)) {
+    return false;
+  }
+
+  const distinctProfileMatches = new Set(
+    input.matchedOn
+      .filter((signal) => BROAD_WORKFLOW_MATCH_TYPES.has(signal.type))
+      .map((signal) => signal.type),
+  );
+
+  const hasStrongGapMatch = input.matchedOn.some((signal) =>
+    STRONG_WORKFLOW_GAP_MATCH_TYPES.has(signal.type),
+  );
+
+  const hasClaimShapeMatch = input.matchedOn.some(
+    (signal) =>
+      signal.type === "SAME_CLAIM_TYPE" ||
+      signal.type === "SAME_LOSS_TYPE",
+  );
+
+  // Three broad similarities remain sufficient. An exact current-workflow gap
+  // (for example the same missing FIR field or required police report) can also
+  // qualify when the claim/loss shape matches. The memory remains guidance only
+  // and never becomes evidence for the current claim.
+  return (
+    distinctProfileMatches.size >= 3 ||
+    (hasStrongGapMatch && hasClaimShapeMatch)
+  );
+}
+
+function isGeneralizedWorkflowMemory(memory: WorkflowMemoryLike): boolean {
+  return (
+    memory.kind === "PRIOR_REVIEW_DECISION" &&
+    memory.entityType === "WORKFLOW"
+  );
 }
 
 function hasEntityRiskMatch(input: {
@@ -478,6 +568,51 @@ export function scoreMemory(input: {
     });
   }
 
+  if (
+    hasSameProfileValue({
+      memoryTags,
+      prefix: "claim_type",
+      value: query.claimType,
+    })
+  ) {
+    pushSignal({
+      matchedOn,
+      type: "SAME_CLAIM_TYPE",
+      value: query.claimType ?? "unknown",
+      points: MEMORY_SCORE.SAME_CLAIM_TYPE,
+    });
+  }
+
+  if (
+    hasSameProfileValue({
+      memoryTags,
+      prefix: "evidence_profile",
+      value: query.evidenceProfile,
+    })
+  ) {
+    pushSignal({
+      matchedOn,
+      type: "EVIDENCE_PROFILE_MATCH",
+      value: query.evidenceProfile,
+      points: MEMORY_SCORE.EVIDENCE_PROFILE_MATCH,
+    });
+  }
+
+  if (
+    hasSameProfileValue({
+      memoryTags,
+      prefix: "validation_pattern",
+      value: query.validationPattern,
+    })
+  ) {
+    pushSignal({
+      matchedOn,
+      type: "VALIDATION_PATTERN_MATCH",
+      value: query.validationPattern,
+      points: MEMORY_SCORE.VALIDATION_PATTERN_MATCH,
+    });
+  }
+
   if (memory.riskLevel === "HIGH") {
     pushSignal({
       matchedOn,
@@ -516,13 +651,28 @@ export function scoreMemory(input: {
 
   const score = matchedOn.reduce((total, signal) => total + signal.points, 0);
 
-  const isEligible =
-    score > 0 &&
-    (hasWorkflowMatch(matchedOn) ||
-      hasEntityRiskMatch({
-        memory,
-        matchedOn,
-      }));
+  const hasConflictingWorkflowProfile =
+    hasConflictingProfileValue({
+      memoryTags,
+      prefix: "claim_type",
+      value: query.claimType,
+    }) ||
+    hasConflictingProfileValue({
+      memoryTags,
+      prefix: "loss_type",
+      value: query.lossType,
+    });
+
+  const isEligible = isGeneralizedWorkflowMemory(memory)
+    ? score > 0 &&
+      !hasConflictingWorkflowProfile &&
+      hasBroadWorkflowMatch({ memory, matchedOn })
+    : score > 0 &&
+      (hasWorkflowMatch(matchedOn) ||
+        hasEntityRiskMatch({
+          memory,
+          matchedOn,
+        }));
 
   return {
     score,

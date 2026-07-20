@@ -33,6 +33,8 @@
   },
   "globalEnv": [
     "DATABASE_URL",
+    "AUTH_SECRET",
+    "NODE_ENV",
     "GEMINI_API_KEY",
     "GEMINI_MODEL",
     "USE_MOCK_EXTRACTION",

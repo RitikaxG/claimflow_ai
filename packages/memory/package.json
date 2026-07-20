@@ -25,6 +25,8 @@
     "smoke:write": "bun --env-file ../db/.env scripts/smoke-test-memory-write.ts",
     "smoke:retrieval": "bun --env-file ../db/.env scripts/smoke-test-memory-retrieval.ts",
     "smoke:update": "bun --env-file ../db/.env scripts/smoke-test-memory-update.ts",
-    "smoke:patterns": "bun --env-file ../db/.env scripts/smoke-test-memory-patterns.ts"
+    "smoke:patterns": "bun --env-file ../db/.env scripts/smoke-test-memory-patterns.ts",
+    "smoke:workflow-profile": "bun scripts/smoke-test-workflow-profile-matching.ts",
+    "backfill:completed-reviews": "bun --env-file ../db/.env scripts/backfill-completed-review-memories.ts"
   }
 }
