@@ -8,5 +8,6 @@ node_modules
 .env.*
 !.env.example
 docs
+artifacts
 sample-data/**/*.pdf
 sample-data/**/eval-results
